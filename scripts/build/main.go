@@ -6,7 +6,8 @@
 //	go run ./scripts/build -version 1.2.3    force a version
 //
 // Without -version the version comes from the git tag on HEAD (v1.2.3 -> 1.2.3),
-// or "dev" when HEAD is not tagged. Release builds require a real version.
+// or "dev" when HEAD is not tagged or the tree has uncommitted changes. Release
+// builds require a real version.
 package main
 
 import (
@@ -119,9 +120,14 @@ func run(release bool, ver string, skipWeb bool) error {
 	return writeChecksums(filepath.Join("release", "SHA256SUMS"), artifacts)
 }
 
+// versionFromGit returns the tag on HEAD, but only for a clean tree: a build
+// with uncommitted changes is not that release, so it is "dev".
 func versionFromGit() string {
 	out, err := exec.Command("git", "describe", "--tags", "--exact-match", "--match", "v[0-9]*").Output()
 	if err != nil {
+		return "dev"
+	}
+	if dirty, err := exec.Command("git", "status", "--porcelain").Output(); err != nil || len(dirty) > 0 {
 		return "dev"
 	}
 	return strings.TrimPrefix(strings.TrimSpace(string(out)), "v")

@@ -3,7 +3,7 @@
   import { api, LOCKED_EVENT, type SessionInfo } from './lib/api'
   import { clearNow } from './lib/clipboard'
   import Login from './lib/Login.svelte'
-  import Vault from './lib/Vault.svelte'
+  import Shell from './lib/Shell.svelte'
 
   let info = $state<SessionInfo | null>(null)
   let ended = $state(false)
@@ -45,7 +45,7 @@
     <p class="dim">run <span class="cmd">dtvlt</span> to start a new one</p>
   </main>
 {:else if info?.unlocked}
-  <Vault {info} onlock={lock} onrefresh={refresh} />
+  <Shell {info} onlock={lock} onrefresh={refresh} />
 {:else if info}
   <Login {info} onunlock={refresh} />
 {/if}

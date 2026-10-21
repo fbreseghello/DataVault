@@ -7,6 +7,16 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- Barra lateral só com ícones em pixel art de 1 bit, centralizados. As teclas 1–3 trocam de página.
+- **Grimoire** (livro): a tela onde ficam logins, chaves e segredos.
+- Duas páginas seladas (coração partido e espada), reservadas para funcionalidades futuras.
+
+### Corrigido
+
+- Um build local com alterações não commitadas não herda mais a versão da tag; ele sai como `dev`.
+
 ## [0.2.0] - 2026-10-21
 
 ### Adicionado

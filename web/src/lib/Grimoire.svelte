@@ -2,16 +2,15 @@
   import { api, ApiError, type Item, type ItemInput, type SessionInfo, type Summary } from './api'
   import { copy } from './clipboard'
   import Editor from './Editor.svelte'
-  import Settings from './Settings.svelte'
   import { isMultiline, typeShort } from './items'
 
-  let { info, onlock, onrefresh }: { info: SessionInfo; onlock: () => void; onrefresh: () => void } = $props()
+  // active is false while another page is shown; the grimoire stays mounted to keep its state.
+  let { info, active }: { info: SessionInfo; active: boolean } = $props()
 
   let query = $state('')
   let items = $state<Summary[]>([])
   let selected = $state<Item | null>(null)
   let editing = $state<Item | 'new' | null>(null)
-  let settings = $state(false)
   let revealed = $state<Record<number, boolean>>({})
   let copied = $state<number | null>(null)
   let confirmDelete = $state(false)
@@ -42,7 +41,6 @@
       copied = null
       confirmDelete = false
       editing = null
-      settings = false
     } catch (e) {
       fail(e)
     }
@@ -93,9 +91,9 @@
   }
 
   function onkeydown(e: KeyboardEvent) {
+    if (!active) return
     if (e.key === 'Escape') {
-      if (settings) settings = false
-      else if (editing) editing = null
+      if (editing) editing = null
       else if (isTyping(e.target)) (e.target as HTMLElement).blur()
       else selected = null
       return
@@ -106,7 +104,6 @@
       search?.focus()
     } else if (e.key === 'n') {
       e.preventDefault()
-      settings = false
       editing = 'new'
     }
   }
@@ -116,19 +113,13 @@
 
 <svelte:window {onkeydown} />
 
-<div class="shell">
-  <header>
-    <span class="brand">datavault</span>
-    <span class="spacer"></span>
-    <span class="dim">session {info.id}</span>
-    <button onclick={() => ((settings = true), (editing = null))} class:current={settings}>settings</button>
-    <button onclick={onlock}>lock</button>
-  </header>
-
+<div class="grimoire">
   <div class="toolbar">
     <span class="dim" aria-hidden="true">/</span>
     <input type="search" bind:this={search} bind:value={query} placeholder="search" aria-label="search" spellcheck="false" />
-    <button onclick={() => ((settings = false), (editing = 'new'))}>+ new</button>
+    <button onclick={() => (editing = 'new')}>+ new</button>
+    <span class="spacer"></span>
+    <span class="dim count">{items.length} {items.length === 1 ? 'item' : 'items'}</span>
   </div>
 
   <div class="body">
@@ -147,9 +138,7 @@
     <section>
       {#if error}<p class="error" role="alert">{error}</p>{/if}
 
-      {#if settings}
-        <Settings onsaved={onrefresh} onclose={() => (settings = false)} />
-      {:else if editing}
+      {#if editing}
         {#key editing}
           <Editor item={editing === 'new' ? null : editing} onsave={save} oncancel={() => (editing = null)} />
         {/key}
@@ -206,44 +195,28 @@
       {/if}
     </section>
   </div>
-
-  <footer>
-    <span>{items.length} {items.length === 1 ? 'item' : 'items'}</span>
-    <span>auto-lock {info.auto_lock_minutes}m · clipboard {info.clipboard_clear_seconds}s</span>
-    <span class="keys">n new · / search · esc close</span>
-  </footer>
 </div>
 
 <style>
-  .shell {
-    min-height: 100vh;
+  .grimoire {
+    height: 100%;
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
+    grid-template-rows: auto 1fr;
+    min-height: 0;
   }
 
-  header,
-  .toolbar,
-  footer {
+  .toolbar {
     display: flex;
     align-items: center;
-    gap: 16px;
     padding: 12px 24px;
-  }
-
-  header {
-    border-bottom: 1px solid var(--line);
-  }
-
-  .brand {
-    font-weight: 700;
   }
 
   .spacer {
     flex: 1;
   }
 
-  .current {
-    color: var(--fg);
+  .count {
+    font-size: 11px;
   }
 
   .dim {
@@ -393,16 +366,6 @@
     margin-top: 20px;
   }
 
-  footer {
-    border-top: 1px solid var(--line);
-    color: var(--dim);
-    font-size: 11px;
-  }
-
-  .keys {
-    margin-left: auto;
-  }
-
   @media (max-width: 720px) {
     .body {
       grid-template-columns: 1fr;
@@ -414,9 +377,6 @@
     }
     section {
       padding: 16px;
-    }
-    .keys {
-      display: none;
     }
   }
 </style>
