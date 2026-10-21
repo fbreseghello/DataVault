@@ -114,11 +114,16 @@
 
   .art {
     margin: 0 0 56px;
-    /* The art is 121 columns; shrink it to fit narrow windows. */
-    font-size: min(12px, calc((100vw - 32px) / 121 / 0.6));
+    /* The art is 127 columns; shrink it to fit narrow windows. */
+    font-size: min(12px, calc((100vw - 32px) / 127 / 0.6));
     line-height: 1.12;
-    color: var(--fg);
-    animation: appear 1.8s ease-out both;
+    color: var(--neon-core);
+    /* A faint neon tube: tight white core, soft accent halo. */
+    text-shadow:
+      0 0 1px var(--neon-core),
+      0 0 5px var(--neon-glow),
+      0 0 14px var(--neon-haze);
+    animation: power-on 1.6s linear both;
     user-select: none;
   }
 
@@ -174,9 +179,29 @@
     font-size: 11px;
   }
 
-  @keyframes appear {
-    from {
+  /* The tube strikes, stutters twice, then holds. */
+  @keyframes power-on {
+    0%,
+    8% {
       opacity: 0;
+    }
+    10% {
+      opacity: 0.7;
+    }
+    13% {
+      opacity: 0.1;
+    }
+    18% {
+      opacity: 0.9;
+    }
+    21% {
+      opacity: 0.3;
+    }
+    28% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
     }
   }
 
