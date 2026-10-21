@@ -8,11 +8,10 @@ import (
 	"strings"
 
 	"github.com/fbreseghello/DataVault/internal/config"
+	"github.com/fbreseghello/DataVault/internal/install"
 	"github.com/fbreseghello/DataVault/internal/server"
+	"github.com/fbreseghello/DataVault/internal/version"
 )
-
-// Version is set at build time with -ldflags "-X .../internal/cli.Version=v0.1.0".
-var Version = "dev"
 
 // serveCommand is the hidden subcommand a detached session runs as.
 const serveCommand = "__serve"
@@ -35,25 +34,45 @@ const usage = `usage: dtvlt [command]
   lock      lock the vault, keep the session
   stop      end the session
   config    change preferences
+  install   install dtvlt for this user and add it to the PATH
+  uninstall remove dtvlt (keeps your vault)
   version   print the version
 `
 
 // Run executes dtvlt with args (without the program name) and returns the exit code.
 func Run(args []string) int {
 	u := newUI()
+	cmd := ""
+	if len(args) > 0 {
+		cmd = args[0]
+	}
+	code := run(u, cmd)
+	// Opened by double-click: the console window closes with the process, so
+	// keep it up when there is something to read.
+	if cmd != serveCommand && ownsConsole() && (code != 0 || cmd == "install" || cmd == "uninstall") {
+		u.println("")
+		u.prompt(u.dim("press enter to close"), "")
+		_, _ = u.readLine()
+	}
+	return code
+}
+
+func run(u *ui, cmd string) int {
+	install.Cleanup()
 	paths, err := config.ResolvePaths()
 	if err != nil {
 		u.fail("%v", err)
 		return 1
 	}
 
-	cmd := ""
-	if len(args) > 0 {
-		cmd = args[0]
-	}
 	switch cmd {
 	case "":
 		err = start(u, paths)
+	case "install":
+		printBanner(u)
+		err = runInstall(u)
+	case "uninstall":
+		err = runUninstall(u, paths)
 	case serveCommand:
 		err = serveDetached(paths)
 	case "status":
@@ -77,7 +96,7 @@ func Run(args []string) int {
 	case "config":
 		err = configure(u, paths)
 	case "version", "--version", "-v":
-		u.println("dtvlt %s", Version)
+		u.println("dtvlt %s", version.Version)
 	case "help", "--help", "-h":
 		u.println("%s", usage)
 	default:

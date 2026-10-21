@@ -24,6 +24,9 @@ const maxPINTries = 3
 // start is plain `dtvlt`: set up if needed, check the PIN, then serve.
 func start(u *ui, paths config.Paths) error {
 	printBanner(u)
+	if err := offerInstall(u); err != nil {
+		return err
+	}
 
 	if c, err := server.Dial(paths.State); err == nil {
 		return reopen(u, c)

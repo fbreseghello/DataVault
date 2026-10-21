@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"syscall"
+	"unsafe"
 
 	"golang.org/x/sys/windows"
 )
@@ -28,6 +29,15 @@ func detachAttr() *syscall.SysProcAttr {
 		CreationFlags: windows.DETACHED_PROCESS | windows.CREATE_NEW_PROCESS_GROUP,
 		HideWindow:    true,
 	}
+}
+
+// ownsConsole reports whether this process is alone in its console, which is
+// what happens when the .exe is opened from Explorer instead of a terminal.
+func ownsConsole() bool {
+	var pids [2]uint32
+	proc := windows.NewLazySystemDLL("kernel32.dll").NewProc("GetConsoleProcessList")
+	n, _, _ := proc.Call(uintptr(unsafe.Pointer(&pids[0])), uintptr(len(pids)))
+	return n == 1
 }
 
 func openBrowser(url string) error {

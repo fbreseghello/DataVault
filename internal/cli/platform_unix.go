@@ -9,6 +9,9 @@ import (
 
 func enableTerminal() bool { return true }
 
+// ownsConsole is a Windows concern (double-clicked .exe); terminals on Linux stay open.
+func ownsConsole() bool { return false }
+
 // detachAttr puts the background session in its own session, away from this
 // terminal's hangup signal.
 func detachAttr() *syscall.SysProcAttr {

@@ -21,6 +21,7 @@ export type Summary = Pick<Item, 'id' | 'type' | 'name' | 'tags' | 'updated_at'>
 
 export interface SessionInfo {
   id: string
+  version: string
   unlocked: boolean
   auto_lock_minutes: number
   clipboard_clear_seconds: number

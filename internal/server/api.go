@@ -9,6 +9,7 @@ import (
 	"unicode"
 
 	"github.com/fbreseghello/DataVault/internal/vault"
+	"github.com/fbreseghello/DataVault/internal/version"
 )
 
 const maxBody = 1 << 20
@@ -17,6 +18,7 @@ func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 	// Polling this must not count as activity, or the vault would never auto-lock.
 	writeJSON(w, http.StatusOK, map[string]any{
 		"id":                      s.opts.Session.ID,
+		"version":                 version.Version,
 		"unlocked":                s.opts.Session.Unlocked(),
 		"auto_lock_minutes":       s.opts.Config.AutoLockMinutes,
 		"clipboard_clear_seconds": s.opts.Config.ClipboardClearSeconds,

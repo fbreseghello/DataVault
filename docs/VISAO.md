@@ -164,6 +164,21 @@ credenciais recebidas pela API ainda passam por `string` (JSON). Melhorar isso e
 |---|---|---|
 | Vault | `%APPDATA%\DataVault\vault.dtv` | `~/.local/share/datavault/vault.dtv` |
 | Config | `%APPDATA%\DataVault\config.toml` | `~/.config/datavault/config.toml` |
+| Binário instalado | `%LOCALAPPDATA%\Programs\DataVault\dtvlt.exe` | `~/.local/bin/dtvlt` |
+
+## Distribuição e versões
+
+- Quem usa baixa **um arquivo só** da página de Releases. Não precisa de Go nem de Node:
+  o frontend vai embutido no binário.
+- No Windows, o `.exe` baixado oferece se instalar ao ser aberto: ele se copia para a
+  pasta do usuário e entra no PATH, sem pedir admin. Uma versão mais nova, aberta do
+  mesmo jeito, oferece substituir a instalada.
+- Versionamento semântico. A versão vem da tag git (`v1.2.3`), é embutida no build e
+  aparece em `dtvlt version` e no rodapé do login.
+- A tag dispara o GitHub Actions, que testa, compila Windows e Linux (amd64 e arm64)
+  e publica a release com `SHA256SUMS` e as notas do `CHANGELOG.md`.
+- A versão do **formato do arquivo** (byte no cabeçalho do vault) é separada da versão
+  do app. Uma mudança que versões antigas não conseguem ler exige versão MAJOR (depois do 1.0).
 
 ## Escopo
 

@@ -12,6 +12,7 @@
   let busy = $state(false)
   let error = $state('')
   let input = $state<HTMLInputElement>()
+  const shownVersion = $derived(info.version === 'dev' ? 'dev' : 'v' + info.version)
 
   $effect(() => {
     void step
@@ -97,7 +98,7 @@
     {#if busy}deriving key{:else if error}<span class="error">{error}</span>{:else}{step}{/if}
   </p>
 
-  <footer>session {info.id}</footer>
+  <footer>session {info.id} · {shownVersion}</footer>
 </main>
 
 <style>
