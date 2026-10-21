@@ -34,6 +34,7 @@ const usage = `usage: dtvlt [command]
   lock      lock the vault, keep the session
   stop      end the session
   config    change preferences
+  update    download and install the latest release
   install   install dtvlt for this user and add it to the PATH
   uninstall remove dtvlt (keeps your vault)
   version   print the version
@@ -73,6 +74,8 @@ func run(u *ui, cmd string) int {
 		err = runInstall(u)
 	case "uninstall":
 		err = runUninstall(u, paths)
+	case "update":
+		err = runUpdate(u, paths)
 	case serveCommand:
 		err = serveDetached(paths)
 	case "status":

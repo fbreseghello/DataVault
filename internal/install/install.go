@@ -87,6 +87,11 @@ func Install() (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
+	return InstallFile(src)
+}
+
+// InstallFile installs the binary at src (a downloaded update, for example).
+func InstallFile(src string) (Result, error) {
 	dir, err := Dir()
 	if err != nil {
 		return Result{}, err

@@ -1,12 +1,17 @@
 package cli
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"os"
 	"runtime"
+	"time"
 
 	"github.com/fbreseghello/DataVault/internal/config"
 	"github.com/fbreseghello/DataVault/internal/install"
 	"github.com/fbreseghello/DataVault/internal/server"
+	"github.com/fbreseghello/DataVault/internal/update"
 	"github.com/fbreseghello/DataVault/internal/version"
 )
 
@@ -53,6 +58,11 @@ func runInstall(u *ui) error {
 	if err != nil {
 		return err
 	}
+	printInstalled(u, res)
+	return nil
+}
+
+func printInstalled(u *ui, res install.Result) {
 	u.row("installed", res.Path)
 	u.println("")
 	switch {
@@ -69,6 +79,67 @@ func runInstall(u *ui) error {
 	default:
 		u.println("  %s", u.dim("type dtvlt in a terminal to start."))
 	}
+}
+
+// runUpdate is `dtvlt update`: install the newest GitHub release, verified
+// against its SHA256SUMS. It only touches the network when asked.
+func runUpdate(u *ui, paths config.Paths) error {
+	u.pause = true
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	c := &update.Client{}
+
+	u.row("checking", "github.com/"+update.Repo)
+	rel, err := c.Latest(ctx)
+	if errors.Is(err, update.ErrNoRelease) {
+		return err
+	}
+	if err != nil {
+		return fmt.Errorf("could not get the latest release: %w", err)
+	}
+
+	// What matters is the copy on the PATH, not necessarily this process.
+	current := version.Version
+	if install.Installed() {
+		current = install.InstalledVersion()
+	} else if version.IsDev() {
+		current = ""
+	}
+	have := current
+	if have == "" {
+		have = "not installed"
+	}
+	u.row("latest", rel.Version+u.dim("  (you have "+have+")"))
+	if current != "" && version.Compare(rel.Version, current) <= 0 {
+		u.println("")
+		u.println("  already up to date")
+		return nil
+	}
+
+	dir, err := install.Dir()
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
+	}
+	d, err := c.Fetch(ctx, rel, dir)
+	if err != nil {
+		return err
+	}
+	defer d.Remove()
+	u.row("download", fmt.Sprintf("%s  %.1f MiB", d.Asset, float64(d.Size)/(1<<20)))
+	u.row("verified", "sha256 "+d.SHA256[:16]+"…")
+
+	res, err := install.InstallFile(d.Path)
+	if err != nil {
+		return err
+	}
+	printInstalled(u, res)
+	if _, err := server.Dial(paths.State); err == nil {
+		u.println("  %s", u.dim("a session is running on the old version. dtvlt stop, then dtvlt, to switch."))
+	}
+	u.row("notes", rel.URL)
 	return nil
 }
 

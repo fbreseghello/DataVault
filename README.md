@@ -23,7 +23,7 @@ A visão completa e as decisões de design estão em [docs/VISAO.md](docs/VISAO.
    e entra no seu PATH, sem pedir permissão de administrador.
 3. Abra um terminal novo e digite `dtvlt`.
 
-Para atualizar, baixe a versão nova e abra do mesmo jeito: ela substitui a instalada.
+Para atualizar, rode `dtvlt update` (ou baixe a versão nova e abra do mesmo jeito).
 
 > O executável ainda não é assinado digitalmente, então o Windows SmartScreen
 > pode mostrar um aviso. Clique em "Mais informações" → "Executar assim mesmo".
@@ -46,6 +46,7 @@ dtvlt status     mostra a sessão em execução
 dtvlt lock       trava o vault e mantém a sessão
 dtvlt stop       encerra a sessão
 dtvlt config     altera as preferências
+dtvlt update     baixa e instala a versão mais nova
 dtvlt uninstall  remove o dtvlt (o vault é mantido)
 dtvlt version    mostra a versão
 ```
@@ -59,6 +60,17 @@ necessárias e **não existe recuperação**.
 
 O PIN opcional no terminal só impede que alguém inicie o `dtvlt` casualmente.
 Ele não criptografa nada.
+
+### Atualizar
+
+`dtvlt update` busca a release mais nova no GitHub, baixa o binário da sua
+plataforma, confere o SHA256 com o `SHA256SUMS` da release e só então instala.
+Se o hash não bater, nada é instalado. O DataVault só acessa a rede quando você
+roda esse comando: não há checagem automática nem telemetria.
+
+O `SHA256SUMS` vem da mesma release, então ele detecta downloads corrompidos
+ou alterados no caminho, mas não uma release comprometida. Releases assinadas
+estão nos planos.
 
 ### Variáveis de ambiente
 

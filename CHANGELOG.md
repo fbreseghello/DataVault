@@ -7,6 +7,11 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- `dtvlt update`: baixa a release mais nova do GitHub, confere o SHA256 com o
+  `SHA256SUMS` da release e instala. Só acessa a rede quando você roda o comando.
+
 ## [0.3.0] - 2026-10-21
 
 ### Adicionado
