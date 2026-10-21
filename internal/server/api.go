@@ -20,8 +20,8 @@ func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 		"id":                      s.opts.Session.ID,
 		"version":                 version.Version,
 		"unlocked":                s.opts.Session.Unlocked(),
-		"auto_lock_minutes":       s.opts.Config.AutoLockMinutes,
-		"clipboard_clear_seconds": s.opts.Config.ClipboardClearSeconds,
+		"auto_lock_minutes":       s.config().AutoLockMinutes,
+		"clipboard_clear_seconds": s.config().ClipboardClearSeconds,
 	})
 }
 
@@ -148,7 +148,7 @@ func (s *Server) handleEvent(w http.ResponseWriter, r *http.Request) {
 	case "copy":
 		s.opts.Session.Touch()
 		s.opts.Session.Log(fmt.Sprintf("copied  %s/%s · clears in %ds",
-			printable(ev.Item), printable(ev.Field), s.opts.Config.ClipboardClearSeconds))
+			printable(ev.Item), printable(ev.Field), s.config().ClipboardClearSeconds))
 	default:
 		writeError(w, http.StatusBadRequest, "unknown event")
 		return

@@ -7,6 +7,18 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-21
+
+### Adicionado
+
+- Tela de configurações no DataVault: auto-lock, limpeza da área de transferência,
+  PIN no início e manter terminal aberto. Auto-lock e área de transferência valem na hora.
+
+### Alterado
+
+- O `.exe` baixado agora só instala (ou atualiza) e fecha. A sessão começa ao
+  digitar `dtvlt` no terminal. Abrir uma versão mais antiga que a instalada pede confirmação.
+
 ## [0.1.0] - 2026-10-21
 
 Primeira versão.
@@ -27,5 +39,6 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/fbreseghello/DataVault/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/fbreseghello/DataVault/releases/tag/v0.1.0

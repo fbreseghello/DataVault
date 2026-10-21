@@ -49,7 +49,7 @@ func Run(args []string) int {
 	code := run(u, cmd)
 	// Opened by double-click: the console window closes with the process, so
 	// keep it up when there is something to read.
-	if cmd != serveCommand && ownsConsole() && (code != 0 || cmd == "install" || cmd == "uninstall") {
+	if cmd != serveCommand && ownsConsole() && (code != 0 || u.pause) {
 		u.println("")
 		u.prompt(u.dim("press enter to close"), "")
 		_, _ = u.readLine()

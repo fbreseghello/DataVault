@@ -10,56 +10,70 @@ import (
 	"github.com/fbreseghello/DataVault/internal/version"
 )
 
-// offerInstall runs when a release binary starts from somewhere other than
-// the install location (a fresh download, typically): it offers to install or
-// to update the installed copy. Local dev builds never ask.
-func offerInstall(u *ui) error {
-	if version.IsDev() || install.RunningInstalled() {
-		return nil
-	}
-	question := "install dtvlt for this user"
+// actsAsInstaller reports whether plain `dtvlt` should install instead of
+// starting a session: a release binary running from anywhere but the install
+// location is a download. Local dev builds always run normally.
+func actsAsInstaller() bool {
+	return !version.IsDev() && !install.RunningInstalled()
+}
+
+// installSelf is what a downloaded binary does when opened: install or update
+// the per-user copy, then tell the user to type dtvlt. It never starts a session.
+func installSelf(u *ui, paths config.Paths) error {
+	u.pause = true
 	if install.Installed() {
 		current := install.InstalledVersion()
-		if current == version.Version {
+		switch {
+		case current == version.Version:
+			u.row("ready", "dtvlt "+version.Version+" is already installed")
+			u.println("")
+			u.println("  %s", u.dim("open a terminal and type dtvlt to start."))
 			return nil
+		case current != "" && version.Compare(version.Version, current) < 0:
+			ok, err := u.confirm("replace the newer "+current+" with "+version.Version, false)
+			if err != nil || !ok {
+				return err
+			}
+		case current != "":
+			u.row("update", current+" → "+version.Version)
 		}
-		if current == "" {
-			current = "?"
-		}
-		question = "update dtvlt " + current + " → " + version.Version
 	}
-	ok, err := u.confirm(question, true)
-	if err != nil || !ok {
+	if err := runInstall(u); err != nil {
 		return err
 	}
-	return runInstall(u)
+	if _, err := server.Dial(paths.State); err == nil {
+		u.println("  %s", u.dim("a session is running on the old version. dtvlt stop, then dtvlt, to switch."))
+	}
+	return nil
 }
 
 func runInstall(u *ui) error {
+	u.pause = true
 	res, err := install.Install()
 	if err != nil {
 		return err
 	}
 	u.row("installed", res.Path)
+	u.println("")
 	switch {
 	case res.PathUpdated:
-		u.println("  %s", u.dim("added to your PATH. open a new terminal and type dtvlt."))
+		u.println("  %s", u.dim("open a new terminal and type dtvlt to start."))
 	case !res.OnPath:
 		dir, _ := install.Dir()
 		if runtime.GOOS == "windows" {
-			u.println("  %s", u.dim("add "+dir+" to your PATH to run dtvlt from any terminal."))
+			u.println("  %s", u.dim("add "+dir+" to your PATH, then type dtvlt in a terminal."))
 		} else {
-			u.println("  %s", u.dim("add this to your shell profile to run dtvlt from any terminal:"))
+			u.println("  %s", u.dim("add this to your shell profile, then type dtvlt:"))
 			u.println("  export PATH=\"%s:$PATH\"", dir)
 		}
 	default:
-		u.println("  %s", u.dim("type dtvlt in any terminal to start."))
+		u.println("  %s", u.dim("type dtvlt in a terminal to start."))
 	}
-	u.println("")
 	return nil
 }
 
 func runUninstall(u *ui, paths config.Paths) error {
+	u.pause = true
 	if !install.Installed() {
 		u.println("  %s", u.dim("dtvlt is not installed"))
 		return nil

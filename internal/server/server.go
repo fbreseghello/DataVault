@@ -29,6 +29,9 @@ const launchTTL = 60 * time.Second
 type Options struct {
 	Session *session.Session
 	Config  config.Config
+	// ConfigPath is where the settings screen saves changes; VaultPath is shown there.
+	ConfigPath string
+	VaultPath  string
 	// Assets is the built frontend (index.html at its root).
 	Assets fs.FS
 	// OnStop is called when `dtvlt stop` asks the server to shut down.
@@ -48,6 +51,9 @@ type Server struct {
 	mu      sync.Mutex
 	launch  map[string]time.Time // sha256(token) -> expiry
 	cookies map[string]bool      // sha256(cookie)
+
+	cfgMu sync.Mutex
+	cfg   config.Config // current settings; the settings screen can change them
 }
 
 // New listens on a random port of 127.0.0.1. Call Serve to start handling requests.
@@ -67,6 +73,7 @@ func New(opts Options) (*Server, error) {
 		controlToken: randomToken(),
 		launch:       map[string]time.Time{},
 		cookies:      map[string]bool{},
+		cfg:          opts.Config,
 	}
 	s.http = &http.Server{
 		Handler:           s.routes(),
@@ -124,6 +131,8 @@ func (s *Server) routes() http.Handler {
 	api.HandleFunc("PUT /api/items/{id}", s.handleUpdateItem)
 	api.HandleFunc("DELETE /api/items/{id}", s.handleDeleteItem)
 	api.HandleFunc("POST /api/events", s.handleEvent)
+	api.HandleFunc("GET /api/settings", s.handleGetSettings)
+	api.HandleFunc("PUT /api/settings", s.handlePutSettings)
 	mux.Handle("/api/", s.requireCookie(s.requireSameOrigin(api)))
 
 	control := http.NewServeMux()

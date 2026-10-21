@@ -65,6 +65,20 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 
 export type ItemInput = Omit<Item, 'id' | 'created_at' | 'updated_at'>
 
+export interface Settings {
+  pin_enabled: boolean
+  keep_terminal: boolean
+  auto_lock_minutes: number
+  clipboard_clear_seconds: number
+  config_path: string
+  vault_path: string
+}
+
+export type SettingsInput = Omit<Settings, 'config_path' | 'vault_path'> & {
+  /** A new PIN; empty keeps the current one. */
+  pin: string
+}
+
 export const api = {
   session: () => request<SessionInfo>('GET', '/api/session'),
   unlock: (keyword: string, password: string) => request<void>('POST', '/api/unlock', { keyword, password }),
@@ -75,4 +89,6 @@ export const api = {
   update: (id: string, item: ItemInput) => request<Item>('PUT', '/api/items/' + encodeURIComponent(id), item),
   remove: (id: string) => request<void>('DELETE', '/api/items/' + encodeURIComponent(id)),
   copied: (item: string, field: string) => request<void>('POST', '/api/events', { type: 'copy', item, field }),
+  settings: () => request<Settings>('GET', '/api/settings'),
+  saveSettings: (s: SettingsInput) => request<Settings>('PUT', '/api/settings', s),
 }

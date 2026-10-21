@@ -124,6 +124,13 @@ func (s *Session) Vault() (*vault.Vault, error) {
 	return s.v, nil
 }
 
+// SetIdle changes the auto-lock timeout for the running session.
+func (s *Session) SetIdle(d time.Duration) {
+	s.mu.Lock()
+	s.idle = d
+	s.mu.Unlock()
+}
+
 // Touch counts as activity without reading the vault.
 func (s *Session) Touch() {
 	s.mu.Lock()
@@ -141,10 +148,11 @@ func (s *Session) WatchIdle(stop <-chan struct{}) {
 			return
 		case now := <-tick.C:
 			s.mu.Lock()
-			expired := s.v != nil && now.Sub(s.activity) >= s.idle
+			idle := s.idle
+			expired := s.v != nil && now.Sub(s.activity) >= idle
 			s.mu.Unlock()
 			if expired {
-				s.Lock(fmt.Sprintf("idle %dm", int(s.idle.Minutes())))
+				s.Lock(fmt.Sprintf("idle %dm", int(idle.Minutes())))
 			}
 		}
 	}

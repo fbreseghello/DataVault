@@ -10,6 +10,9 @@ import (
 	"golang.org/x/crypto/argon2"
 )
 
+// MinPIN is the shortest PIN accepted, in characters.
+const MinPIN = 4
+
 // The PIN only gates starting dtvlt; it never touches the vault key. It is
 // stored as an Argon2id hash in PHC string format.
 const (

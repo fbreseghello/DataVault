@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	minPIN      = 4
 	minKeyword  = 4
 	minPassword = 10
 )
@@ -66,7 +65,7 @@ func askPreferences(u *ui, cur config.Config) (config.Config, error) {
 		}
 		if change {
 			u.println("  %s", u.dim("the pin only gates starting dtvlt. it does not encrypt anything."))
-			pin, err := u.newSecret("pin", minPIN)
+			pin, err := u.newSecret("pin", config.MinPIN)
 			if err != nil {
 				return cfg, err
 			}

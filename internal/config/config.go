@@ -102,7 +102,7 @@ func Save(path string, cfg Config) error {
 		return err
 	}
 	var buf bytes.Buffer
-	buf.WriteString("# DataVault preferences. Edit with `dtvlt config`.\n\n")
+	buf.WriteString("# DataVault preferences. Change them in the settings screen or with `dtvlt config`.\n\n")
 	if err := toml.NewEncoder(&buf).Encode(cfg); err != nil {
 		return err
 	}

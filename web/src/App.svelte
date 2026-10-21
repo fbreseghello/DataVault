@@ -45,7 +45,7 @@
     <p class="dim">run <span class="cmd">dtvlt</span> to start a new one</p>
   </main>
 {:else if info?.unlocked}
-  <Vault {info} onlock={lock} />
+  <Vault {info} onlock={lock} onrefresh={refresh} />
 {:else if info}
   <Login {info} onunlock={refresh} />
 {/if}

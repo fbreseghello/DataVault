@@ -18,6 +18,8 @@ type ui struct {
 	in    *bufio.Reader
 	out   io.Writer
 	color bool
+	// pause keeps a double-clicked console window open after the command ends.
+	pause bool
 }
 
 func newUI() *ui {

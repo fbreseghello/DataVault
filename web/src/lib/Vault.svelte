@@ -2,14 +2,16 @@
   import { api, ApiError, type Item, type ItemInput, type SessionInfo, type Summary } from './api'
   import { copy } from './clipboard'
   import Editor from './Editor.svelte'
+  import Settings from './Settings.svelte'
   import { isMultiline, typeShort } from './items'
 
-  let { info, onlock }: { info: SessionInfo; onlock: () => void } = $props()
+  let { info, onlock, onrefresh }: { info: SessionInfo; onlock: () => void; onrefresh: () => void } = $props()
 
   let query = $state('')
   let items = $state<Summary[]>([])
   let selected = $state<Item | null>(null)
   let editing = $state<Item | 'new' | null>(null)
+  let settings = $state(false)
   let revealed = $state<Record<number, boolean>>({})
   let copied = $state<number | null>(null)
   let confirmDelete = $state(false)
@@ -40,6 +42,7 @@
       copied = null
       confirmDelete = false
       editing = null
+      settings = false
     } catch (e) {
       fail(e)
     }
@@ -91,7 +94,8 @@
 
   function onkeydown(e: KeyboardEvent) {
     if (e.key === 'Escape') {
-      if (editing) editing = null
+      if (settings) settings = false
+      else if (editing) editing = null
       else if (isTyping(e.target)) (e.target as HTMLElement).blur()
       else selected = null
       return
@@ -102,6 +106,7 @@
       search?.focus()
     } else if (e.key === 'n') {
       e.preventDefault()
+      settings = false
       editing = 'new'
     }
   }
@@ -116,13 +121,14 @@
     <span class="brand">datavault</span>
     <span class="spacer"></span>
     <span class="dim">session {info.id}</span>
+    <button onclick={() => ((settings = true), (editing = null))} class:current={settings}>settings</button>
     <button onclick={onlock}>lock</button>
   </header>
 
   <div class="toolbar">
     <span class="dim" aria-hidden="true">/</span>
     <input type="search" bind:this={search} bind:value={query} placeholder="search" aria-label="search" spellcheck="false" />
-    <button onclick={() => (editing = 'new')}>+ new</button>
+    <button onclick={() => ((settings = false), (editing = 'new'))}>+ new</button>
   </div>
 
   <div class="body">
@@ -141,7 +147,9 @@
     <section>
       {#if error}<p class="error" role="alert">{error}</p>{/if}
 
-      {#if editing}
+      {#if settings}
+        <Settings onsaved={onrefresh} onclose={() => (settings = false)} />
+      {:else if editing}
         {#key editing}
           <Editor item={editing === 'new' ? null : editing} onsave={save} oncancel={() => (editing = null)} />
         {/key}
@@ -232,6 +240,10 @@
 
   .spacer {
     flex: 1;
+  }
+
+  .current {
+    color: var(--fg);
   }
 
   .dim {

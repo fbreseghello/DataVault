@@ -19,12 +19,11 @@ A visão completa e as decisões de design estão em [docs/VISAO.md](docs/VISAO.
 1. Baixe `dtvlt-<versão>-windows-amd64.exe` na página de
    [Releases](https://github.com/fbreseghello/DataVault/releases/latest)
    (use `arm64` em PCs ARM).
-2. Dê dois cliques no arquivo e responda `y` para instalar.
+2. Dê dois cliques no arquivo. Ele se instala em `%LOCALAPPDATA%\Programs\DataVault`
+   e entra no seu PATH, sem pedir permissão de administrador.
+3. Abra um terminal novo e digite `dtvlt`.
 
-Ele se copia para `%LOCALAPPDATA%\Programs\DataVault` e entra no seu PATH, sem
-pedir permissão de administrador. Depois, é só digitar `dtvlt` em qualquer terminal.
-
-Para atualizar, baixe a versão nova e abra do mesmo jeito: ela oferece substituir a instalada.
+Para atualizar, baixe a versão nova e abra do mesmo jeito: ela substitui a instalada.
 
 > O executável ainda não é assinado digitalmente, então o Windows SmartScreen
 > pode mostrar um aviso. Clique em "Mais informações" → "Executar assim mesmo".
@@ -51,7 +50,10 @@ dtvlt uninstall  remove o dtvlt (o vault é mantido)
 dtvlt version    mostra a versão
 ```
 
-Na primeira execução, o `dtvlt` pergunta as preferências e cria o vault.
+Na primeira execução, o `dtvlt` pergunta as preferências, cria o vault e salva
+o `config.toml`. Depois, dá para mudar tudo na tela **settings** do DataVault
+(ou com `dtvlt config` no terminal).
+
 O vault é protegido por uma **palavra-chave** e uma **senha**: as duas são
 necessárias e **não existe recuperação**.
 

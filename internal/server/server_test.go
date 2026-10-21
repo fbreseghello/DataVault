@@ -184,3 +184,58 @@ func TestPrintableStripsEscapes(t *testing.T) {
 		t.Fatalf("got %q", got)
 	}
 }
+
+func TestSettings(t *testing.T) {
+	s := startServer(t)
+	s.opts.ConfigPath = filepath.Join(t.TempDir(), "config.toml")
+	c := browser(t)
+	signIn(t, s, c)
+
+	put := func(body string) *http.Response {
+		req, _ := http.NewRequest(http.MethodPut, s.URL()+"/api/settings", strings.NewReader(body))
+		req.Header.Set("X-Dtvlt", "1")
+		resp, err := c.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		resp.Body.Close()
+		return resp
+	}
+	valid := `{"pin_enabled":false,"keep_terminal":false,"auto_lock_minutes":5,"clipboard_clear_seconds":30}`
+
+	if r := put(valid); r.StatusCode != http.StatusLocked {
+		t.Fatalf("while locked: %s", r.Status)
+	}
+	post(t, s, c, "/api/unlock", `{"keyword":"kw","password":"pw"}`, sameOrigin)
+
+	if r := put(`{"pin_enabled":true,"keep_terminal":true,"auto_lock_minutes":5,"clipboard_clear_seconds":30}`); r.StatusCode != http.StatusBadRequest {
+		t.Errorf("pin on without a pin: %s", r.Status)
+	}
+	if r := put(`{"pin_enabled":true,"pin":"12","keep_terminal":true,"auto_lock_minutes":5,"clipboard_clear_seconds":30}`); r.StatusCode != http.StatusBadRequest {
+		t.Errorf("short pin: %s", r.Status)
+	}
+	if r := put(`{"pin_enabled":false,"keep_terminal":true,"auto_lock_minutes":0,"clipboard_clear_seconds":30}`); r.StatusCode != http.StatusBadRequest {
+		t.Errorf("invalid auto-lock: %s", r.Status)
+	}
+	if r := put(valid); r.StatusCode != http.StatusOK {
+		t.Fatalf("valid settings: %s", r.Status)
+	}
+	saved, err := config.Load(s.opts.ConfigPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if saved.AutoLockMinutes != 5 || saved.ClipboardClearSeconds != 30 || saved.KeepTerminal {
+		t.Fatalf("saved: %+v", saved)
+	}
+	if s.config().ClipboardClearSeconds != 30 {
+		t.Fatal("settings not applied to the running server")
+	}
+
+	if r := put(`{"pin_enabled":true,"pin":"4321","keep_terminal":false,"auto_lock_minutes":5,"clipboard_clear_seconds":30}`); r.StatusCode != http.StatusOK {
+		t.Fatalf("set pin: %s", r.Status)
+	}
+	saved, _ = config.Load(s.opts.ConfigPath)
+	if !config.VerifyPIN(saved.PinHash, []byte("4321")) {
+		t.Fatal("pin not saved")
+	}
+}
