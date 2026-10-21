@@ -1,0 +1,129 @@
+// Package cli implements the dtvlt command.
+package cli
+
+import (
+	_ "embed"
+	"errors"
+	"strconv"
+	"strings"
+
+	"github.com/fbreseghello/DataVault/internal/config"
+	"github.com/fbreseghello/DataVault/internal/server"
+)
+
+// Version is set at build time with -ldflags "-X .../internal/cli.Version=v0.1.0".
+var Version = "dev"
+
+// serveCommand is the hidden subcommand a detached session runs as.
+const serveCommand = "__serve"
+
+//go:embed banner.txt
+var banner string
+
+func printBanner(u *ui) {
+	u.println("")
+	for _, line := range strings.Split(strings.TrimRight(banner, "\n"), "\n") {
+		u.println("  %s", line)
+	}
+	u.println("")
+}
+
+const usage = `usage: dtvlt [command]
+
+  (none)    start a session and open DataVault in the browser
+  status    show the running session
+  lock      lock the vault, keep the session
+  stop      end the session
+  config    change preferences
+  version   print the version
+`
+
+// Run executes dtvlt with args (without the program name) and returns the exit code.
+func Run(args []string) int {
+	u := newUI()
+	paths, err := config.ResolvePaths()
+	if err != nil {
+		u.fail("%v", err)
+		return 1
+	}
+
+	cmd := ""
+	if len(args) > 0 {
+		cmd = args[0]
+	}
+	switch cmd {
+	case "":
+		err = start(u, paths)
+	case serveCommand:
+		err = serveDetached(paths)
+	case "status":
+		err = status(u, paths)
+	case "lock":
+		err = withSession(u, paths, func(c *server.Client) error {
+			if err := c.Lock(); err != nil {
+				return err
+			}
+			u.println("  locked")
+			return nil
+		})
+	case "stop":
+		err = withSession(u, paths, func(c *server.Client) error {
+			if err := c.Stop(); err != nil {
+				return err
+			}
+			u.println("  stopped")
+			return nil
+		})
+	case "config":
+		err = configure(u, paths)
+	case "version", "--version", "-v":
+		u.println("dtvlt %s", Version)
+	case "help", "--help", "-h":
+		u.println("%s", usage)
+	default:
+		u.fail("unknown command %q", cmd)
+		u.println("")
+		u.println("%s", usage)
+		return 2
+	}
+
+	if errors.Is(err, errAborted) {
+		u.println("")
+		return 130
+	}
+	if err != nil {
+		u.fail("%v", err)
+		return 1
+	}
+	return 0
+}
+
+func withSession(u *ui, paths config.Paths, fn func(*server.Client) error) error {
+	c, err := server.Dial(paths.State)
+	if errors.Is(err, server.ErrNotRunning) {
+		u.println("  %s", u.dim("no session running"))
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	return fn(c)
+}
+
+func status(u *ui, paths config.Paths) error {
+	return withSession(u, paths, func(c *server.Client) error {
+		st, err := c.Status()
+		if err != nil {
+			return err
+		}
+		state := "locked"
+		if st.Unlocked {
+			state = "unlocked"
+		}
+		u.row("session", u.bold(st.SessionID))
+		u.row("state", state)
+		u.row("url", st.URL)
+		u.row("pid", strconv.Itoa(st.PID))
+		return nil
+	})
+}

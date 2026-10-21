@@ -148,13 +148,15 @@ O clima é de ferramenta de terminal séria, **sem "hacker cringe"**.
 |---|---|---|
 | Linguagem | **Go** | Binário único, compila para Windows e Linux sem complicação, código fácil de ler para quem quiser contribuir. |
 | Criptografia | `golang.org/x/crypto` (`argon2`, `chacha20poly1305`) | Bibliotecas padrão e auditadas do ecossistema Go. |
-| CLI / TUI | Bubble Tea + Lip Gloss (Charm) | Feitas exatamente para essa estética de terminal. |
+| CLI | `golang.org/x/term` + ANSI simples | Por enquanto bastam prompts de linha. Bubble Tea (Charm) fica para quando o CLI ganhar telas interativas. |
 | Frontend | Svelte + Vite | Leve e sem runtime pesado. O build é embutido no binário com `go:embed`. |
 | Armazenamento | Um único arquivo criptografado | Simples de entender, de fazer backup e de mover. |
 
 **Ponto de atenção do Go:** o coletor de lixo pode deixar cópias de segredos na memória.
 Mitigação: manter segredos em `[]byte` (nunca `string`), zerar os buffers depois do uso
 e avaliar uma biblioteca de memória protegida (ex.: `memguard`).
+Hoje a chave (KEK/DEK) segue essa regra, mas os itens descriptografados e as
+credenciais recebidas pela API ainda passam por `string` (JSON). Melhorar isso está na lista.
 
 ### Onde ficam os arquivos
 

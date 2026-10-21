@@ -1,0 +1,126 @@
+:root {
+  --bg: #0a0a0a;
+  --fg: #e4e4e4;
+  --muted: #8a8a8a;
+  --dim: #555;
+  --line: #1e1e1e;
+  --raise: #121212;
+  /* The single accent. Use it for state changes only, never decoration. */
+  --accent: #c8a96a;
+
+  --font: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --blink: 1.6s;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: 13px/1.6 var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  min-height: 100%;
+}
+
+::selection {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+button:hover:not(:disabled),
+button:focus-visible {
+  color: var(--fg);
+}
+
+button:disabled {
+  color: var(--dim);
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 1px solid var(--muted);
+  outline-offset: 2px;
+}
+
+input[type='text'],
+input[type='search'],
+input[type='password'],
+select,
+textarea {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 4px 0;
+  outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-bottom-color: var(--muted);
+}
+
+select option {
+  background: var(--raise);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 4.8em;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@keyframes blink {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  56%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --blink: 0s;
+  }
+}
