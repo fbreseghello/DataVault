@@ -155,6 +155,11 @@ func status(u *ui, paths config.Paths) error {
 		}
 		u.row("session", u.bold(st.SessionID))
 		u.row("state", state)
+		ver := st.Version
+		if ver == "" {
+			ver = "0.6.0 or older"
+		}
+		u.row("version", ver)
 		u.row("url", st.URL)
 		u.row("pid", strconv.Itoa(st.PID))
 		return nil

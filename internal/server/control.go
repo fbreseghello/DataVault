@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/fbreseghello/DataVault/internal/version"
 )
 
 // The control API lets later `dtvlt` invocations (status, lock, stop, or a
@@ -20,6 +22,7 @@ func (s *Server) handleControlStatus(w http.ResponseWriter, r *http.Request) {
 		Unlocked:  s.opts.Session.Unlocked(),
 		PID:       os.Getpid(),
 		URL:       s.origin,
+		Version:   version.Version,
 	})
 }
 
@@ -52,6 +55,8 @@ type Status struct {
 	Unlocked  bool   `json:"unlocked"`
 	PID       int    `json:"pid"`
 	URL       string `json:"url"`
+	// Version is empty for sessions started by dtvlt 0.6.0 and older.
+	Version string `json:"version,omitempty"`
 }
 
 var ErrNotRunning = errors.New("no dtvlt session is running")

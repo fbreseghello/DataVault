@@ -7,6 +7,19 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-10-22
+
+### Corrigido
+
+- Depois de atualizar, o login ainda mostrava a versão antiga: a sessão que já
+  estava aberta continuava rodando o binário anterior. Agora o `dtvlt` percebe
+  quando a sessão aberta é de outra versão, encerra essa sessão e abre uma nova
+  na versão atual.
+
+### Alterado
+
+- `dtvlt status` mostra a versão da sessão em execução.
+
 ## [0.6.0] - 2026-10-22
 
 ### Adicionado
@@ -108,7 +121,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/fbreseghello/DataVault/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/fbreseghello/DataVault/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/fbreseghello/DataVault/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/fbreseghello/DataVault/compare/v0.4.0...v0.5.0

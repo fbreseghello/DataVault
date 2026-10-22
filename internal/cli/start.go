@@ -14,8 +14,10 @@ import (
 	"time"
 
 	"github.com/fbreseghello/DataVault/internal/config"
+	"github.com/fbreseghello/DataVault/internal/install"
 	"github.com/fbreseghello/DataVault/internal/server"
 	"github.com/fbreseghello/DataVault/internal/session"
+	"github.com/fbreseghello/DataVault/internal/version"
 	"github.com/fbreseghello/DataVault/web"
 )
 
@@ -29,7 +31,13 @@ func start(u *ui, paths config.Paths) error {
 	}
 
 	if c, err := server.Dial(paths.State); err == nil {
-		return reopen(u, c)
+		restarted, err := replaceStale(u, c, paths)
+		if err != nil {
+			return err
+		}
+		if !restarted {
+			return reopen(u, c)
+		}
 	}
 
 	cfg, err := ensureSetup(u, paths)
@@ -48,6 +56,39 @@ func start(u *ui, paths config.Paths) error {
 		return serveForeground(u, paths, cfg)
 	}
 	return startDetached(u)
+}
+
+// replaceStale stops a running session that belongs to another dtvlt version,
+// typically the one that was running when dtvlt update replaced the binary,
+// so this start serves the version the user now has. It reports whether the
+// old session was stopped.
+func replaceStale(u *ui, c *server.Client, paths config.Paths) (bool, error) {
+	st, err := c.Status()
+	if err != nil {
+		return false, err
+	}
+	if st.Version == version.Version {
+		return false, nil
+	}
+	old := st.Version
+	if old == "" {
+		old = "an older version"
+	}
+	u.row("session", st.SessionID+u.dim("  running on "+old+" · restarting on "+version.Version))
+	u.println("")
+	if err := c.Stop(); err != nil {
+		return false, err
+	}
+	// Wait for the old process to let go of the state file.
+	deadline := time.Now().Add(5 * time.Second)
+	for time.Now().Before(deadline) {
+		if _, err := server.Dial(paths.State); errors.Is(err, server.ErrNotRunning) {
+			install.Cleanup() // the old binary is free to delete now
+			return true, nil
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	return false, errors.New("the old session did not stop; run dtvlt stop and try again")
 }
 
 // reopen handles `dtvlt` while a session is already running: same session, new browser tab.
