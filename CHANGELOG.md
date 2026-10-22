@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-22
+
 ### Adicionado
 
 - Comandos de servidor no Grimoire: um novo tipo de entrada com o comando (várias
@@ -106,7 +108,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/fbreseghello/DataVault/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/fbreseghello/DataVault/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/fbreseghello/DataVault/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/fbreseghello/DataVault/compare/v0.3.0...v0.4.0
