@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -46,5 +47,21 @@ func TestValidate(t *testing.T) {
 	cfg.PinEnabled = true
 	if cfg.Validate() == nil {
 		t.Fatal("pin enabled without hash should be invalid")
+	}
+}
+
+// Configs written before check_updates existed must keep checking by default.
+func TestMissingCheckUpdatesDefaultsOn(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.toml")
+	old := "pin_enabled = false\nkeep_terminal = true\nauto_lock_minutes = 15\nclipboard_clear_seconds = 20\n"
+	if err := os.WriteFile(path, []byte(old), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !cfg.CheckUpdates {
+		t.Fatal("check_updates should default to on")
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"runtime"
 	"time"
@@ -78,6 +79,21 @@ func printInstalled(u *ui, res install.Result) {
 		}
 	default:
 		u.println("  %s", u.dim("type dtvlt in a terminal to start."))
+	}
+}
+
+// updateCheckTimeout caps how long startup waits on GitHub. A slow or missing
+// network skips the notice (and is cached for a day) instead of delaying the PIN.
+const updateCheckTimeout = 1500 * time.Millisecond
+
+// updateNotice tells the user, before the PIN, that a newer release exists.
+func updateNotice(u *ui, paths config.Paths) {
+	ctx, cancel := context.WithTimeout(context.Background(), updateCheckTimeout)
+	defer cancel()
+	c := &update.Client{HTTP: &http.Client{Timeout: updateCheckTimeout}}
+	if latest := c.Available(ctx, paths.UpdateCache, time.Now()); latest != "" {
+		u.row("update", u.bold(latest)+" available"+u.dim("  (you have "+version.Version+") · run dtvlt update"))
+		u.println("")
 	}
 }
 

@@ -18,10 +18,12 @@ type Config struct {
 	KeepTerminal          bool   `toml:"keep_terminal"`
 	AutoLockMinutes       int    `toml:"auto_lock_minutes"`
 	ClipboardClearSeconds int    `toml:"clipboard_clear_seconds"`
+	// CheckUpdates lets dtvlt ask GitHub for a newer release, at most once a day.
+	CheckUpdates bool `toml:"check_updates"`
 }
 
 func Default() Config {
-	return Config{KeepTerminal: true, AutoLockMinutes: 15, ClipboardClearSeconds: 20}
+	return Config{KeepTerminal: true, AutoLockMinutes: 15, ClipboardClearSeconds: 20, CheckUpdates: true}
 }
 
 func (c Config) Validate() error {
@@ -43,6 +45,8 @@ type Paths struct {
 	Vault  string
 	// State describes the running session so other dtvlt invocations can reach it.
 	State string
+	// UpdateCache remembers the last update check.
+	UpdateCache string
 }
 
 // ResolvePaths follows the platform conventions. DTVLT_HOME puts every file in
@@ -72,9 +76,10 @@ func ResolvePaths() (Paths, error) {
 
 func pathsIn(configDir, dataDir string) Paths {
 	return Paths{
-		Config: filepath.Join(configDir, "config.toml"),
-		Vault:  filepath.Join(dataDir, "vault.dtv"),
-		State:  filepath.Join(dataDir, "session.json"),
+		Config:      filepath.Join(configDir, "config.toml"),
+		Vault:       filepath.Join(dataDir, "vault.dtv"),
+		State:       filepath.Join(dataDir, "session.json"),
+		UpdateCache: filepath.Join(dataDir, "update-check.json"),
 	}
 }
 

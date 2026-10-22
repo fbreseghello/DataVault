@@ -36,6 +36,9 @@ func start(u *ui, paths config.Paths) error {
 	if err != nil {
 		return err
 	}
+	if cfg.CheckUpdates {
+		updateNotice(u, paths)
+	}
 	if cfg.PinEnabled {
 		if err := checkPIN(u, cfg); err != nil {
 			return err

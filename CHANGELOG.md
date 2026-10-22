@@ -10,7 +10,10 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 ### Adicionado
 
 - `dtvlt update`: baixa a release mais nova do GitHub, confere o SHA256 com o
-  `SHA256SUMS` da release e instala. Só acessa a rede quando você roda o comando.
+  `SHA256SUMS` da release e instala.
+- Aviso de atualização antes do PIN. O `dtvlt` consulta o GitHub no máximo uma vez
+  por dia, com limite de 1,5 s. A opção "check for updates" desliga a consulta
+  (vem ligada).
 
 ## [0.3.0] - 2026-10-21
 

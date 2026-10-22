@@ -70,6 +70,7 @@ export interface Settings {
   keep_terminal: boolean
   auto_lock_minutes: number
   clipboard_clear_seconds: number
+  check_updates: boolean
   config_path: string
   vault_path: string
 }

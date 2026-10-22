@@ -8,6 +8,8 @@ Um cofre local, de código aberto, para segredos de quem vive no terminal:
 logins, chaves de API, tokens, chaves SSH, seeds/passphrases, 2FA e notas seguras.
 
 - **Local-first:** os dados ficam só na máquina do usuário. Sem nuvem, sem conta, sem telemetria.
+  A única conexão de rede é a checagem de versão nova (no máximo uma vez por dia, desligável)
+  e o `dtvlt update`.
 - **Plataformas:** Windows e Linux.
 - **Nomes:** o produto se chama **DataVault**. O comando é **`dtvlt`**, que aparece só no CLI.
 - **Licença:** MIT (ver [`LICENSE`](../LICENSE)).

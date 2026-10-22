@@ -9,6 +9,7 @@
   let keepTerminal = $state(true)
   let autoLock = $state(15)
   let clipboard = $state(20)
+  let checkUpdates = $state(true)
   let pin = $state('')
   let pinConfirm = $state('')
   let busy = $state(false)
@@ -24,6 +25,7 @@
     keepTerminal = s.keep_terminal
     autoLock = s.auto_lock_minutes
     clipboard = s.clipboard_clear_seconds
+    checkUpdates = s.check_updates
     pin = pinConfirm = ''
   }
 
@@ -48,6 +50,7 @@
           keep_terminal: keepTerminal,
           auto_lock_minutes: autoLock,
           clipboard_clear_seconds: clipboard,
+          check_updates: checkUpdates,
         }),
       )
       done = true
@@ -106,6 +109,13 @@
         {keepTerminal ? 'on' : 'off'}
       </button>
       <span class="unit">{keepTerminal ? 'the session logs to the terminal' : 'the session runs in the background'}</span>
+    </div>
+    <div class="row">
+      <span>check for updates</span>
+      <button type="button" class="toggle" class:on={checkUpdates} onclick={() => (checkUpdates = !checkUpdates)} aria-pressed={checkUpdates}>
+        {checkUpdates ? 'on' : 'off'}
+      </button>
+      <span class="unit">once a day, asks github.com for a newer version before the pin</span>
     </div>
 
     <h3>files</h3>

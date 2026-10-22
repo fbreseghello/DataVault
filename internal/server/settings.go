@@ -19,6 +19,7 @@ type settingsView struct {
 	KeepTerminal          bool   `json:"keep_terminal"`
 	AutoLockMinutes       int    `json:"auto_lock_minutes"`
 	ClipboardClearSeconds int    `json:"clipboard_clear_seconds"`
+	CheckUpdates          bool   `json:"check_updates"`
 	ConfigPath            string `json:"config_path"`
 	VaultPath             string `json:"vault_path"`
 }
@@ -29,6 +30,7 @@ func (s *Server) viewOf(c config.Config) settingsView {
 		KeepTerminal:          c.KeepTerminal,
 		AutoLockMinutes:       c.AutoLockMinutes,
 		ClipboardClearSeconds: c.ClipboardClearSeconds,
+		CheckUpdates:          c.CheckUpdates,
 		ConfigPath:            s.opts.ConfigPath,
 		VaultPath:             s.opts.VaultPath,
 	}
@@ -59,6 +61,7 @@ func (s *Server) handlePutSettings(w http.ResponseWriter, r *http.Request) {
 		Pin                   string `json:"pin"`
 		AutoLockMinutes       int    `json:"auto_lock_minutes"`
 		ClipboardClearSeconds int    `json:"clipboard_clear_seconds"`
+		CheckUpdates          bool   `json:"check_updates"`
 	}
 	if !readJSON(w, r, &req) || !s.requireUnlocked(w) {
 		return
@@ -75,6 +78,7 @@ func (s *Server) handlePutSettings(w http.ResponseWriter, r *http.Request) {
 	next.KeepTerminal = req.KeepTerminal
 	next.AutoLockMinutes = req.AutoLockMinutes
 	next.ClipboardClearSeconds = req.ClipboardClearSeconds
+	next.CheckUpdates = req.CheckUpdates
 	switch {
 	case !req.PinEnabled:
 		next.PinHash = ""

@@ -141,7 +141,7 @@ func removeBinary(dst, dir string) error {
 	}
 	cmd := exec.Command("cmd.exe")
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		CmdLine: fmt.Sprintf(`cmd.exe /c ping -n 3 127.0.0.1 >nul & del /f /q "%s" "%s.old" & rmdir "%s"`, dst, dst, dir),
+		CmdLine:       fmt.Sprintf(`cmd.exe /c ping -n 3 127.0.0.1 >nul & del /f /q "%s" "%s.old" & rmdir "%s"`, dst, dst, dir),
 		CreationFlags: windows.DETACHED_PROCESS | windows.CREATE_NEW_PROCESS_GROUP,
 		HideWindow:    true,
 	}

@@ -11,8 +11,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/fbreseghello/DataVault/internal/version"
 )
 
 const fakeBinary = "#!dtvlt test binary"
@@ -117,5 +121,71 @@ func TestNoPublicRelease(t *testing.T) {
 	c := &Client{API: srv.URL, Download: srv.URL, HTTP: srv.Client()}
 	if _, err := c.Latest(context.Background()); err != ErrNoRelease {
 		t.Fatalf("got %v, want ErrNoRelease", err)
+	}
+}
+
+func TestAvailableCachesForADay(t *testing.T) {
+	old := version.Version
+	version.Version = "0.2.0"
+	t.Cleanup(func() { version.Version = old })
+
+	calls := 0
+	mux := http.NewServeMux()
+	mux.HandleFunc("/repos/"+Repo+"/releases/latest", func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		fmt.Fprint(w, `{"tag_name":"v0.3.0"}`)
+	})
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+	c := &Client{API: srv.URL, HTTP: srv.Client()}
+	cache := filepath.Join(t.TempDir(), "update-check.json")
+	now := time.Date(2026, 10, 21, 12, 0, 0, 0, time.UTC)
+
+	if got := c.Available(context.Background(), cache, now); got != "0.3.0" {
+		t.Fatalf("first check: %q", got)
+	}
+	if got := c.Available(context.Background(), cache, now.Add(time.Hour)); got != "0.3.0" || calls != 1 {
+		t.Fatalf("cached check: %q after %d calls", got, calls)
+	}
+	c.Available(context.Background(), cache, now.Add(25*time.Hour))
+	if calls != 2 {
+		t.Fatalf("expected a new call after a day, got %d", calls)
+	}
+
+	version.Version = "0.3.0"
+	if got := c.Available(context.Background(), cache, now.Add(26*time.Hour)); got != "" {
+		t.Fatalf("up to date but got %q", got)
+	}
+}
+
+func TestAvailableCachesFailures(t *testing.T) {
+	old := version.Version
+	version.Version = "0.2.0"
+	t.Cleanup(func() { version.Version = old })
+
+	calls := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		http.NotFound(w, r)
+	}))
+	defer srv.Close()
+	c := &Client{API: srv.URL, HTTP: srv.Client()}
+	cache := filepath.Join(t.TempDir(), "update-check.json")
+	now := time.Now()
+	c.Available(context.Background(), cache, now)
+	c.Available(context.Background(), cache, now.Add(time.Minute))
+	if calls != 1 {
+		t.Fatalf("a failed check should be cached, got %d calls", calls)
+	}
+}
+
+func TestAvailableSkipsDevBuilds(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t.Error("dev builds must not contact GitHub")
+	}))
+	defer srv.Close()
+	c := &Client{API: srv.URL, HTTP: srv.Client()}
+	if got := c.Available(context.Background(), filepath.Join(t.TempDir(), "c.json"), time.Now()); got != "" {
+		t.Fatalf("got %q", got)
 	}
 }

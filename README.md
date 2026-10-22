@@ -65,8 +65,13 @@ Ele não criptografa nada.
 
 `dtvlt update` busca a release mais nova no GitHub, baixa o binário da sua
 plataforma, confere o SHA256 com o `SHA256SUMS` da release e só então instala.
-Se o hash não bater, nada é instalado. O DataVault só acessa a rede quando você
-roda esse comando: não há checagem automática nem telemetria.
+Se o hash não bater, nada é instalado.
+
+Ao iniciar, antes do PIN, o `dtvlt` avisa quando há versão nova. Para isso, ele
+pergunta ao `api.github.com` qual é a release mais recente, **no máximo uma vez
+por dia** (a resposta fica em cache) e esperando no máximo 1,5 s. Nada além
+dessa consulta é enviado: não há telemetria. Dá para desligar em **settings**,
+no `dtvlt config` ou com `check_updates = false` no `config.toml`.
 
 O `SHA256SUMS` vem da mesma release, então ele detecta downloads corrompidos
 ou alterados no caminho, mas não uma release comprometida. Releases assinadas
