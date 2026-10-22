@@ -97,17 +97,15 @@
       <input type="number" min="0" max="240" bind:value={rest} required />
       <span class="unit">{rest === 0 ? 'off · ctrl+shift+l still rests' : 'minutes idle on the login · ctrl+shift+l rests now'}</span>
     </label>
-    <div class="row">
+    <label class="row">
       <span>rest style</span>
-      <div class="choice" role="radiogroup" aria-label="rest style">
-        {#each ['pillar', 'skull-i', 'skull-ii', 'random'] as const as style (style)}
-          <button type="button" role="radio" class:on={restStyle === style} aria-checked={restStyle === style} onclick={() => (restStyle = style)}>
-            {style}
-          </button>
+      <select bind:value={restStyle}>
+        {#each Object.keys(restHints) as style (style)}
+          <option value={style}>{style}</option>
         {/each}
-      </div>
+      </select>
       <span class="unit">{restHints[restStyle]}</span>
-    </div>
+    </label>
 
     <h3>terminal <span>applies the next time dtvlt starts</span></h3>
 
@@ -216,16 +214,11 @@
   .toggle {
     justify-self: start;
   }
-  .toggle.on,
-  .choice .on {
+  .toggle.on {
     color: var(--accent);
   }
-  .choice {
-    display: flex;
-    gap: 14px;
-  }
-  .choice button:not(.on) {
-    color: var(--dim);
+  select {
+    cursor: pointer;
   }
   .path {
     grid-column: 2 / 4;
