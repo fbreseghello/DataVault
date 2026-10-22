@@ -187,6 +187,55 @@ credenciais recebidas pela API ainda passam por `string` (JSON). Melhorar isso e
 - A versão do **formato do arquivo** (byte no cabeçalho do vault) é separada da versão
   do app. Uma mudança que versões antigas não conseguem ler exige versão MAJOR (depois do 1.0).
 
+## Páginas
+
+A barra lateral tem uma página por ícone. Os nomes seguem a estética do Grimoire.
+
+| Ícone | Página | O que é |
+|---|---|---|
+| livro | **Grimoire** | credenciais, chaves, comandos de servidor |
+| coração partido | **Unspoken** | notas íntimas, o que não foi dito em voz alta |
+| espada | **Siege** | kanban das tarefas do dia: ir para a guerra |
+
+### Unspoken
+
+Um lugar para escrever o que dói e ninguém mais lê. Muita gente usa o app de notas
+do celular para isso; aqui o texto fica criptografado no vault.
+
+- **Nota:** título opcional, texto livre, datas de criação e de edição. Na lista,
+  aparece o título (ou a primeira linha) e a data.
+- **Escrever:** editor de texto simples, monoespaçado, que salva sozinho quando você
+  para de digitar e ao sair da nota. `n` cria uma nota nova.
+- **Selo por nota:** como no Grimoire. Uma nota selada pede o PIN de selo para abrir,
+  e volta a selar ao sair dela.
+- **Dead Words:** uma nota pode ser **enterrada**. Ela sai da lista principal e vai
+  para a seção Dead Words, onde continua guardada para reler, e pode ser desenterrada.
+  Apagar de vez só existe dentro de Dead Words, com confirmação.
+- **Detalhes de texto:** "dead words" também aparece como texto de clima, por exemplo
+  na tela vazia e como dica do editor.
+- **Dados:** uma coleção própria de notas dentro do payload criptografado do vault.
+  As regras do selo (token por nota, que morre no lock) são as mesmas das credenciais.
+
+### Siege (planejado)
+
+O plano de batalha do dia. **Um quadro por dia**, com quatro colunas:
+
+| Orders | In Battle | Conquered | Fallen |
+|---|---|---|---|
+| a fazer | sendo feito | concluído | cancelado |
+
+- **Tarefa:** título, nota opcional, coluna, posição na coluna e o dia a que pertence.
+- **Dias:** o quadro abre no dia de hoje. Dá para navegar para os dias anteriores
+  (histórico) e voltar para hoje. Um dia novo começa vazio e oferece trazer o que
+  ficou em Orders e In Battle no dia anterior.
+- **Mover:** arrastar com o mouse entre colunas e dentro da coluna, e também pelo
+  teclado: setas para escolher a tarefa, um atalho para levá-la à coluna ao lado,
+  `n` para uma ordem nova, `Enter` para editar.
+- **Contagem:** o topo do quadro mostra quantas tarefas há em cada coluna.
+- **Dados:** uma coleção de tarefas dentro do payload criptografado do vault.
+
+Cada página deve sair numa versão MINOR própria.
+
 ## Escopo
 
 ### MVP

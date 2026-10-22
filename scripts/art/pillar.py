@@ -8,6 +8,7 @@ wide). Each cell averages several samples, so silhouettes are antialiased, and
 brightness 0..1 maps onto a long character ramp from sparse to dense.
 """
 import math
+import os
 import sys
 
 W, H = 172, 84
@@ -190,7 +191,7 @@ def drum(x, y):
 
 
 ROCKS = [(cx - 47, 1.2, 2.4), (cx + 47, 1.6, 3.0), (cx + 53, 1.0, 1.8),
-         (cx + 95, 1.3, 2.4), (cx - 52, 0.8, 1.4), (cx + 41, 0.7, 1.2)]
+         (cx + 66, 1.0, 1.8), (cx - 52, 0.8, 1.4), (cx + 41, 0.7, 1.2)]
 
 
 def rocks(x, y):
@@ -202,7 +203,7 @@ def rocks(x, y):
 
 
 def ground_band(x, y):
-    if ground <= y < ground + 2.5 and cx - 58 < x < cx + 98:
+    if ground <= y < ground + 2.5 and cx - 58 < x < cx + 72:
         fade = 1 - (y - ground) / 2.5
         b = (0.13 + 0.10 * stone(x * 0.7, y * 3)) * fade
         if cx + steps[0] < x < cx + steps[0] + 14:
@@ -217,8 +218,10 @@ def ground_band(x, y):
 # a little to its left (our left): the features slide left of the cranium, the
 # far (left) orbit is foreshortened and the right temple turns into shadow.
 # u, v are normalised: the cranium is about 2 wide; v grows downward.
-SKU = 22.0                                  # columns per unit
-SKX = cx + 84.0
+# Real scale would make it about a tenth of the column width, too small to read
+# in characters; this is the smallest size where the orbits and teeth still show.
+SKU = float(os.environ.get("SKULL_UNIT", "7.5"))   # columns per unit
+SKX = cx + 61.0
 SKY = ground - 1.12 * SKU / 2.0             # teeth rest on the ground
 TURN = -0.16
 

@@ -7,6 +7,24 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-22
+
+### Adicionado
+
+- **Unspoken** (coração partido): notas para o que não se diz em voz alta.
+  - Editor simples que salva sozinho enquanto você escreve; `n` cria uma nota.
+  - Selo por nota, com o mesmo PIN de selo do Grimoire. Notas seladas não mostram
+    título nem prévia na lista.
+  - **Dead Words:** uma nota pode ser enterrada e desenterrada. Apagar de vez só
+    existe lá dentro, com confirmação. Uma nota deixada em branco é descartada.
+  - As notas ficam criptografadas no vault, e o log do terminal nunca mostra o
+    título nem o texto.
+
+### Alterado
+
+- O crânio da tela de descanso ficou bem menor, mais perto da escala real ao lado
+  da coluna, e ainda mostra as órbitas e os dentes.
+
 ## [0.9.2] - 2026-10-22
 
 ### Alterado
@@ -186,7 +204,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.9.2...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/fbreseghello/DataVault/compare/v0.9.2...v0.10.0
 [0.9.2]: https://github.com/fbreseghello/DataVault/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/fbreseghello/DataVault/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/fbreseghello/DataVault/compare/v0.8.0...v0.9.0

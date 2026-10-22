@@ -46,7 +46,7 @@ export const LOCKED_EVENT = 'dtvlt:locked'
 /** Header carrying the token that keeps one sealed item open. */
 const UNSEAL_HEADER = 'X-Dtvlt-Unseal'
 
-async function send(method: string, path: string, body?: unknown, token = ''): Promise<Response> {
+async function send(method: string, path: string, body?: unknown, token = '', keepalive = false): Promise<Response> {
   const headers: Record<string, string> = { 'X-Dtvlt': '1' }
   if (body !== undefined) headers['Content-Type'] = 'application/json'
   if (token) headers[UNSEAL_HEADER] = token
@@ -56,6 +56,7 @@ async function send(method: string, path: string, body?: unknown, token = ''): P
     body: body === undefined ? undefined : JSON.stringify(body),
     credentials: 'same-origin',
     cache: 'no-store',
+    keepalive,
   })
   if (res.status === 423) window.dispatchEvent(new Event(LOCKED_EVENT))
   if (!res.ok) {
@@ -84,6 +85,42 @@ async function saveItem(method: string, path: string, item: ItemInput, token: st
 
 export type ItemInput = Omit<Item, 'id' | 'created_at' | 'updated_at'>
 
+/** An Unspoken entry. */
+export interface Note {
+  id: string
+  title: string
+  body: string
+  sealed: boolean
+  buried: boolean
+  created_at: string
+  updated_at: string
+}
+
+/** A note as listed; sealed notes carry no title or preview. */
+export interface NoteSummary {
+  id: string
+  title: string
+  preview: string
+  sealed: boolean
+  buried: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface NoteInput {
+  title: string
+  body: string
+  sealed: boolean
+}
+
+/** Saves a note; a sealed result comes with a token that keeps it open. */
+async function saveNote(method: string, path: string, note: NoteInput, token: string, keepalive = false) {
+  const res = await send(method, path, note, token, keepalive)
+  return { note: (await res.json()) as Note, token: res.headers.get(UNSEAL_HEADER) ?? token }
+}
+
+const notePath = (id: string) => '/api/notes/' + encodeURIComponent(id)
+
 export interface Settings {
   pin_enabled: boolean
   keep_terminal: boolean
@@ -101,6 +138,16 @@ export type SettingsInput = Omit<Settings, 'config_path' | 'vault_path'> & {
 }
 
 export const api = {
+  notes: (buried: boolean) => request<NoteSummary[]>('GET', '/api/notes' + (buried ? '?buried=1' : '')),
+  note: (id: string, token = '') => request<Note>('GET', notePath(id), undefined, token),
+  createNote: (note: NoteInput) => saveNote('POST', '/api/notes', note, ''),
+  /** keepalive lets a save finish while the page is closing. */
+  updateNote: (id: string, note: NoteInput, token = '', keepalive = false) =>
+    saveNote('PUT', notePath(id), note, token, keepalive),
+  buryNote: (id: string, buried: boolean, token = '') =>
+    request<Note>('POST', notePath(id) + '/bury', { buried }, token),
+  deleteNote: (id: string, token = '') => request<void>('DELETE', notePath(id), undefined, token),
+  unsealNote: (id: string, pin: string) => request<{ note: Note; token: string }>('POST', notePath(id) + '/unseal', { pin }),
   session: () => request<SessionInfo>('GET', '/api/session'),
   unlock: (keyword: string, password: string) => request<void>('POST', '/api/unlock', { keyword, password }),
   lock: () => request<void>('POST', '/api/lock'),

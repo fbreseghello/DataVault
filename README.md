@@ -87,6 +87,13 @@ Depois de um tempo sem atividade no login (15 minutos por padrão, ajustável em
 **settings**; 0 desliga), a tela descansa: fica só um pilar quebrado em ASCII. O
 atalho `Ctrl+Shift+L` faz isso na hora e, com o vault aberto, também trava o vault.
 
+### Páginas
+
+- **Grimoire** (livro): logins, chaves, seeds, notas seguras e comandos de servidor.
+- **Unspoken** (coração partido): notas para o que não se diz em voz alta. Salvam
+  sozinhas, podem ser seladas e podem ser enterradas em **Dead Words**.
+- **Siege** (espada): kanban das tarefas do dia. Em breve.
+
 No Grimoire, uma credencial pode ser **selada**: para abri-la, é preciso o PIN
 de selo, que é único para todas as seladas e fica guardado dentro do vault. É
 uma segunda trava para quando o vault já está aberto (alguém olhando a tela, um

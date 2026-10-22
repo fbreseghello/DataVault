@@ -331,3 +331,67 @@ func TestSealedItems(t *testing.T) {
 		t.Fatalf("change seal pin: %d", code)
 	}
 }
+
+func TestNotes(t *testing.T) {
+	s := startServer(t)
+	c := browser(t)
+	signIn(t, s, c)
+	call(t, s, c, "POST", "/api/unlock", `{"keyword":"kw","password":"pw"}`, nil, nil)
+
+	var open vault.Note
+	if code := call(t, s, c, "POST", "/api/notes", `{"title":"t","body":"plain words"}`, nil, &open); code != http.StatusCreated {
+		t.Fatalf("create: %d", code)
+	}
+	if code := call(t, s, c, "POST", "/api/notes", `{"body":"x","sealed":true}`, nil, nil); code != http.StatusBadRequest {
+		t.Fatalf("sealed note without a seal pin: %d", code)
+	}
+	call(t, s, c, "PUT", "/api/seal", `{"pin":"1234"}`, nil, nil)
+	var sealed vault.Note
+	call(t, s, c, "POST", "/api/notes", `{"title":"hidden","body":"what hurts","sealed":true}`, nil, &sealed)
+
+	var list []vault.NoteSummary
+	call(t, s, c, "GET", "/api/notes", "", nil, &list)
+	if len(list) != 2 {
+		t.Fatalf("list: %+v", list)
+	}
+	for _, n := range list {
+		if n.Sealed && (n.Title != "" || n.Preview != "") {
+			t.Fatalf("sealed note leaked in the list: %+v", n)
+		}
+	}
+
+	path := "/api/notes/" + sealed.ID
+	if code := call(t, s, c, "GET", path, "", nil, nil); code != http.StatusForbidden {
+		t.Fatalf("sealed note without pin: %d", code)
+	}
+	if code := call(t, s, c, "PUT", path, `{"body":"overwritten"}`, nil, nil); code != http.StatusForbidden {
+		t.Fatalf("editing a sealed note without pin: %d", code)
+	}
+	var opened struct {
+		Note  vault.Note `json:"note"`
+		Token string     `json:"token"`
+	}
+	if code := call(t, s, c, "POST", path+"/unseal", `{"pin":"1234"}`, nil, &opened); code != http.StatusOK || opened.Note.Body != "what hurts" {
+		t.Fatalf("unseal: %d %+v", code, opened)
+	}
+	grant := map[string]string{unsealHeader: opened.Token}
+	if code := call(t, s, c, "GET", path, "", grant, nil); code != http.StatusOK {
+		t.Fatalf("get with token: %d", code)
+	}
+
+	// Only buried notes can be deleted.
+	if code := call(t, s, c, "DELETE", "/api/notes/"+open.ID, "", nil, nil); code != http.StatusConflict {
+		t.Fatalf("deleting an unburied note: %d", code)
+	}
+	if code := call(t, s, c, "POST", "/api/notes/"+open.ID+"/bury", `{"buried":true}`, nil, nil); code != http.StatusOK {
+		t.Fatalf("bury: %d", code)
+	}
+	var dead []vault.NoteSummary
+	call(t, s, c, "GET", "/api/notes?buried=1", "", nil, &dead)
+	if len(dead) != 1 || dead[0].ID != open.ID {
+		t.Fatalf("dead words: %+v", dead)
+	}
+	if code := call(t, s, c, "DELETE", "/api/notes/"+open.ID, "", nil, nil); code != http.StatusNoContent {
+		t.Fatalf("delete buried: %d", code)
+	}
+}

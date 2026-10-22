@@ -5,6 +5,7 @@
   import type { IconName } from './icons'
   import Sealed from './Sealed.svelte'
   import Settings from './Settings.svelte'
+  import Unspoken from './Unspoken.svelte'
   import { showVersion } from './version'
 
   let { info, onlock, onrefresh }: { info: SessionInfo; onlock: () => void; onrefresh: () => void } = $props()
@@ -14,7 +15,7 @@
   // The sidebar shows icons only; label is for the hover tip and screen readers.
   const pages: Page[] = [
     { id: 'grimoire', label: 'grimoire', icon: 'book' },
-    { id: 'heart', label: 'sealed', icon: 'heart', sealed: true },
+    { id: 'heart', label: 'unspoken', icon: 'heart' },
     { id: 'sword', label: 'sealed', icon: 'sword', sealed: true },
   ]
 
@@ -79,6 +80,9 @@
     <div class="page-view" hidden={settings || page !== 'grimoire'}>
       <Grimoire {info} active={!settings && page === 'grimoire'} />
     </div>
+    <div class="page-view" hidden={settings || page !== 'heart'}>
+      <Unspoken active={!settings && page === 'heart'} />
+    </div>
     {#if settings}
       <div class="page-view padded">
         <Settings onsaved={onrefresh} onclose={() => (settings = false)} />
@@ -92,6 +96,7 @@
     <span>auto-lock {info.auto_lock_minutes}m · clipboard {info.clipboard_clear_seconds}s</span>
     <span class="spacer"></span>
     {#if !settings && page === 'grimoire'}<span>n new · / search · esc close ·</span>{/if}
+    {#if !settings && page === 'heart'}<span>n new · esc close · saves as you write ·</span>{/if}
     <span>1–{pages.length} pages · ctrl+shift+l rest</span>
     <span class="version">{showVersion(info.version)}</span>
   </footer>
