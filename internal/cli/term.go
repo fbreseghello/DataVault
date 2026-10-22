@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -129,6 +130,25 @@ func (u *ui) confirm(label string, def bool) (bool, error) {
 		case "n", "no", "nao", "não":
 			return false, nil
 		}
+	}
+}
+
+// choose asks for one of options; an empty answer keeps def.
+func (u *ui) choose(label, def string, options []string) (string, error) {
+	for {
+		u.prompt(label, "["+def+"] "+strings.Join(options, "/"))
+		s, err := u.readLine()
+		if err != nil {
+			return "", err
+		}
+		s = strings.ToLower(strings.TrimSpace(s))
+		if s == "" {
+			return def, nil
+		}
+		if slices.Contains(options, s) {
+			return s, nil
+		}
+		u.fail("enter one of %s", strings.Join(options, ", "))
 	}
 }
 

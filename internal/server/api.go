@@ -23,6 +23,7 @@ func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 		"auto_lock_minutes":       s.config().AutoLockMinutes,
 		"clipboard_clear_seconds": s.config().ClipboardClearSeconds,
 		"rest_minutes":            s.config().RestMinutes,
+		"rest_style":              s.config().RestStyle,
 	})
 }
 

@@ -29,7 +29,11 @@ export interface SessionInfo {
   clipboard_clear_seconds: number
   /** Idle minutes on the login before the rest screen; 0 is off. */
   rest_minutes: number
+  rest_style: RestStyle
 }
+
+/** What the rest screen shows: one of the still images, or one of them at random. */
+export type RestStyle = 'pillar' | 'skull-i' | 'skull-ii' | 'random'
 
 export class ApiError extends Error {
   constructor(
@@ -152,6 +156,7 @@ export interface Settings {
   clipboard_clear_seconds: number
   check_updates: boolean
   rest_minutes: number
+  rest_style: RestStyle
   config_path: string
   vault_path: string
 }

@@ -79,6 +79,9 @@ func TestRestMinutes(t *testing.T) {
 	if cfg.RestMinutes != 15 {
 		t.Fatalf("old configs should rest after 15 minutes, got %d", cfg.RestMinutes)
 	}
+	if cfg.RestStyle != RestPillar {
+		t.Fatalf("old configs should rest on the pillar, got %q", cfg.RestStyle)
+	}
 	for _, m := range []int{0, 1, MaxRestMinutes} {
 		cfg.RestMinutes = m
 		if err := cfg.Validate(); err != nil {
@@ -89,6 +92,22 @@ func TestRestMinutes(t *testing.T) {
 		cfg.RestMinutes = m
 		if cfg.Validate() == nil {
 			t.Errorf("%d minutes accepted", m)
+		}
+	}
+}
+
+func TestRestStyle(t *testing.T) {
+	cfg := Default()
+	for _, style := range RestStyles {
+		cfg.RestStyle = style
+		if err := cfg.Validate(); err != nil {
+			t.Errorf("%q rejected: %v", style, err)
+		}
+	}
+	for _, style := range []string{"", "skull", "Skull-I", "static", "animated"} {
+		cfg.RestStyle = style
+		if cfg.Validate() == nil {
+			t.Errorf("%q accepted", style)
 		}
 	}
 }

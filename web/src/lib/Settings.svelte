@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { api, ApiError, type Settings } from './api'
+  import { api, ApiError, type RestStyle, type Settings } from './api'
   import SealPinSettings from './SealPinSettings.svelte'
 
   let { onsaved, onclose }: { onsaved: () => void; onclose: () => void } = $props()
@@ -12,6 +12,13 @@
   let clipboard = $state(20)
   let checkUpdates = $state(true)
   let rest = $state(15)
+  let restStyle = $state<RestStyle>('pillar')
+  const restHints: Record<RestStyle, string> = {
+    pillar: 'the broken pillar',
+    'skull-i': 'the skull, drawn in lines',
+    'skull-ii': 'the skull, drawn in dust',
+    random: 'one of the three, drawn each time it rests',
+  }
   let pin = $state('')
   let pinConfirm = $state('')
   let busy = $state(false)
@@ -29,6 +36,7 @@
     clipboard = s.clipboard_clear_seconds
     checkUpdates = s.check_updates
     rest = s.rest_minutes
+    restStyle = s.rest_style
     pin = pinConfirm = ''
   }
 
@@ -55,6 +63,7 @@
           clipboard_clear_seconds: clipboard,
           check_updates: checkUpdates,
           rest_minutes: rest,
+          rest_style: restStyle,
         }),
       )
       done = true
@@ -88,6 +97,17 @@
       <input type="number" min="0" max="240" bind:value={rest} required />
       <span class="unit">{rest === 0 ? 'off · ctrl+shift+l still rests' : 'minutes idle on the login · ctrl+shift+l rests now'}</span>
     </label>
+    <div class="row">
+      <span>rest style</span>
+      <div class="choice" role="radiogroup" aria-label="rest style">
+        {#each ['pillar', 'skull-i', 'skull-ii', 'random'] as const as style (style)}
+          <button type="button" role="radio" class:on={restStyle === style} aria-checked={restStyle === style} onclick={() => (restStyle = style)}>
+            {style}
+          </button>
+        {/each}
+      </div>
+      <span class="unit">{restHints[restStyle]}</span>
+    </div>
 
     <h3>terminal <span>applies the next time dtvlt starts</span></h3>
 
@@ -196,8 +216,16 @@
   .toggle {
     justify-self: start;
   }
-  .toggle.on {
+  .toggle.on,
+  .choice .on {
     color: var(--accent);
+  }
+  .choice {
+    display: flex;
+    gap: 14px;
+  }
+  .choice button:not(.on) {
+    color: var(--dim);
   }
   .path {
     grid-column: 2 / 4;

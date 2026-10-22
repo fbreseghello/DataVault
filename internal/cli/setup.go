@@ -87,6 +87,10 @@ func askPreferences(u *ui, cur config.Config) (config.Config, error) {
 	if cfg.RestMinutes, err = u.number("rest screen (minutes)", cur.RestMinutes, 0, config.MaxRestMinutes); err != nil {
 		return cfg, err
 	}
+	u.println("  %s", u.dim("the rest screen shows the pillar, one of two skulls, or one of them at random."))
+	if cfg.RestStyle, err = u.choose("rest screen art", cur.RestStyle, config.RestStyles); err != nil {
+		return cfg, err
+	}
 	u.println("  %s", u.dim("on each start dtvlt can ask github.com for a newer version. nothing else is sent."))
 	if cfg.CheckUpdates, err = u.confirm("check for updates", cur.CheckUpdates); err != nil {
 		return cfg, err

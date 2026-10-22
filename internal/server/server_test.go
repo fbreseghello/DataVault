@@ -231,6 +231,19 @@ func TestSettings(t *testing.T) {
 		t.Fatal("settings not applied to the running server")
 	}
 
+	if saved.RestStyle != config.RestPillar {
+		t.Fatalf("leaving rest_style out should keep the pillar, got %q", saved.RestStyle)
+	}
+	if r := put(`{"pin_enabled":false,"keep_terminal":false,"auto_lock_minutes":5,"clipboard_clear_seconds":30,"rest_style":"spinning"}`); r.StatusCode != http.StatusBadRequest {
+		t.Errorf("unknown rest style: %s", r.Status)
+	}
+	if r := put(`{"pin_enabled":false,"keep_terminal":false,"auto_lock_minutes":5,"clipboard_clear_seconds":30,"rest_style":"random"}`); r.StatusCode != http.StatusOK {
+		t.Fatalf("random rest style: %s", r.Status)
+	}
+	if saved, _ = config.Load(s.opts.ConfigPath); saved.RestStyle != config.RestRandom {
+		t.Fatalf("rest style not saved: %q", saved.RestStyle)
+	}
+
 	if r := put(`{"pin_enabled":true,"pin":"4321","keep_terminal":false,"auto_lock_minutes":5,"clipboard_clear_seconds":30}`); r.StatusCode != http.StatusOK {
 		t.Fatalf("set pin: %s", r.Status)
 	}

@@ -21,6 +21,7 @@ type settingsView struct {
 	ClipboardClearSeconds int    `json:"clipboard_clear_seconds"`
 	CheckUpdates          bool   `json:"check_updates"`
 	RestMinutes           int    `json:"rest_minutes"`
+	RestStyle             string `json:"rest_style"`
 	ConfigPath            string `json:"config_path"`
 	VaultPath             string `json:"vault_path"`
 }
@@ -33,6 +34,7 @@ func (s *Server) viewOf(c config.Config) settingsView {
 		ClipboardClearSeconds: c.ClipboardClearSeconds,
 		CheckUpdates:          c.CheckUpdates,
 		RestMinutes:           c.RestMinutes,
+		RestStyle:             c.RestStyle,
 		ConfigPath:            s.opts.ConfigPath,
 		VaultPath:             s.opts.VaultPath,
 	}
@@ -65,6 +67,8 @@ func (s *Server) handlePutSettings(w http.ResponseWriter, r *http.Request) {
 		ClipboardClearSeconds int    `json:"clipboard_clear_seconds"`
 		CheckUpdates          bool   `json:"check_updates"`
 		RestMinutes           int    `json:"rest_minutes"`
+		// RestStyle left out keeps the current style.
+		RestStyle string `json:"rest_style"`
 	}
 	if !readJSON(w, r, &req) || !s.requireUnlocked(w) {
 		return
@@ -83,6 +87,9 @@ func (s *Server) handlePutSettings(w http.ResponseWriter, r *http.Request) {
 	next.ClipboardClearSeconds = req.ClipboardClearSeconds
 	next.CheckUpdates = req.CheckUpdates
 	next.RestMinutes = req.RestMinutes
+	if req.RestStyle != "" {
+		next.RestStyle = req.RestStyle
+	}
 	switch {
 	case !req.PinEnabled:
 		next.PinHash = ""

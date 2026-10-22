@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 )
@@ -22,13 +24,27 @@ type Config struct {
 	CheckUpdates bool `toml:"check_updates"`
 	// RestMinutes is the idle time before the login shows the rest screen; 0 turns it off.
 	RestMinutes int `toml:"rest_minutes"`
+	// RestStyle picks what the rest screen shows: one of RestStyles.
+	RestStyle string `toml:"rest_style"`
 }
+
+// Rest screen styles: one of the still images (the broken pillar or one of
+// two skulls), or one of them drawn at random each time the screen rests.
+const (
+	RestPillar  = "pillar"
+	RestSkullI  = "skull-i"
+	RestSkullII = "skull-ii"
+	RestRandom  = "random"
+)
+
+// RestStyles lists every rest style, in the order the screens offer them.
+var RestStyles = []string{RestPillar, RestSkullI, RestSkullII, RestRandom}
 
 // MaxRestMinutes caps the rest screen delay.
 const MaxRestMinutes = 240
 
 func Default() Config {
-	return Config{KeepTerminal: true, AutoLockMinutes: 15, ClipboardClearSeconds: 20, CheckUpdates: true, RestMinutes: 15}
+	return Config{KeepTerminal: true, AutoLockMinutes: 15, ClipboardClearSeconds: 20, CheckUpdates: true, RestMinutes: 15, RestStyle: RestPillar}
 }
 
 func (c Config) Validate() error {
@@ -40,6 +56,9 @@ func (c Config) Validate() error {
 	}
 	if c.RestMinutes < 0 || c.RestMinutes > MaxRestMinutes {
 		return fmt.Errorf("rest_minutes must be between 0 (off) and %d", MaxRestMinutes)
+	}
+	if !slices.Contains(RestStyles, c.RestStyle) {
+		return fmt.Errorf("rest_style must be one of %s", strings.Join(RestStyles, ", "))
 	}
 	if c.PinEnabled && c.PinHash == "" {
 		return errors.New("pin_enabled is set but no pin is configured")

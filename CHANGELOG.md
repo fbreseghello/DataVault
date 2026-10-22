@@ -7,6 +7,14 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- Opção "rest style" na tela settings e no `dtvlt config`, para escolher a imagem
+  da tela de descanso: **pillar** (o pilar partido, como hoje), **skull-i** (um
+  crânio sem mandíbula em traços), **skull-ii** (o mesmo crânio em pó) ou
+  **random**, que sorteia uma das três cada vez que a tela descansa. Os crânios
+  ficam no canto inferior direito. Configs antigas continuam no pillar.
+
 ## [0.11.2] - 2026-10-22
 
 ### Alterado
