@@ -5,7 +5,7 @@
 ## O que é
 
 Um cofre local, de código aberto, para segredos de quem vive no terminal:
-logins, chaves de API, tokens, chaves SSH, seeds/passphrases, 2FA e notas seguras.
+logins, chaves de API, tokens, chaves SSH, seeds/passphrases, 2FA, notas seguras e comandos de servidor.
 
 - **Local-first:** os dados ficam só na máquina do usuário. Sem nuvem, sem conta, sem telemetria.
   A única conexão de rede é a checagem de versão nova (no máximo uma vez por dia, desligável)
@@ -132,6 +132,7 @@ Outros processos e outras abas do navegador também alcançam portas locais. Por
 | Seed / passphrase | nome, palavras |
 | TOTP (2FA) | serviço, secret → gera o código |
 | Nota segura | texto livre |
+| Comando de servidor | comando (várias linhas), servidor, diretório; só guarda e copia, nunca executa |
 
 Todos os itens têm tags e campos personalizados.
 

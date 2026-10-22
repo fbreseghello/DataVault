@@ -1,7 +1,7 @@
 # DataVault
 
 Cofre local e de código aberto para segredos de quem vive no terminal:
-logins, chaves de API, chaves SSH, seeds e notas seguras.
+logins, chaves de API, chaves SSH, seeds, notas seguras e comandos de servidor.
 
 - Os dados ficam só na sua máquina, num único arquivo criptografado
   (Argon2id + XChaCha20-Poly1305). Sem nuvem, sem conta, sem telemetria.

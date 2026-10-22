@@ -16,11 +16,13 @@ const (
 	TypeSSHKey ItemType = "ssh_key"
 	TypeSeed   ItemType = "seed"
 	TypeNote   ItemType = "note"
+	// TypeCommand is a saved server command; dtvlt stores and copies it, never runs it.
+	TypeCommand ItemType = "command"
 )
 
 func (t ItemType) valid() bool {
 	switch t {
-	case TypeLogin, TypeAPIKey, TypeSSHKey, TypeSeed, TypeNote:
+	case TypeLogin, TypeAPIKey, TypeSSHKey, TypeSeed, TypeNote, TypeCommand:
 		return true
 	}
 	return false

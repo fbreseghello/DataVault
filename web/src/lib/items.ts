@@ -6,6 +6,7 @@ export const TYPES: { type: ItemType; label: string; short: string }[] = [
   { type: 'ssh_key', label: 'ssh key', short: 'ssh' },
   { type: 'seed', label: 'seed / passphrase', short: 'seed' },
   { type: 'note', label: 'secure note', short: 'note' },
+  { type: 'command', label: 'server command', short: 'cmd' },
 ]
 
 export function typeShort(t: ItemType): string {
@@ -26,10 +27,21 @@ export function template(t: ItemType): Field[] {
       return [f('words', true)]
     case 'note':
       return []
+    case 'command':
+      return [f('command'), f('server'), f('workdir')]
   }
 }
 
-const MULTILINE = new Set(['private_key', 'public_key', 'words'])
+const MULTILINE = new Set(['private_key', 'public_key', 'words', 'command'])
+
+/** The field of a command entry shown as a terminal line, with a prompt. */
+export function isCommand(type: ItemType, field: Field): boolean {
+  return type === 'command' && field.name === 'command'
+}
+
+export function commandLines(value: string): string[] {
+  return value.replace(/\r\n/g, '\n').split('\n')
+}
 
 export function isMultiline(field: Field): boolean {
   return MULTILINE.has(field.name) || field.value.includes('\n')

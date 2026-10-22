@@ -1,4 +1,4 @@
-export type ItemType = 'login' | 'api_key' | 'ssh_key' | 'seed' | 'note'
+export type ItemType = 'login' | 'api_key' | 'ssh_key' | 'seed' | 'note' | 'command'
 
 export interface Field {
   name: string

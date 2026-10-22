@@ -163,3 +163,17 @@ func TestSummaryShowsSealed(t *testing.T) {
 		t.Fatalf("summary: %+v", list)
 	}
 }
+
+func TestCommandItem(t *testing.T) {
+	v, _ := newVault(t)
+	it, err := v.Add(Item{Type: TypeCommand, Name: "restart api", Fields: []Field{
+		{Name: "command", Value: "sudo systemctl restart api\njournalctl -u api -n 50"},
+		{Name: "server", Value: "deploy@10.0.0.5"},
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, _ := v.Get(it.ID); got.Fields[0].Value != "sudo systemctl restart api\njournalctl -u api -n 50" {
+		t.Fatalf("multi-line command changed: %q", got.Fields[0].Value)
+	}
+}

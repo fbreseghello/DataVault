@@ -4,7 +4,7 @@
   import { copy } from './clipboard'
   import Editor from './Editor.svelte'
   import Icon from './Icon.svelte'
-  import { isMultiline, typeShort } from './items'
+  import { commandLines, isCommand, isMultiline, typeShort } from './items'
   import Placard from './Placard.svelte'
   import SealGate from './SealGate.svelte'
 
@@ -284,6 +284,8 @@
                 <span class="label">{field.name}</span>
                 {#if field.secret && !revealed[i]}
                   <span class="value masked">{masked}</span>
+                {:else if isCommand(opened.type, field)}
+                  <pre class="value command">{#each commandLines(field.value) as line, n (n)}<span class="line"><span class="prompt" aria-hidden="true">$</span>{line}</span>{/each}</pre>
                 {:else if isMultiline(field)}
                   <pre class="value">{field.value}</pre>
                 {:else}
@@ -516,6 +518,25 @@
     margin: 0;
     white-space: pre-wrap;
     font: inherit;
+  }
+
+  /* A saved command reads like a terminal: one prompt per line, bright text. */
+  .command {
+    padding: 8px 12px;
+    background: var(--raise);
+    border-left: 2px solid var(--line);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .command .line {
+    display: block;
+  }
+
+  .prompt {
+    color: var(--dim);
+    margin-right: 1ch;
+    user-select: none;
   }
 
   .masked {

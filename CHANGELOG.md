@@ -7,6 +7,12 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- Comandos de servidor no Grimoire: um novo tipo de entrada com o comando (várias
+  linhas), o servidor e o diretório. O comando aparece como num terminal, com um `$`
+  por linha, e o `copy` copia só o comando. O DataVault guarda e copia, nunca executa.
+
 ### Alterado
 
 - A versão instalada aparece no rodapé do DataVault, em todas as telas.
