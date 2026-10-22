@@ -15,6 +15,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- O neon da arte do login agora é branco: letras brancas com um brilho fino e um
+  halo suave que respira devagar. Com "reduzir movimento" no sistema, o halo fica parado.
 - A versão instalada aparece no rodapé do DataVault, em todas as telas.
 
 ### Corrigido

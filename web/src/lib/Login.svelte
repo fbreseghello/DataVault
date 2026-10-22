@@ -57,7 +57,11 @@
 <!-- Clicking anywhere returns focus to the hidden input, like a terminal. -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 <main onclick={() => input?.focus()}>
-  <pre class="art" aria-hidden="true">{art}</pre>
+  <!-- Two copies of the art: the crisp tube on top, a blurred halo behind it that breathes. -->
+  <div class="art" aria-hidden="true">
+    <pre class="halo">{art}</pre>
+    <pre class="tube">{art}</pre>
+  </div>
   <h1 class="sr-only">DataVault</h1>
 
   <div class="prompt" aria-hidden="true">
@@ -113,18 +117,39 @@
   }
 
   .art {
+    position: relative;
     margin: 0 0 56px;
     /* The art is 127 columns; shrink it to fit narrow windows. */
     font-size: min(12px, calc((100vw - 32px) / 127 / 0.6));
     line-height: 1.12;
-    color: var(--neon-core);
-    /* A faint neon tube: tight white core, soft accent halo. */
-    text-shadow:
-      0 0 1px var(--neon-core),
-      0 0 5px var(--neon-glow),
-      0 0 14px var(--neon-haze);
     animation: power-on 1.6s linear both;
     user-select: none;
+  }
+
+  .art pre {
+    margin: 0;
+    font: inherit;
+    line-height: inherit;
+  }
+
+  /* The tube: white letters with a glow that hugs them. */
+  .tube {
+    position: relative;
+    color: var(--neon-core);
+    text-shadow:
+      0 0 1px var(--neon-core),
+      0 0 4px var(--neon-glow);
+  }
+
+  /* The halo: the same art blurred behind, breathing slowly. Only its opacity
+     animates, which is cheap for the browser. */
+  .halo {
+    position: absolute;
+    inset: 0;
+    color: var(--neon-haze);
+    filter: blur(6px);
+    opacity: 0.5;
+    animation: breathe 4s ease-in-out 1.6s infinite;
   }
 
   .prompt {
@@ -205,8 +230,19 @@
     }
   }
 
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .art {
+    .art,
+    .halo {
       animation: none;
     }
   }
