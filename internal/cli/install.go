@@ -98,8 +98,10 @@ func updateNotice(u *ui, paths config.Paths) {
 }
 
 // runUpdate is `dtvlt update`: install the newest GitHub release, verified
-// against its SHA256SUMS. It only touches the network when asked.
-func runUpdate(u *ui, paths config.Paths) error {
+// against its SHA256SUMS. It reports whether a new version was installed.
+// From the console the caller restarts on the new version itself, so the
+// "run dtvlt again" hints are left out.
+func runUpdate(u *ui, paths config.Paths, fromConsole bool) (bool, error) {
 	u.pause = true
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
@@ -108,10 +110,10 @@ func runUpdate(u *ui, paths config.Paths) error {
 	u.row("checking", "github.com/"+update.Repo)
 	rel, err := c.Latest(ctx)
 	if errors.Is(err, update.ErrNoRelease) {
-		return err
+		return false, err
 	}
 	if err != nil {
-		return fmt.Errorf("could not get the latest release: %w", err)
+		return false, fmt.Errorf("could not get the latest release: %w", err)
 	}
 
 	// What matters is the copy on the PATH, not necessarily this process.
@@ -129,19 +131,19 @@ func runUpdate(u *ui, paths config.Paths) error {
 	if current != "" && version.Compare(rel.Version, current) <= 0 {
 		u.println("")
 		u.println("  already up to date")
-		return nil
+		return false, nil
 	}
 
 	dir, err := install.Dir()
 	if err != nil {
-		return err
+		return false, err
 	}
 	if err := os.MkdirAll(dir, 0o755); err != nil {
-		return err
+		return false, err
 	}
 	d, err := c.Fetch(ctx, rel, dir)
 	if err != nil {
-		return err
+		return false, err
 	}
 	defer d.Remove()
 	u.row("download", fmt.Sprintf("%s  %.1f MiB", d.Asset, float64(d.Size)/(1<<20)))
@@ -149,14 +151,18 @@ func runUpdate(u *ui, paths config.Paths) error {
 
 	res, err := install.InstallFile(d.Path)
 	if err != nil {
-		return err
+		return false, err
+	}
+	u.row("notes", rel.URL)
+	if fromConsole {
+		u.row("installed", res.Path)
+		return true, nil
 	}
 	printInstalled(u, res)
 	if _, err := server.Dial(paths.State); err == nil {
 		u.println("  %s", u.dim("the session still runs the old version. stop it, then run dtvlt again."))
 	}
-	u.row("notes", rel.URL)
-	return nil
+	return true, nil
 }
 
 func runUninstall(u *ui, paths config.Paths) error {

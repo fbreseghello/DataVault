@@ -59,6 +59,9 @@ func Run(args []string) int {
 		cmd = args[0]
 	}
 	code := run(u, cmd)
+	if relaunch != "" {
+		return relaunchInto(relaunch)
+	}
 	// Opened by double-click: the console window closes with the process, so
 	// keep it up when there is something to read.
 	if cmd != serveCommand && ownsConsole() && (code != 0 || u.pause) {
@@ -86,7 +89,7 @@ func run(u *ui, cmd string) int {
 	case "uninstall":
 		err = runUninstall(u, paths)
 	case "update":
-		err = runUpdate(u, paths)
+		_, err = runUpdate(u, paths, false)
 	case serveCommand:
 		err = serveDetached(paths)
 	case "status":

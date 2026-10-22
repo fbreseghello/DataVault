@@ -2,10 +2,14 @@ package cli
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"os/exec"
+	"os/signal"
 	"strings"
 
 	"github.com/fbreseghello/DataVault/internal/config"
+	"github.com/fbreseghello/DataVault/internal/install"
 	"github.com/fbreseghello/DataVault/internal/server"
 	"github.com/fbreseghello/DataVault/internal/session"
 	"github.com/fbreseghello/DataVault/internal/version"
@@ -94,9 +98,23 @@ func console(u *ui, paths config.Paths, ctl controller, owns bool) error {
 			}
 			u.println("  locked")
 		case "update":
-			if err := runUpdate(u, paths); err != nil {
+			updated, err := runUpdate(u, paths, true)
+			if err != nil {
 				u.fail("%v", err)
 				continue
+			}
+			if updated {
+				// This console and its session are still the old version: end
+				// the session and hand the terminal to the new binary.
+				target, err := install.Target()
+				if err != nil {
+					u.fail("%v", err)
+					continue
+				}
+				u.println("")
+				u.println("  %s", u.dim("restarting on the new version..."))
+				relaunch = target
+				return ctl.Stop()
 			}
 		case "config":
 			if err := configure(u, paths); err != nil && !errors.Is(err, errAborted) {
@@ -147,4 +165,25 @@ func printStatus(u *ui, st server.Status) {
 	u.row("state", state)
 	u.row("version", ver)
 	u.row("url", st.URL)
+}
+
+// relaunch is set when the console updated dtvlt: once this process is done
+// with its session, Run hands the terminal to the installed binary.
+var relaunch string
+
+// relaunchInto runs the binary at path in this terminal and returns its exit
+// code. ctrl+c belongs to the new process now, so this one ignores it.
+func relaunchInto(path string) int {
+	signal.Ignore(os.Interrupt)
+	cmd := exec.Command(path)
+	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
+	if err := cmd.Run(); err != nil {
+		var exit *exec.ExitError
+		if errors.As(err, &exit) {
+			return exit.ExitCode()
+		}
+		fmt.Fprintf(os.Stderr, "  ! could not start %s: %v\n", path, err)
+		return 1
+	}
+	return 0
 }
