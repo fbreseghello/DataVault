@@ -7,6 +7,12 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- Seção "appearance" na tela settings com a opção **theme**, por enquanto fixa em
+  **souls** (o tema atual). Os temas vão trocar os ícones e os nomes das páginas
+  numa versão futura; a opção ainda não muda nada nem é salva.
+
 ## [0.12.1] - 2026-10-22
 
 ### Alterado

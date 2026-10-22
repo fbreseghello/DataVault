@@ -107,6 +107,18 @@
       <span class="unit">{restHints[restStyle]}</span>
     </label>
 
+    <h3>appearance <span>coming in a future version</span></h3>
+
+    <!-- Themes will swap the icons and the page names. Only souls exists for
+         now, so the choice is shown but cannot change and is not saved. -->
+    <label class="row">
+      <span>theme</span>
+      <select disabled aria-describedby="theme-hint">
+        <option value="souls" selected>souls</option>
+      </select>
+      <span class="unit" id="theme-hint">the current theme · themes will change the icons and page names</span>
+    </label>
+
     <h3>terminal <span>applies the next time dtvlt starts</span></h3>
 
     <div class="row">
@@ -219,6 +231,10 @@
   }
   select {
     cursor: pointer;
+  }
+  select:disabled {
+    cursor: default;
+    color: var(--muted);
   }
   .path {
     grid-column: 2 / 4;
