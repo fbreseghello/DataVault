@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-22
+
 ### Adicionado
 
 - Tela de descanso no login: depois de 15 minutos sem teclado nem mouse, a tela
@@ -158,7 +160,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/fbreseghello/DataVault/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/fbreseghello/DataVault/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/fbreseghello/DataVault/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/fbreseghello/DataVault/compare/v0.5.1...v0.6.0
