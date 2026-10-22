@@ -2,6 +2,7 @@
   import { tick } from 'svelte'
   import { api, type SessionInfo } from './api'
   import art from './art.txt?raw'
+  import { showVersion } from './version'
 
   let { info, onunlock }: { info: SessionInfo; onunlock: () => void } = $props()
 
@@ -12,7 +13,6 @@
   let busy = $state(false)
   let error = $state('')
   let input = $state<HTMLInputElement>()
-  const shownVersion = $derived(info.version === 'dev' ? 'dev' : 'v' + info.version)
 
   $effect(() => {
     void step
@@ -98,7 +98,7 @@
     {#if busy}deriving key{:else if error}<span class="error">{error}</span>{:else}{step}{/if}
   </p>
 
-  <footer>session {info.id} · {shownVersion}</footer>
+  <footer>session {info.id} · {showVersion(info.version)}</footer>
 </main>
 
 <style>

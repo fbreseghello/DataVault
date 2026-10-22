@@ -7,6 +7,10 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Alterado
+
+- A versão instalada aparece no rodapé do DataVault, em todas as telas.
+
 ## [0.5.1] - 2026-10-21
 
 ### Alterado

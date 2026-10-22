@@ -5,6 +5,7 @@
   import type { IconName } from './icons'
   import Sealed from './Sealed.svelte'
   import Settings from './Settings.svelte'
+  import { showVersion } from './version'
 
   let { info, onlock, onrefresh }: { info: SessionInfo; onlock: () => void; onrefresh: () => void } = $props()
 
@@ -92,6 +93,7 @@
     <span class="spacer"></span>
     {#if !settings && page === 'grimoire'}<span>n new · / search · esc close ·</span>{/if}
     <span>1–{pages.length} pages</span>
+    <span class="version">{showVersion(info.version)}</span>
   </footer>
 </div>
 
@@ -246,6 +248,11 @@
     color: var(--dim);
     font-size: 11px;
     gap: 6px;
+  }
+
+  .version {
+    margin-left: 12px;
+    color: var(--muted);
   }
 
   @media (max-width: 720px) {
