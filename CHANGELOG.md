@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-10-22
+
 ### Alterado
 
 - O coração do Unspoken ficou visivelmente partido: as duas metades se separam por
@@ -279,7 +281,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.12.1...HEAD
+[0.12.1]: https://github.com/fbreseghello/DataVault/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/fbreseghello/DataVault/compare/v0.11.2...v0.12.0
 [0.11.2]: https://github.com/fbreseghello/DataVault/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/fbreseghello/DataVault/compare/v0.11.0...v0.11.1
