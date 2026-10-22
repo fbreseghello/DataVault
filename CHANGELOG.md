@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-10-22
+
 ### Adicionado
 
 - Opção "rest style" na tela settings e no `dtvlt config`, para escolher a imagem
@@ -265,7 +267,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.11.2...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/fbreseghello/DataVault/compare/v0.11.2...v0.12.0
 [0.11.2]: https://github.com/fbreseghello/DataVault/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/fbreseghello/DataVault/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/fbreseghello/DataVault/compare/v0.10.0...v0.11.0
