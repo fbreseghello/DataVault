@@ -11,6 +11,13 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 - A versão instalada aparece no rodapé do DataVault, em todas as telas.
 
+### Corrigido
+
+- Nomes de campo longos (como `POSTGRES_PASSWORD`) passavam por cima do valor.
+  A coluna do nome agora se ajusta ao nome mais longo da credencial, e nomes
+  muito longos quebram linha.
+- A lista do Grimoire recarrega ao voltar para ele.
+
 ## [0.5.1] - 2026-10-21
 
 ### Alterado

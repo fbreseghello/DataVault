@@ -52,9 +52,14 @@
     api.sealStatus().then((r) => (hasSealPin = r.has_pin), fail)
   })
 
-  // Entering the grimoire never resumes an open entry or an unsaved draft.
+  // Entering the grimoire never resumes an open entry or an unsaved draft, and
+  // reloads the list in case it changed meanwhile.
   $effect(() => {
-    if (active) untrack(close)
+    if (!active) return
+    untrack(() => {
+      close()
+      load().catch(fail)
+    })
   })
 
   // close drops the open entry, which also seals it again.
@@ -253,7 +258,7 @@
           </h2>
 
           {#if sealPrompt}
-            <form class="sealpin" onsubmit={sealNow}>
+            <form class="sealpin fields" onsubmit={sealNow}>
               <p class="dim">no seal pin yet. choose one; it opens every sealed entry.</p>
               <label class="field">
                 <span class="label">seal pin</span>
@@ -272,6 +277,7 @@
             </form>
           {/if}
 
+          <div class="fields">
           {#each opened.fields as field, i (i)}
             {#if field.value}
               <div class="field">
@@ -305,6 +311,8 @@
               <pre class="value">{opened.notes}</pre>
             </div>
           {/if}
+
+          </div>
 
           <p class="meta">updated {new Date(opened.updated_at).toLocaleString()}</p>
 
@@ -471,10 +479,18 @@
     font-weight: 400;
   }
 
-  .field {
+  /* One grid for all rows, so every value starts at the same column. The name
+     column grows to the longest field name; very long names wrap. */
+  .fields {
     display: grid;
-    grid-template-columns: 110px 1fr auto;
-    gap: 12px;
+    grid-template-columns: minmax(110px, max-content) minmax(0, 1fr) auto;
+    column-gap: 16px;
+  }
+
+  .field {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
     align-items: baseline;
     padding: 6px 0;
     border-bottom: 1px solid var(--line);
@@ -482,6 +498,13 @@
 
   .label {
     color: var(--dim);
+    max-width: 28ch;
+    overflow-wrap: anywhere;
+  }
+
+  .sealpin p,
+  .sealpin .buttons {
+    grid-column: 1 / -1;
   }
 
   .value {
