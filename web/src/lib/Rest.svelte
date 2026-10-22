@@ -54,9 +54,9 @@
      fills most of the height, the skulls a bit over half, and none gets wider
      than about half the screen. */
 
-  /* 88 x 110 cells (scripts/art/scene.py). */
+  /* 121 x 109 cells (scripts/art/scene.py), rubble included. */
   .pillar {
-    font-size: min(calc(88vh / 110), calc(50vw / 88 / 0.6));
+    font-size: min(calc(88vh / 109), calc(50vw / 121 / 0.6));
   }
 
   /* 60 x 40 cells. */

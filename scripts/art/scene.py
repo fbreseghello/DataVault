@@ -3,8 +3,9 @@ image into ASCII.
 
 Everything is modelled in metres at real scale (the shaft is about 0.9 m across
 and breaks off near 3 m) and raymarched with a signed distance field: soft
-shadows, ambient occlusion, weathered stone. The ground fades to black like a
-spotlight.
+shadows, ambient occlusion, weathered stone. The break is ragged, with chips torn
+out below it, cracks zigzag down the lit face and pieces of it lie on the steps
+and the ground. The ground fades to black like a spotlight.
 
 The character ramp is ordered by ink coverage measured in JetBrains Mono, read
 from web/node_modules (run npm install in web first). Rendering takes a few
@@ -90,11 +91,72 @@ FLUTE_DEPTH = 0.028
 
 
 def column_top(qx, qz):
-    """Height of the fracture: higher on the left, bitten on the right, rough."""
+    """Height of the fracture: higher on the left, falling away to the right,
+    with a deep bite out of the front and a rough, stepped edge."""
     u = qx / R_BOTTOM
     flat = np.stack([qx, qz, np.zeros_like(qx)], -1)
-    return (2.78 - 0.3 * u - 0.3 * np.maximum(u - 0.15, 0)
-            + 0.4 * fbm(flat * 2.6 + 3.0, 3) + 0.08 * fbm(flat * 13.0, 2))
+    bite = 0.42 * np.exp(-((qx - 0.08) ** 2 + (qz - 0.3) ** 2) / 0.03)
+    return (2.72 - 0.34 * u - 0.42 * np.maximum(u - 0.1, 0) - bite
+            + 0.5 * fbm(flat * 2.2 + 3.0, 3) + 0.12 * fbm(flat * 11.0, 2))
+
+
+# Cracks on the lit face the camera sees, as paths of (angle around the shaft,
+# height) and a half width in metres. Each one is a groove a few cm deep.
+CRACKS = [
+    # the main crack, zigzagging down from the break across the flutes
+    ([(2.02, 2.56), (1.76, 2.36), (1.96, 2.16), (1.62, 1.96), (1.86, 1.76), (1.56, 1.52), (1.76, 1.3), (1.62, 1.1)], 0.015),
+    # its branches
+    ([(1.62, 1.96), (1.38, 1.86), (1.3, 1.64)], 0.01),
+    ([(1.86, 1.76), (2.14, 1.62), (2.3, 1.42), (2.5, 1.32)], 0.011),
+    # a shorter one near the top, and one in the lowest drum
+    ([(1.36, 2.32), (1.52, 2.12), (1.32, 1.96)], 0.01),
+    ([(2.24, 1.04), (2.06, 0.86), (2.22, 0.62)], 0.009),
+]
+
+# Chips torn out of the shaft near the break: shallow scoops, wide and ragged.
+# (angle, height, half width, half height, depth)
+SPALLS = [(2.05, 2.3, 0.15, 0.1, 0.05), (1.5, 2.08, 0.1, 0.07, 0.04), (2.5, 2.48, 0.12, 0.09, 0.045)]
+
+# Fallen pieces on the steps and on the ground, angular: centre, half sizes,
+# turn around the vertical and tilt (radians).
+RUBBLE = [
+    ((0.32, 0.33, 0.42), (0.08, 0.05, 0.06), 0.5, 0.3),
+    ((-0.27, 0.31, 0.46), (0.05, 0.035, 0.045), -0.4, -0.2),
+    ((0.82, 0.08, 0.74), (0.14, 0.08, 0.1), 0.9, 0.2),
+    ((-0.78, 0.05, 0.62), (0.08, 0.05, 0.07), -0.7, 0.35),
+    ((0.6, 0.04, 1.05), (0.05, 0.035, 0.04), 0.2, -0.4),
+    ((-0.5, 0.03, 0.95), (0.04, 0.03, 0.035), 1.1, 0.5),
+]
+
+
+def seg_dist(px, py, ax, ay, bx, by):
+    vx, vy = bx - ax, by - ay
+    t = np.clip(((px - ax) * vx + (py - ay) * vy) / (vx * vx + vy * vy), 0, 1)
+    return np.hypot(px - ax - vx * t, py - ay - vy * t)
+
+
+def crack_groove(q):
+    """How far each point is from the nearest crack, measured along the shaft
+    surface (arc length and height); negative inside a crack."""
+    yy = q[:, 1]
+    # the edges wander a little, so a crack is never drawn with a ruler
+    arc = np.arctan2(q[:, 2], q[:, 0]) * R_BOTTOM + 0.008 * fbm(np.stack([yy * 50, q[:, 0] * 50, q[:, 2] * 50], -1), 2)
+    ragged = 0.55 + 0.9 * vnoise(np.stack([arc * 60, yy * 60, np.zeros_like(yy)], -1))
+    groove = np.full(len(q), 1e9)
+    for path, w in CRACKS:
+        n = len(path) - 1
+        for i, ((a0, y0), (a1, y1)) in enumerate(zip(path, path[1:])):
+            dd = seg_dist(arc, yy, a0 * R_BOTTOM, y0, a1 * R_BOTTOM, y1)
+            # widest where it starts, a hairline at its tip
+            taper = 1.0 - 0.75 * (i + 0.5) / n
+            groove = np.minimum(groove, dd - w * taper * ragged)
+    return groove
+
+
+def sd_ellipsoid(p, r):
+    k0 = length(p / r)
+    k1 = length(p / (r * r))
+    return k0 * (k0 - 1.0) / np.maximum(k1, 1e-9)
 
 
 def weathered(d, q, amount, scale):
@@ -122,15 +184,38 @@ def sd_column(p):
     channel = FLUTE_DEPTH * np.sqrt(np.maximum(0.0, 1.0 - (phase * 2 - 1) ** 2))
     d_cyl = r2 - (rad - channel)
     d_shaft = np.maximum(d_cyl, SHAFT_BOTTOM - y)
-    # the joints between the drums, and a crack running down from the break
+    # the joints between the drums
     for joint in (1.08, 1.9):
-        d_shaft = smax(d_shaft, -(np.abs(y - joint) - 0.004), 0.004)
-    crack_x = 0.1 + 0.05 * np.sin(y * 7.0) + 0.03 * np.sin(y * 23.0)
-    crack = np.maximum(np.abs(x - crack_x) - 0.003, 1.55 - y)
-    d_shaft = smax(d_shaft, -np.maximum(crack, -z), 0.003)
+        d_shaft = smax(d_shaft, -(np.abs(y - joint) - 0.005), 0.004)
+    # cracks, cut 6 cm into the shaft
+    near = (r2 > rad - 0.09) & (r2 < rad + 0.05)
+    if near.any():
+        groove = crack_groove(q[near])
+        cut = np.maximum(groove, (rad[near] - 0.06) - r2[near])
+        d_shaft = d_shaft.copy()
+        d_shaft[near] = smax(d_shaft[near], -cut, 0.002)
+    # chips torn out near the break: shallow, ragged, rough inside
+    for a, h, hw, hh, depth in SPALLS:
+        c = np.array([R_BOTTOM * math.cos(a), h, R_BOTTOM * math.sin(a)])
+        n_out = np.array([math.cos(a), 0.0, math.sin(a)])
+        tang = np.array([-math.sin(a), 0.0, math.cos(a)])
+        rel = q - c
+        local_p = np.stack([(rel * tang).sum(-1), rel[:, 1], (rel * n_out).sum(-1)], -1)
+        hole = sd_ellipsoid(local_p, np.array([hw, hh, depth])) - 0.03 * fbm(rel * 14.0 + 5.0, 3)
+        d_shaft = smax(d_shaft, -hole, 0.006)
     d_shaft = np.maximum(d_shaft, (y - column_top(x, z)) * 0.6)
-    d_shaft = weathered(d_shaft, q, 0.006, 14.0)
-    return np.minimum(d, d_shaft)
+    d_shaft = weathered(d_shaft, q, 0.007, 14.0)
+    # the fallen pieces
+    rubble = np.full(len(p), 1e9)
+    for c, half, turn, tilt in RUBBLE:
+        rel = q - np.array(c)
+        ct, st = math.cos(turn), math.sin(turn)
+        rx, rz = ct * rel[:, 0] + st * rel[:, 2], -st * rel[:, 0] + ct * rel[:, 2]
+        cl, sl = math.cos(tilt), math.sin(tilt)
+        ry, rx = cl * rel[:, 1] - sl * rx, sl * rel[:, 1] + cl * rx
+        rubble = np.minimum(rubble, sd_box(np.stack([rx, ry, rz], -1), np.array(half)) - 0.006)
+    rubble = weathered(rubble, q, 0.018, 9.0)
+    return np.minimum(np.minimum(d, d_shaft), rubble)
 
 
 # ---------------------------------------------------------------- scene
@@ -219,6 +304,12 @@ def render(cam=(0.45, 1.25, 5.4), look=(0.0, 1.42, 0.0), fov_deg=34, cols=COLS, 
     ao = occlusion(p, n)
     grain = fbm(p * 38.0, 3)
     albedo = np.where(mat == COLUMN, 0.8 + 0.12 * grain, 0.1 + 0.06 * grain)
+    # the inside of a crack is dark: little light gets that deep
+    q = p - np.array([CX, 0.0, CZ])
+    inside = (mat == COLUMN) & (q[:, 1] > SHAFT_BOTTOM)
+    if inside.any():
+        g = crack_groove(q[inside])
+        albedo[inside] *= np.clip(0.18 + g / 0.012, 0.18, 1.0)
     spec = np.clip((n * norm(light - rd[idx])).sum(-1), 0, 1) ** 30 * (mat != GROUND)
     b = albedo * (0.10 * ao + 0.90 * diff * sh * (0.55 + 0.45 * ao)) + 0.18 * spec * sh
     # spotlight: the ground fades out away from the ruins
