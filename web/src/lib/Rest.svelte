@@ -28,14 +28,16 @@
     cursor: default;
   }
 
+  /* The art is 160 x 70 cells (scripts/art/pillar.py). Size it to fill most of
+     the height, but never wider than about two thirds of the screen. */
   pre {
     position: absolute;
-    right: 8vw;
-    bottom: 8vh;
+    right: 4vw;
+    bottom: 5vh;
     margin: 0;
-    color: var(--muted);
-    font-size: clamp(10px, 1.6vh, 15px);
-    line-height: 1.15;
+    color: var(--fg);
+    font-size: min(calc(82vh / 70), calc(66vw / 160 / 0.6));
+    line-height: 1;
     user-select: none;
   }
 </style>
