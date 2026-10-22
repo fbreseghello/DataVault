@@ -207,12 +207,12 @@
 <svelte:window {onkeydown} />
 
 <div class="grimoire">
-  <div class="toolbar">
+  <div class="toolbar page-toolbar">
     <span class="dim" aria-hidden="true">/</span>
     <input type="search" bind:this={search} bind:value={query} placeholder="search" aria-label="search" spellcheck="false" />
-    <button onclick={() => (close(), (editing = 'new'))}>+ new</button>
     <span class="spacer"></span>
-    <span class="dim count">{items.length} {items.length === 1 ? 'entry' : 'entries'}</span>
+    <span class="count">{items.length} {items.length === 1 ? 'entry' : 'entries'}</span>
+    <button class="new" onclick={() => (close(), (editing = 'new'))}>+ new</button>
   </div>
 
   <div class="body">
@@ -340,27 +340,8 @@
     min-height: 0;
   }
 
-  .toolbar {
-    display: flex;
-    align-items: center;
-    padding: 12px 24px;
-  }
-
-  .spacer {
-    flex: 1;
-  }
-
-  .count {
-    font-size: 11px;
-  }
-
   .dim {
     color: var(--dim);
-  }
-
-  .toolbar {
-    gap: 10px;
-    padding-top: 16px;
   }
 
   .toolbar input {
@@ -419,7 +400,9 @@
     font-size: 11px;
   }
 
+  /* position: relative anchors the front page icon (Placard) to this pane. */
   section {
+    position: relative;
     padding: 16px 32px;
     overflow-y: auto;
     min-height: 0;

@@ -295,16 +295,16 @@
 <svelte:window {onkeydown} />
 
 <div class="siege">
-  <div class="toolbar">
+  <div class="toolbar page-toolbar">
     <button onclick={() => go(shift(day, -1))} aria-label="previous day">‹</button>
     <span class="day" class:today={isToday}>{label(day)}</span>
     <button onclick={() => go(shift(day, 1))} aria-label="next day">›</button>
     {#if !isToday}<button onclick={() => go(today)}>today</button>{/if}
-    <button onclick={openAdd}>+ order</button>
     <span class="spacer"></span>
-    <span class="dim tally">
+    <span class="count">
       {#each COLUMNS as c, i (c.id)}{i ? ' · ' : ''}{column(c.id).length} {c.label.toLowerCase()}{/each}
     </span>
+    <button class="new" onclick={openAdd}>+ new</button>
   </div>
 
   {#if isToday && board.pending_before > 0}
@@ -397,12 +397,6 @@
     min-height: 0;
   }
 
-  .toolbar {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 24px;
-  }
 
   .day {
     min-width: 11ch;
@@ -414,17 +408,8 @@
     color: var(--fg);
   }
 
-  .spacer {
-    flex: 1;
-  }
-
-  .dim,
-  .tally {
+  .dim {
     color: var(--dim);
-  }
-
-  .tally {
-    font-size: 11px;
   }
 
   .carry {

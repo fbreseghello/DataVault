@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-22
+
 ### Adicionado
 
 - **Siege** (espada): o kanban do dia, um quadro por dia com as colunas
@@ -23,6 +25,9 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 - O crânio da tela de descanso foi redesenhado à mão para ser reconhecível no
   tamanho pequeno: órbitas, cavidade nasal, maçãs do rosto e dentes de cima.
 - Datas em inglês em todas as telas, como o resto da interface.
+- Layout padronizado entre as telas: a barra do topo tem a mesma altura em todas,
+  o "+ new" fica sempre no canto direito (no Siege, "+ order" virou "+ new") e o
+  ícone central fica sempre no mesmo ponto, inclusive na tela do PIN de selo.
 
 ## [0.10.0] - 2026-10-22
 
@@ -221,7 +226,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/fbreseghello/DataVault/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/fbreseghello/DataVault/compare/v0.9.2...v0.10.0
 [0.9.2]: https://github.com/fbreseghello/DataVault/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/fbreseghello/DataVault/compare/v0.9.0...v0.9.1

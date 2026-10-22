@@ -274,12 +274,12 @@
 <svelte:window {onkeydown} />
 
 <div class="unspoken">
-  <div class="toolbar">
+  <div class="toolbar page-toolbar">
     <button class="tab" class:on={view === 'live'} onclick={() => switchView('live')}>unspoken</button>
     <button class="tab" class:on={view === 'dead'} onclick={() => switchView('dead')}>dead words</button>
-    <button onclick={write}>+ new</button>
     <span class="spacer"></span>
-    <span class="dim count">{list.length} {list.length === 1 ? 'note' : 'notes'}</span>
+    <span class="count">{list.length} {list.length === 1 ? 'note' : 'notes'}</span>
+    <button class="new" onclick={write}>+ new</button>
   </div>
 
   <div class="body">
@@ -376,27 +376,13 @@
     min-height: 0;
   }
 
-  .toolbar {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 12px 24px;
-  }
 
   .tab.on {
     color: var(--fg);
   }
 
-  .spacer {
-    flex: 1;
-  }
-
   .dim {
     color: var(--dim);
-  }
-
-  .count {
-    font-size: 11px;
   }
 
   .body {
@@ -458,7 +444,9 @@
     padding: 0 24px;
   }
 
+  /* position: relative anchors the front page icon (Placard) to this pane. */
   section {
+    position: relative;
     padding: 16px 32px;
     min-height: 0;
     overflow: hidden;
