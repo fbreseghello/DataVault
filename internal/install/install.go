@@ -10,6 +10,7 @@ package install
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -136,10 +137,20 @@ func Uninstall() error {
 	return removeBinary(dst, dir)
 }
 
-// Cleanup removes the copy left behind when a running binary was replaced.
+// Cleanup removes the copies left behind when running binaries were replaced.
+// Copies still in use stay until a later run.
 func Cleanup() {
-	if t, err := Target(); err == nil {
-		_ = os.Remove(t + ".old")
+	t, err := Target()
+	if err != nil {
+		return
+	}
+	removeOld(t)
+}
+
+func removeOld(dst string) {
+	olds, _ := filepath.Glob(dst + ".old*")
+	for _, old := range olds {
+		_ = os.Remove(old)
 	}
 }
 
@@ -151,19 +162,40 @@ func replace(src, dst string) error {
 		os.Remove(tmp)
 		return err
 	}
+	var aside string
 	if _, err := os.Stat(dst); err == nil {
-		_ = os.Remove(dst + ".old")
-		if err := os.Rename(dst, dst+".old"); err != nil {
+		aside = asideName(dst)
+		if err := os.Rename(dst, aside); err != nil {
 			os.Remove(tmp)
 			return err
 		}
 	}
 	if err := os.Rename(tmp, dst); err != nil {
-		_ = os.Rename(dst+".old", dst)
+		if aside != "" {
+			_ = os.Rename(aside, dst)
+		}
 		return err
 	}
-	_ = os.Remove(dst + ".old") // fails harmlessly while the old binary still runs
+	if aside != "" {
+		_ = os.Remove(aside) // fails harmlessly while the old binary still runs
+	}
 	return nil
+}
+
+// asideName picks where the current binary moves during an update. Usually
+// dst.old, but that file may still be held by a session from an even older
+// version, so a free dst.old-N is used instead.
+func asideName(dst string) string {
+	old := dst + ".old"
+	if err := os.Remove(old); err == nil || errors.Is(err, os.ErrNotExist) {
+		return old
+	}
+	for n := 1; ; n++ {
+		name := fmt.Sprintf("%s-%d", old, n)
+		if err := os.Remove(name); err == nil || errors.Is(err, os.ErrNotExist) {
+			return name
+		}
+	}
 }
 
 func copyFile(src, dst string) error {

@@ -135,13 +135,13 @@ func broadcastEnvChange() {
 // detached cmd deletes it (and the empty directory) a moment after we exit.
 func removeBinary(dst, dir string) error {
 	if err := os.Remove(dst); err == nil {
-		_ = os.Remove(dst + ".old")
+		removeOld(dst)
 		_ = os.Remove(dir)
 		return nil
 	}
 	cmd := exec.Command("cmd.exe")
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		CmdLine:       fmt.Sprintf(`cmd.exe /c ping -n 3 127.0.0.1 >nul & del /f /q "%s" "%s.old" & rmdir "%s"`, dst, dst, dir),
+		CmdLine:       fmt.Sprintf(`cmd.exe /c ping -n 3 127.0.0.1 >nul & del /f /q "%s" "%s.old*" & rmdir "%s"`, dst, dst, dir),
 		CreationFlags: windows.DETACHED_PROCESS | windows.CREATE_NEW_PROCESS_GROUP,
 		HideWindow:    true,
 	}

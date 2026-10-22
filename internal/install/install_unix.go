@@ -29,6 +29,6 @@ func removeFromPath(dir string) error { return nil }
 // A running binary can be unlinked on Linux, and ~/.local/bin is shared, so
 // only the file goes.
 func removeBinary(dst, dir string) error {
-	_ = os.Remove(dst + ".old")
+	removeOld(dst)
 	return os.Remove(dst)
 }

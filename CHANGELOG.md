@@ -7,6 +7,13 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Corrigido
+
+- `dtvlt update` falhava com "Access is denied" no Windows quando uma sessão de
+  uma versão ainda mais antiga continuava aberta, porque ela segurava o arquivo
+  `dtvlt.exe.old`. Agora o binário atual vai para um nome livre (`dtvlt.exe.old-N`)
+  e todas essas cópias são apagadas quando ficam livres.
+
 ## [0.6.1] - 2026-10-22
 
 ### Corrigido
