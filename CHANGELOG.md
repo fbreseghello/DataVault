@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-21
+
 ### Adicionado
 
 - `dtvlt update`: baixa a release mais nova do GitHub, confere o SHA256 com o
@@ -62,7 +64,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/fbreseghello/DataVault/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/fbreseghello/DataVault/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/fbreseghello/DataVault/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/fbreseghello/DataVault/releases/tag/v0.1.0
