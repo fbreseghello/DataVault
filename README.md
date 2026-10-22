@@ -83,6 +83,10 @@ necessárias e **não existe recuperação**.
 O PIN opcional no terminal só impede que alguém inicie o `dtvlt` casualmente.
 Ele não criptografa nada.
 
+Depois de um tempo sem atividade no login (15 minutos por padrão, ajustável em
+**settings**; 0 desliga), a tela descansa: fica só um pilar quebrado em ASCII. O
+atalho `Ctrl+Shift+L` faz isso na hora e, com o vault aberto, também trava o vault.
+
 No Grimoire, uma credencial pode ser **selada**: para abri-la, é preciso o PIN
 de selo, que é único para todas as seladas e fica guardado dentro do vault. É
 uma segunda trava para quando o vault já está aberto (alguém olhando a tela, um

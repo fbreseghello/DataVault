@@ -92,7 +92,7 @@
     <span>auto-lock {info.auto_lock_minutes}m · clipboard {info.clipboard_clear_seconds}s</span>
     <span class="spacer"></span>
     {#if !settings && page === 'grimoire'}<span>n new · / search · esc close ·</span>{/if}
-    <span>1–{pages.length} pages</span>
+    <span>1–{pages.length} pages · ctrl+shift+l rest</span>
     <span class="version">{showVersion(info.version)}</span>
   </footer>
 </div>

@@ -3,6 +3,7 @@
   import { api, LOCKED_EVENT, type SessionInfo } from './lib/api'
   import { clearNow } from './lib/clipboard'
   import Login from './lib/Login.svelte'
+  import { isRestShortcut, requestRest } from './lib/restscreen.svelte'
   import Shell from './lib/Shell.svelte'
 
   let info = $state<SessionInfo | null>(null)
@@ -32,12 +33,22 @@
     }
   })
 
+  // ctrl+shift+L: lock the vault if it is open and show the rest screen.
+  async function onkeydown(e: KeyboardEvent) {
+    if (!isRestShortcut(e) || ended || !info) return
+    e.preventDefault()
+    if (info.unlocked) await lock()
+    requestRest()
+  }
+
   async function lock() {
     await api.lock().catch(() => {})
     void clearNow()
     await refresh()
   }
 </script>
+
+<svelte:window {onkeydown} />
 
 {#if ended}
   <main class="ended">

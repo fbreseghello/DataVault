@@ -11,6 +11,7 @@
   let autoLock = $state(15)
   let clipboard = $state(20)
   let checkUpdates = $state(true)
+  let rest = $state(15)
   let pin = $state('')
   let pinConfirm = $state('')
   let busy = $state(false)
@@ -27,6 +28,7 @@
     autoLock = s.auto_lock_minutes
     clipboard = s.clipboard_clear_seconds
     checkUpdates = s.check_updates
+    rest = s.rest_minutes
     pin = pinConfirm = ''
   }
 
@@ -52,6 +54,7 @@
           auto_lock_minutes: autoLock,
           clipboard_clear_seconds: clipboard,
           check_updates: checkUpdates,
+          rest_minutes: rest,
         }),
       )
       done = true
@@ -79,6 +82,11 @@
       <span>clear clipboard</span>
       <input type="number" min="5" max="600" bind:value={clipboard} required />
       <span class="unit">seconds after copy</span>
+    </label>
+    <label class="row">
+      <span>rest screen</span>
+      <input type="number" min="0" max="240" bind:value={rest} required />
+      <span class="unit">{rest === 0 ? 'off · ctrl+shift+l still rests' : 'minutes idle on the login · ctrl+shift+l rests now'}</span>
     </label>
 
     <h3>terminal <span>applies the next time dtvlt starts</span></h3>

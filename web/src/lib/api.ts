@@ -27,6 +27,8 @@ export interface SessionInfo {
   unlocked: boolean
   auto_lock_minutes: number
   clipboard_clear_seconds: number
+  /** Idle minutes on the login before the rest screen; 0 is off. */
+  rest_minutes: number
 }
 
 export class ApiError extends Error {
@@ -88,6 +90,7 @@ export interface Settings {
   auto_lock_minutes: number
   clipboard_clear_seconds: number
   check_updates: boolean
+  rest_minutes: number
   config_path: string
   vault_path: string
 }

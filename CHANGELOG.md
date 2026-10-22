@@ -7,6 +7,15 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-22
+
+### Adicionado
+
+- Atalho `Ctrl+Shift+L` para a tela de descanso. No login, vai direto para o pilar;
+  com o vault aberto, trava o vault e mostra o pilar.
+- Opção "rest screen" (minutos sem atividade no login até o descanso) na tela
+  settings e no `dtvlt config`. Padrão 15, até 240; 0 desliga o descanso automático.
+
 ## [0.8.0] - 2026-10-22
 
 ### Adicionado
@@ -160,7 +169,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/fbreseghello/DataVault/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/fbreseghello/DataVault/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/fbreseghello/DataVault/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/fbreseghello/DataVault/compare/v0.6.0...v0.6.1

@@ -65,3 +65,30 @@ func TestMissingCheckUpdatesDefaultsOn(t *testing.T) {
 		t.Fatal("check_updates should default to on")
 	}
 }
+
+func TestRestMinutes(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.toml")
+	old := "pin_enabled = false\nkeep_terminal = true\nauto_lock_minutes = 15\nclipboard_clear_seconds = 20\n"
+	if err := os.WriteFile(path, []byte(old), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.RestMinutes != 15 {
+		t.Fatalf("old configs should rest after 15 minutes, got %d", cfg.RestMinutes)
+	}
+	for _, m := range []int{0, 1, MaxRestMinutes} {
+		cfg.RestMinutes = m
+		if err := cfg.Validate(); err != nil {
+			t.Errorf("%d minutes rejected: %v", m, err)
+		}
+	}
+	for _, m := range []int{-1, MaxRestMinutes + 1} {
+		cfg.RestMinutes = m
+		if cfg.Validate() == nil {
+			t.Errorf("%d minutes accepted", m)
+		}
+	}
+}

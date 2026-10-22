@@ -22,6 +22,7 @@ func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 		"unlocked":                s.opts.Session.Unlocked(),
 		"auto_lock_minutes":       s.config().AutoLockMinutes,
 		"clipboard_clear_seconds": s.config().ClipboardClearSeconds,
+		"rest_minutes":            s.config().RestMinutes,
 	})
 }
 

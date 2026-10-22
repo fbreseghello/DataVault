@@ -20,10 +20,15 @@ type Config struct {
 	ClipboardClearSeconds int    `toml:"clipboard_clear_seconds"`
 	// CheckUpdates lets dtvlt ask GitHub for a newer release, each time it starts.
 	CheckUpdates bool `toml:"check_updates"`
+	// RestMinutes is the idle time before the login shows the rest screen; 0 turns it off.
+	RestMinutes int `toml:"rest_minutes"`
 }
 
+// MaxRestMinutes caps the rest screen delay.
+const MaxRestMinutes = 240
+
 func Default() Config {
-	return Config{KeepTerminal: true, AutoLockMinutes: 15, ClipboardClearSeconds: 20, CheckUpdates: true}
+	return Config{KeepTerminal: true, AutoLockMinutes: 15, ClipboardClearSeconds: 20, CheckUpdates: true, RestMinutes: 15}
 }
 
 func (c Config) Validate() error {
@@ -32,6 +37,9 @@ func (c Config) Validate() error {
 	}
 	if c.ClipboardClearSeconds < 5 || c.ClipboardClearSeconds > 600 {
 		return errors.New("clipboard_clear_seconds must be between 5 and 600")
+	}
+	if c.RestMinutes < 0 || c.RestMinutes > MaxRestMinutes {
+		return fmt.Errorf("rest_minutes must be between 0 (off) and %d", MaxRestMinutes)
 	}
 	if c.PinEnabled && c.PinHash == "" {
 		return errors.New("pin_enabled is set but no pin is configured")

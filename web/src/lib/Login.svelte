@@ -3,6 +3,7 @@
   import { api, type SessionInfo } from './api'
   import art from './art.txt?raw'
   import Rest from './Rest.svelte'
+  import { restRequest } from './restscreen.svelte'
   import { showVersion } from './version'
 
   let { info, onunlock }: { info: SessionInfo; onunlock: () => void } = $props()
@@ -15,8 +16,8 @@
   let error = $state('')
   let input = $state<HTMLInputElement>()
 
-  // After this long without a key or a mouse move, the login rests on the pillar screen.
-  const REST_AFTER = 15 * 60 * 1000
+  // After rest_minutes without a key or a mouse move, the login rests on the
+  // pillar screen; 0 turns that off (the shortcut still works).
   let resting = $state(false)
   let restTimer: ReturnType<typeof setTimeout> | undefined
   // Now and then the art stutters like the tube is striking again.
@@ -24,8 +25,16 @@
 
   function scheduleRest() {
     clearTimeout(restTimer)
-    restTimer = setTimeout(rest, REST_AFTER)
+    if (info.rest_minutes > 0) restTimer = setTimeout(rest, info.rest_minutes * 60_000)
   }
+
+  // The shortcut asked for the rest screen (possibly while the vault was open).
+  $effect(() => {
+    if (restRequest.pending) {
+      restRequest.pending = false
+      rest()
+    }
+  })
 
   function rest() {
     // Whatever was typed is dropped, so nobody finds it half entered.
