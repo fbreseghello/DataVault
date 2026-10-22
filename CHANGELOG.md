@@ -7,6 +7,15 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- Tela de descanso no login: depois de 15 minutos sem teclado nem mouse, a tela
+  fica só com um pilar quebrado em ASCII no canto direito, sobre o fundo preto,
+  sem neon e sem animação. Um clique ou uma tecla volta para o login (a tecla é
+  descartada), e o que estava digitado é apagado.
+- A arte "DataVault" do login pisca de vez em quando, como quando liga, em
+  intervalos aleatórios de 20 a 45 s. Com "reduzir movimento", não pisca.
+
 ### Alterado
 
 - O console não mostra mais a dica "type ,,, to open DataVault in the browser" ao abrir.

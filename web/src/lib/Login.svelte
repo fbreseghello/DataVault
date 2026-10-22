@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { tick } from 'svelte'
+  import { onMount, tick } from 'svelte'
   import { api, type SessionInfo } from './api'
   import art from './art.txt?raw'
+  import Rest from './Rest.svelte'
   import { showVersion } from './version'
 
   let { info, onunlock }: { info: SessionInfo; onunlock: () => void } = $props()
@@ -13,6 +14,60 @@
   let busy = $state(false)
   let error = $state('')
   let input = $state<HTMLInputElement>()
+
+  // After this long without a key or a mouse move, the login rests on the pillar screen.
+  const REST_AFTER = 15 * 60 * 1000
+  let resting = $state(false)
+  let restTimer: ReturnType<typeof setTimeout> | undefined
+  // Now and then the art stutters like the tube is striking again.
+  let flickering = $state(false)
+
+  function scheduleRest() {
+    clearTimeout(restTimer)
+    restTimer = setTimeout(rest, REST_AFTER)
+  }
+
+  function rest() {
+    // Whatever was typed is dropped, so nobody finds it half entered.
+    keyword = password = ''
+    step = 'keyword'
+    error = ''
+    resting = true
+  }
+
+  function wake() {
+    resting = false
+    scheduleRest()
+    tick().then(() => input?.focus())
+  }
+
+  onMount(() => {
+    const activity = () => {
+      if (!resting) scheduleRest()
+    }
+    const events = ['mousemove', 'mousedown', 'keydown', 'wheel', 'touchstart'] as const
+    for (const ev of events) window.addEventListener(ev, activity, { passive: true })
+    scheduleRest()
+
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let flickerTimer: ReturnType<typeof setTimeout>
+    const nextFlicker = () => {
+      flickerTimer = setTimeout(
+        () => {
+          if (!resting && !calm) flickering = true
+          nextFlicker()
+        },
+        20_000 + Math.random() * 25_000,
+      )
+    }
+    nextFlicker()
+
+    return () => {
+      clearTimeout(restTimer)
+      clearTimeout(flickerTimer)
+      for (const ev of events) window.removeEventListener(ev, activity)
+    }
+  })
 
   $effect(() => {
     void step
@@ -54,11 +109,21 @@
   }
 </script>
 
+{#if resting}
+  <Rest onwake={wake} />
+{:else}
 <!-- Clicking anywhere returns focus to the hidden input, like a terminal. -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 <main onclick={() => input?.focus()}>
   <!-- Two copies of the art: the crisp tube on top, a blurred halo behind it that breathes. -->
-  <div class="art" aria-hidden="true">
+  <div
+    class="art"
+    class:flicker={flickering}
+    aria-hidden="true"
+    onanimationend={(e) => {
+      if (e.animationName.endsWith('flicker')) flickering = false
+    }}
+  >
     <pre class="halo">{art}</pre>
     <pre class="tube">{art}</pre>
   </div>
@@ -104,6 +169,7 @@
 
   <footer>session {info.id} · {showVersion(info.version)}</footer>
 </main>
+{/if}
 
 <style>
   main {
@@ -226,6 +292,30 @@
       opacity: 1;
     }
     100% {
+      opacity: 1;
+    }
+  }
+
+  .art.flicker {
+    animation: flicker 0.9s linear;
+  }
+
+  /* A shorter stutter than power-on: the tube never goes fully dark. */
+  @keyframes flicker {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    8% {
+      opacity: 0.25;
+    }
+    12% {
+      opacity: 0.9;
+    }
+    18% {
+      opacity: 0.35;
+    }
+    26% {
       opacity: 1;
     }
   }
