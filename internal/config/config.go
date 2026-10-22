@@ -18,7 +18,7 @@ type Config struct {
 	KeepTerminal          bool   `toml:"keep_terminal"`
 	AutoLockMinutes       int    `toml:"auto_lock_minutes"`
 	ClipboardClearSeconds int    `toml:"clipboard_clear_seconds"`
-	// CheckUpdates lets dtvlt ask GitHub for a newer release, at most once a day.
+	// CheckUpdates lets dtvlt ask GitHub for a newer release, each time it starts.
 	CheckUpdates bool `toml:"check_updates"`
 }
 

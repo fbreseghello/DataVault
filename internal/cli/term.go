@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"golang.org/x/term"
@@ -20,6 +21,12 @@ type ui struct {
 	color bool
 	// pause keeps a double-clicked console window open after the command ends.
 	pause bool
+
+	// mu serializes output: session events arrive from other goroutines while
+	// the console waits for input. waiting holds the console prompt being shown,
+	// so an event can clear that line and draw it again below.
+	mu      sync.Mutex
+	waiting string
 }
 
 func newUI() *ui {
@@ -38,6 +45,8 @@ func (u *ui) dim(s string) string  { return u.style("2", s) }
 func (u *ui) bold(s string) string { return u.style("1", s) }
 
 func (u *ui) println(format string, args ...any) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
 	fmt.Fprintf(u.out, format+"\n", args...)
 }
 
@@ -50,12 +59,40 @@ func (u *ui) fail(format string, args ...any) {
 	u.println("  "+u.bold("!")+" "+format, args...)
 }
 
-// event prints a timestamped line for the session log.
+// event prints a timestamped line for the session log, above the console
+// prompt if one is waiting.
 func (u *ui) event(e string) {
-	u.println("%s  %s", u.dim(time.Now().Format("15:04")), e)
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	if u.waiting != "" {
+		if u.color {
+			fmt.Fprint(u.out, "\r\x1b[2K")
+		} else {
+			fmt.Fprintln(u.out)
+		}
+	}
+	fmt.Fprintf(u.out, "%s  %s\n", u.dim(time.Now().Format("15:04")), e)
+	if u.waiting != "" {
+		fmt.Fprint(u.out, u.waiting)
+	}
+}
+
+// command shows the console prompt and reads one line.
+func (u *ui) command(prompt string) (string, error) {
+	u.mu.Lock()
+	u.waiting = prompt
+	fmt.Fprint(u.out, prompt)
+	u.mu.Unlock()
+	line, err := u.readLine()
+	u.mu.Lock()
+	u.waiting = ""
+	u.mu.Unlock()
+	return line, err
 }
 
 func (u *ui) prompt(label, hint string) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
 	if hint != "" {
 		fmt.Fprintf(u.out, "  %-22s %s ", label, u.dim(hint))
 	} else {
@@ -120,11 +157,11 @@ func (u *ui) secret(label string) ([]byte, error) {
 	fd := int(os.Stdin.Fd())
 	if !term.IsTerminal(fd) {
 		s, err := u.readLine()
-		fmt.Fprintln(u.out)
+		u.println("")
 		return []byte(s), err
 	}
 	b, err := term.ReadPassword(fd)
-	fmt.Fprintln(u.out)
+	u.println("")
 	if err != nil {
 		return nil, errAborted
 	}

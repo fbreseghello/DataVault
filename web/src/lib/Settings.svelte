@@ -116,7 +116,7 @@
       <button type="button" class="toggle" class:on={checkUpdates} onclick={() => (checkUpdates = !checkUpdates)} aria-pressed={checkUpdates}>
         {checkUpdates ? 'on' : 'off'}
       </button>
-      <span class="unit">once a day, asks github.com for a newer version before the pin</span>
+      <span class="unit">on each start, asks github.com for a newer version before the pin</span>
     </div>
 
     <h3>files</h3>

@@ -40,7 +40,7 @@ func printBanner(u *ui) {
 
 const usage = `usage: dtvlt [command]
 
-  (none)    start a session and open DataVault in the browser
+  (none)    open the console (,,, opens DataVault in the browser)
   status    show the running session
   lock      lock the vault, keep the session
   stop      end the session
@@ -149,18 +149,7 @@ func status(u *ui, paths config.Paths) error {
 		if err != nil {
 			return err
 		}
-		state := "locked"
-		if st.Unlocked {
-			state = "unlocked"
-		}
-		u.row("session", u.bold(st.SessionID))
-		u.row("state", state)
-		ver := st.Version
-		if ver == "" {
-			ver = "0.6.0 or older"
-		}
-		u.row("version", ver)
-		u.row("url", st.URL)
+		printStatus(u, st)
 		u.row("pid", strconv.Itoa(st.PID))
 		return nil
 	})

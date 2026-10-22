@@ -41,7 +41,7 @@ Ele se instala em `~/.local/bin`, que já está no PATH da maioria das distribui
 ## Usar
 
 ```
-dtvlt            inicia a sessão e abre o DataVault no navegador
+dtvlt            abre o console (digite ,,, para abrir o DataVault no navegador)
 dtvlt status     mostra a sessão em execução
 dtvlt lock       trava o vault e mantém a sessão
 dtvlt stop       encerra a sessão
@@ -50,6 +50,28 @@ dtvlt update     baixa e instala a versão mais nova
 dtvlt uninstall  remove o dtvlt (o vault é mantido)
 dtvlt version    mostra a versão
 ```
+
+### O console
+
+Digitar `dtvlt` mostra a arte, a versão e o aviso de atualização (se houver).
+Com o PIN ativado, ele é pedido para destravar o console. Depois disso, o
+console espera comandos:
+
+```
+,,,       abre o DataVault no navegador
+status    mostra a sessão
+lock      trava o vault e mantém a sessão
+update    baixa e instala a versão mais nova
+config    altera as preferências
+version   mostra a versão
+clear     limpa a tela
+stop      encerra a sessão
+exit      sai do console
+```
+
+O navegador só abre com `,,,`. Com "manter terminal aberto" ligado, o console é
+dono da sessão: `exit` encerra a sessão e trava o vault. Com a opção desligada,
+a sessão roda em segundo plano: `exit` só fecha o console, e `stop` encerra a sessão.
 
 Na primeira execução, o `dtvlt` pergunta as preferências, cria o vault e salva
 o `config.toml`. Depois, dá para mudar tudo na tela **settings** do DataVault
@@ -72,10 +94,10 @@ computador deixado destravado). Ela volta a selar quando você sai dela.
 plataforma, confere o SHA256 com o `SHA256SUMS` da release e só então instala.
 Se o hash não bater, nada é instalado.
 
-Ao iniciar, antes do PIN, o `dtvlt` avisa quando há versão nova. Para isso, ele
-pergunta ao `api.github.com` qual é a release mais recente, **no máximo uma vez
-por dia** (a resposta fica em cache) e esperando no máximo 1,5 s. Nada além
-dessa consulta é enviado: não há telemetria. Dá para desligar em **settings**,
+Ao iniciar, antes do PIN, o `dtvlt` avisa quando há versão nova e pede para
+digitar `update`. Para isso, ele pergunta ao `api.github.com` qual é a release
+mais recente **a cada início**, esperando no máximo 1,5 s. Sem rede, ele usa a
+última resposta guardada. Nada além dessa consulta é enviado: não há telemetria. Dá para desligar em **settings**,
 no `dtvlt config` ou com `check_updates = false` no `config.toml`.
 
 O `SHA256SUMS` vem da mesma release, então ele detecta downloads corrompidos

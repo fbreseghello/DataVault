@@ -48,7 +48,7 @@ func installSelf(u *ui, paths config.Paths) error {
 		return err
 	}
 	if _, err := server.Dial(paths.State); err == nil {
-		u.println("  %s", u.dim("a session is running on the old version. dtvlt stop, then dtvlt, to switch."))
+		u.println("  %s", u.dim("the session still runs the old version. stop it, then run dtvlt again."))
 	}
 	return nil
 }
@@ -92,7 +92,7 @@ func updateNotice(u *ui, paths config.Paths) {
 	defer cancel()
 	c := &update.Client{HTTP: &http.Client{Timeout: updateCheckTimeout}}
 	if latest := c.Available(ctx, paths.UpdateCache, time.Now()); latest != "" {
-		u.row("update", u.bold(latest)+" available"+u.dim("  (you have "+version.Version+") · run dtvlt update"))
+		u.row("update", u.bold(latest)+" available"+u.dim("  (you have "+version.Version+") · type update"))
 		u.println("")
 	}
 }
@@ -153,7 +153,7 @@ func runUpdate(u *ui, paths config.Paths) error {
 	}
 	printInstalled(u, res)
 	if _, err := server.Dial(paths.State); err == nil {
-		u.println("  %s", u.dim("a session is running on the old version. dtvlt stop, then dtvlt, to switch."))
+		u.println("  %s", u.dim("the session still runs the old version. stop it, then run dtvlt again."))
 	}
 	u.row("notes", rel.URL)
 	return nil

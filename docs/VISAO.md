@@ -8,7 +8,7 @@ Um cofre local, de código aberto, para segredos de quem vive no terminal:
 logins, chaves de API, tokens, chaves SSH, seeds/passphrases, 2FA, notas seguras e comandos de servidor.
 
 - **Local-first:** os dados ficam só na máquina do usuário. Sem nuvem, sem conta, sem telemetria.
-  A única conexão de rede é a checagem de versão nova (no máximo uma vez por dia, desligável)
+  A única conexão de rede é a checagem de versão nova (a cada início, desligável)
   e o `dtvlt update`.
 - **Plataformas:** Windows e Linux.
 - **Nomes:** o produto se chama **DataVault**. O comando é **`dtvlt`**, que aparece só no CLI.
@@ -18,10 +18,11 @@ logins, chaves de API, tokens, chaves SSH, seeds/passphrases, 2FA, notas seguras
 
 ```
 $ dtvlt
-  [arte ASCII]
-  pin: ****                         ← só se o PIN estiver ativado
+  [arte ASCII]                                   v0.7.0
+  update  0.7.1 available · type update          ← só se houver versão nova
+  pin: ****                                      ← só se o PIN estiver ativado
   session 7f3a-91c2
-  http://127.0.0.1:48213            ← abre o navegador sozinho
+  dtvlt › ,,,                                    ← abre o navegador
 
 navegador
   [arte ASCII gótica]
@@ -30,11 +31,13 @@ navegador
   → vault aberto
 ```
 
-1. O usuário roda `dtvlt` e vê a arte ASCII.
-2. Se o PIN estiver ativado, o CLI pede o PIN.
-3. O CLI sobe o servidor local, mostra o Session ID e abre o navegador.
-4. O frontend mostra a tela de login: primeiro a palavra-chave, depois a senha.
-5. Com as duas certas, o vault é descriptografado e o frontend é liberado.
+1. O usuário roda `dtvlt` e vê a arte ASCII com a versão.
+2. Se houver versão nova, aparece o aviso pedindo para digitar `update`.
+3. Se o PIN estiver ativado, ele é pedido para destravar o console.
+4. O CLI sobe (ou reencontra) a sessão e abre o **console**, que espera comandos.
+   O navegador **não** abre sozinho: só quando o usuário digita `,,,`.
+5. O frontend mostra a tela de login: primeiro a palavra-chave, depois a senha.
+6. Com as duas certas, o vault é descriptografado e o frontend é liberado.
 
 ## Configuração inicial (primeiro `dtvlt`)
 
@@ -111,7 +114,7 @@ isso claramente. O PIN fica salvo como hash Argon2id na config.
 Outros processos e outras abas do navegador também alcançam portas locais. Por isso:
 
 - O servidor escuta só em `127.0.0.1`, numa porta aleatória.
-- O CLI abre o navegador com um **token de uso único** (validade de 60 s), trocado
+- O console (`,,,`) abre o navegador com um **token de uso único** (validade de 60 s), trocado
   por um cookie `HttpOnly` e `SameSite=Strict`. Sem esse token, nenhuma requisição é aceita.
 - Os headers `Host` e `Origin` são validados (contra DNS rebinding e CSRF).
 - Headers de segurança: CSP restrita, sem recursos externos e sem CDN. Tudo embutido no binário.

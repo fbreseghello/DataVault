@@ -124,7 +124,7 @@ func TestNoPublicRelease(t *testing.T) {
 	}
 }
 
-func TestAvailableCachesForADay(t *testing.T) {
+func TestAvailableAsksEveryStart(t *testing.T) {
 	old := version.Version
 	version.Version = "0.2.0"
 	t.Cleanup(func() { version.Version = old })
@@ -139,43 +139,41 @@ func TestAvailableCachesForADay(t *testing.T) {
 	defer srv.Close()
 	c := &Client{API: srv.URL, HTTP: srv.Client()}
 	cache := filepath.Join(t.TempDir(), "update-check.json")
-	now := time.Date(2026, 10, 21, 12, 0, 0, 0, time.UTC)
+	now := time.Now()
 
-	if got := c.Available(context.Background(), cache, now); got != "0.3.0" {
-		t.Fatalf("first check: %q", got)
+	for i := 1; i <= 3; i++ {
+		if got := c.Available(context.Background(), cache, now); got != "0.3.0" || calls != i {
+			t.Fatalf("start %d: %q after %d calls", i, got, calls)
+		}
 	}
-	if got := c.Available(context.Background(), cache, now.Add(time.Hour)); got != "0.3.0" || calls != 1 {
-		t.Fatalf("cached check: %q after %d calls", got, calls)
-	}
-	c.Available(context.Background(), cache, now.Add(25*time.Hour))
-	if calls != 2 {
-		t.Fatalf("expected a new call after a day, got %d", calls)
-	}
-
 	version.Version = "0.3.0"
-	if got := c.Available(context.Background(), cache, now.Add(26*time.Hour)); got != "" {
+	if got := c.Available(context.Background(), cache, now); got != "" {
 		t.Fatalf("up to date but got %q", got)
 	}
 }
 
-func TestAvailableCachesFailures(t *testing.T) {
+// Offline, the last release seen is still announced.
+func TestAvailableFallsBackToTheLastAnswer(t *testing.T) {
 	old := version.Version
 	version.Version = "0.2.0"
 	t.Cleanup(func() { version.Version = old })
 
-	calls := 0
+	online := true
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		calls++
-		http.NotFound(w, r)
+		if !online {
+			http.Error(w, "down", http.StatusBadGateway)
+			return
+		}
+		fmt.Fprint(w, `{"tag_name":"v0.3.0"}`)
 	}))
 	defer srv.Close()
 	c := &Client{API: srv.URL, HTTP: srv.Client()}
 	cache := filepath.Join(t.TempDir(), "update-check.json")
-	now := time.Now()
-	c.Available(context.Background(), cache, now)
-	c.Available(context.Background(), cache, now.Add(time.Minute))
-	if calls != 1 {
-		t.Fatalf("a failed check should be cached, got %d calls", calls)
+
+	c.Available(context.Background(), cache, time.Now())
+	online = false
+	if got := c.Available(context.Background(), cache, time.Now()); got != "0.3.0" {
+		t.Fatalf("offline: %q", got)
 	}
 }
 

@@ -7,6 +7,22 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-22
+
+### Adicionado
+
+- **Console do `dtvlt`.** Digitar `dtvlt` mostra a arte, a versão e o aviso de
+  atualização, pede o PIN (se ativado) e abre um console que espera comandos:
+  `,,,` (abre o DataVault no navegador), `status`, `lock`, `update`, `config`,
+  `version`, `clear`, `stop` e `exit`. Os eventos da sessão aparecem acima do prompt.
+
+### Alterado
+
+- O navegador não abre mais sozinho ao digitar `dtvlt`: só com `,,,` no console.
+- O aviso de atualização é conferido a cada início (não mais uma vez por dia) e
+  pede para digitar `update`. Sem rede, vale a última resposta guardada.
+- Conectar o console a uma sessão já aberta também pede o PIN.
+
 ### Corrigido
 
 - `dtvlt update` falhava com "Access is denied" no Windows quando uma sessão de
@@ -128,7 +144,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/fbreseghello/DataVault/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/fbreseghello/DataVault/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/fbreseghello/DataVault/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/fbreseghello/DataVault/compare/v0.5.0...v0.5.1

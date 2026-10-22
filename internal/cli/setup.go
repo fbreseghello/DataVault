@@ -84,7 +84,7 @@ func askPreferences(u *ui, cur config.Config) (config.Config, error) {
 	if cfg.ClipboardClearSeconds, err = u.number("clear clipboard (s)", cur.ClipboardClearSeconds, 5, 600); err != nil {
 		return cfg, err
 	}
-	u.println("  %s", u.dim("once a day dtvlt can ask github.com for a newer version. nothing else is sent."))
+	u.println("  %s", u.dim("on each start dtvlt can ask github.com for a newer version. nothing else is sent."))
 	if cfg.CheckUpdates, err = u.confirm("check for updates", cur.CheckUpdates); err != nil {
 		return cfg, err
 	}
