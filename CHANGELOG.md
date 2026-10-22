@@ -10,8 +10,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 ### Alterado
 
 - O coração do Unspoken ficou visivelmente partido: as duas metades se separam por
-  uma fenda em zigue-zague e a da direita cai um pixel, em vez de uma rachadura fina
-  que sumia no tamanho pequeno.
+  uma fenda em zigue-zague de 2 pixels, em vez de uma rachadura fina que sumia no
+  tamanho pequeno.
 
 ## [0.12.0] - 2026-10-22
 
