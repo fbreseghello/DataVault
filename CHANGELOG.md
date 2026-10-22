@@ -7,6 +7,14 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-10-22
+
+### Alterado
+
+- O crânio da tela de descanso agora está em três quartos, virado uns 30° para a
+  esquerda: a órbita distante vira uma fenda, a próxima é larga e fechada por osso,
+  o nariz fica sob a ponte e a lateral mostra a têmpora e o arco da maçã do rosto.
+
 ## [0.11.0] - 2026-10-22
 
 ### Adicionado
@@ -226,7 +234,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.11.1...HEAD
+[0.11.1]: https://github.com/fbreseghello/DataVault/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/fbreseghello/DataVault/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/fbreseghello/DataVault/compare/v0.9.2...v0.10.0
 [0.9.2]: https://github.com/fbreseghello/DataVault/compare/v0.9.1...v0.9.2

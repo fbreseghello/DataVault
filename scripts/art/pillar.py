@@ -214,22 +214,26 @@ def ground_band(x, y):
 
 
 # A skull without its jaw, drawn by hand: at this size, computed shading turns
-# into a blob, so the orbits, nasal cavity, cheekbones and upper teeth are placed
-# character by character. Lit from the left and turned a little to its left:
-# the left orbit is narrower and the right side falls into shadow. Spaces inside
-# the outline are holes and stay dark.
+# into a blob, so every feature is placed character by character. It is seen in
+# three-quarter view, turned about 30 degrees to its left: the far orbit is a
+# narrow slit on the left, the near one is wide and closed by bone, the nasal
+# cavity sits under the bridge, and the right side shows the temple, the
+# cheekbone arch with the dark gap beneath it, and the back of the head. Lit from
+# the left. Spaces inside the outline are holes and stay dark.
 SKULL = """\
-      .:=+*##**+=:.
-    :*%@@@@@@%%%##*+:
-   +@@@@@@@@@%%%%##**=
-  =@@%*=-=*%@%#+=-=+*#+:
-  %@*.    .*@%-     :*+:
-  *@%+:..:+%@@#=.  .:+*=.
-  :#@@@%%%#=. .=#%%##*+:
-   .*%@@%%-    -#%#**=.
-     :*%%#*+:=*##*+:
-      -#:#*:#*:#*:+.
-      .+ .+ .+ .+ ."""
+        .:=+****+=-:.
+     .=*%@@@@%%%###**+=:.
+   .*@@@@@@@@%%%%%%###**+=:
+  :%@@@@@@@@%%%%%%%####**++=.
+  *@%*+*%@%*=-=*%%%%###***+=:
+ .%@: .#@#.    :#%#**++**+==.
+ :%@  .#@=      *%#*+==+*+=:
+  *@: .#@#.    .*%#+====++=.
+  -%@#*  .+%@%%%%+:   .=+=-:
+   =%@-  .=*##*#*=:.  .-=:.
+    *%#*-=*##*=:.:-=-=-:.
+    :#:#*:#*:#+.
+    .+ .+ .+ ."""
 SKULL_COL = int(cx + 50)            # left edge of the drawing
 SKULL_W = max(len(l) for l in SKULL.split("\n"))
 
