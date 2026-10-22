@@ -28,15 +28,15 @@
     cursor: default;
   }
 
-  /* The art is 131 x 70 cells (scripts/art/pillar.py). Size it to fill most of
-     the height, but never wider than about two thirds of the screen. */
+  /* The art is 88 x 110 cells (scripts/art/scene.py). Size it to fill most of
+     the height, but never wider than about half of the screen. */
   pre {
     position: absolute;
     right: 4vw;
     bottom: 5vh;
     margin: 0;
     color: var(--fg);
-    font-size: min(calc(82vh / 70), calc(60vw / 131 / 0.6));
+    font-size: min(calc(88vh / 110), calc(50vw / 88 / 0.6));
     line-height: 1;
     user-select: none;
   }

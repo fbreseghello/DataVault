@@ -7,6 +7,15 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Alterado
+
+- A tela de descanso agora é só a coluna dórica partida, bem mais alta (cerca de
+  3 m, em três tambores), renderizada em 3D e convertida em ASCII: caneluras, pedra
+  gasta, rachadura, a fratura no topo e três degraus lascados, com luz lateral,
+  sombras suaves e oclusão. Ocupa quase toda a altura da tela. O crânio saiu.
+  A arte é gerada por `scripts/art/scene.py` (precisa de `numpy` e `pillow`),
+  que substitui o `pillar.py`.
+
 ## [0.11.1] - 2026-10-22
 
 ### Alterado
