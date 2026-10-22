@@ -52,6 +52,18 @@ func (s *Server) handleLock(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// handleEndSession ends the whole session from the browser, like `dtvlt stop`:
+// the vault locks and the process shuts down. Locking alone keeps it running.
+func (s *Server) handleEndSession(w http.ResponseWriter, r *http.Request) {
+	s.opts.Session.Lock("")
+	s.dropGrants()
+	s.opts.Session.Log("ended from the browser")
+	w.WriteHeader(http.StatusNoContent)
+	if s.opts.OnStop != nil {
+		go s.opts.OnStop()
+	}
+}
+
 func (s *Server) handleListItems(w http.ResponseWriter, r *http.Request) {
 	v, err := s.opts.Session.Vault()
 	if err != nil {

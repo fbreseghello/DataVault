@@ -34,7 +34,7 @@ type Options struct {
 	VaultPath  string
 	// Assets is the built frontend (index.html at its root).
 	Assets fs.FS
-	// OnStop is called when `dtvlt stop` asks the server to shut down.
+	// OnStop is called when `dtvlt stop` or the browser asks the session to end.
 	OnStop func()
 }
 
@@ -131,6 +131,7 @@ func (s *Server) routes() http.Handler {
 	api.HandleFunc("GET /api/session", s.handleSession)
 	api.HandleFunc("POST /api/unlock", s.handleUnlock)
 	api.HandleFunc("POST /api/lock", s.handleLock)
+	api.HandleFunc("POST /api/session/end", s.handleEndSession)
 	api.HandleFunc("GET /api/items", s.handleListItems)
 	api.HandleFunc("POST /api/items", s.handleCreateItem)
 	api.HandleFunc("GET /api/items/{id}", s.handleGetItem)

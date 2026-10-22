@@ -2,16 +2,22 @@
   import { onMount } from 'svelte'
   import { api, LOCKED_EVENT, type SessionInfo } from './lib/api'
   import { clearNow } from './lib/clipboard'
+  import Ended from './lib/Ended.svelte'
   import Login from './lib/Login.svelte'
   import { isRestShortcut, requestRest } from './lib/restscreen.svelte'
   import Shell from './lib/Shell.svelte'
 
   let info = $state<SessionInfo | null>(null)
   let ended = $state(false)
+  // Set when the session was ended from this tab: from then on nothing may
+  // bring the login back, not even a poll that slips in before the shutdown.
+  let closed = false
 
   async function refresh() {
+    if (closed) return
     try {
       const next = await api.session()
+      if (closed) return
       if (info?.unlocked && !next.unlocked) void clearNow()
       info = next
       ended = false
@@ -41,6 +47,13 @@
     requestRest()
   }
 
+  async function endSession() {
+    closed = true
+    await api.endSession().catch(() => {})
+    void clearNow()
+    ended = true
+  }
+
   async function lock() {
     await api.lock().catch(() => {})
     void clearNow()
@@ -51,31 +64,9 @@
 <svelte:window {onkeydown} />
 
 {#if ended}
-  <main class="ended">
-    <p>session ended</p>
-    <p class="dim">run <span class="cmd">dtvlt</span> to start a new one</p>
-  </main>
+  <Ended />
 {:else if info?.unlocked}
-  <Shell {info} onlock={lock} onrefresh={refresh} />
+  <Shell {info} onlock={lock} onrefresh={refresh} onend={endSession} />
 {:else if info}
   <Login {info} onunlock={refresh} />
 {/if}
-
-<style>
-  .ended {
-    min-height: 100vh;
-    display: grid;
-    place-content: center;
-    text-align: center;
-    gap: 4px;
-  }
-  .ended p {
-    margin: 0;
-  }
-  .dim {
-    color: var(--dim);
-  }
-  .cmd {
-    color: var(--muted);
-  }
-</style>

@@ -14,6 +14,18 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
   crânio sem mandíbula em traços), **skull-ii** (o mesmo crânio em pó) ou
   **random**, que sorteia uma das três cada vez que a tela descansa. Os crânios
   ficam no canto inferior direito. Configs antigas continuam no pillar.
+- Lápide no pé da barra lateral para **encerrar a sessão** pelo navegador, como o
+  `stop` do console: trava o vault e encerra o `dtvlt` (e o console, se estiver
+  aberto no terminal). Pede um segundo clique em até 3 s para confirmar. Diferente
+  do `lock`, que só trava e mantém a sessão aberta.
+- Tela "session ended", com a lápide, depois que a sessão termina.
+- Quarta página na barra lateral (cruz sobre um monte de terra, tecla `4`), ainda
+  sem função: mostra só "untitled · nothing here yet".
+
+### Alterado
+
+- Novo ícone do Grimoire: um livro fechado com um crânio na capa, a borda das
+  páginas e uma fita marcadora, no mesmo pixel art de 1 bit dos outros ícones.
 
 ## [0.11.2] - 2026-10-22
 

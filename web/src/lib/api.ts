@@ -188,6 +188,8 @@ export const api = {
   session: () => request<SessionInfo>('GET', '/api/session'),
   unlock: (keyword: string, password: string) => request<void>('POST', '/api/unlock', { keyword, password }),
   lock: () => request<void>('POST', '/api/lock'),
+  /** Ends the whole session: locks the vault and shuts dtvlt down. */
+  endSession: () => request<void>('POST', '/api/session/end'),
   list: (q = '') => request<Summary[]>('GET', '/api/items' + (q ? '?q=' + encodeURIComponent(q) : '')),
   get: (id: string) => request<Item>('GET', '/api/items/' + encodeURIComponent(id)),
   create: (item: ItemInput) => saveItem('POST', '/api/items', item, ''),

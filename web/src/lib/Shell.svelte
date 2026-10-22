@@ -6,9 +6,15 @@
   import Settings from './Settings.svelte'
   import Siege from './Siege.svelte'
   import Unspoken from './Unspoken.svelte'
+  import Vacant from './Vacant.svelte'
   import { showVersion } from './version'
 
-  let { info, onlock, onrefresh }: { info: SessionInfo; onlock: () => void; onrefresh: () => void } = $props()
+  let {
+    info,
+    onlock,
+    onrefresh,
+    onend,
+  }: { info: SessionInfo; onlock: () => void; onrefresh: () => void; onend: () => void } = $props()
 
   type Page = { id: string; label: string; icon: IconName }
 
@@ -17,6 +23,8 @@
     { id: 'grimoire', label: 'grimoire', icon: 'book' },
     { id: 'heart', label: 'unspoken', icon: 'heart' },
     { id: 'sword', label: 'siege', icon: 'sword' },
+    // Not decided yet: the cross holds its place in the sidebar.
+    { id: 'cross', label: 'untitled', icon: 'cross' },
   ]
 
   let page = $state('grimoire')
@@ -26,6 +34,22 @@
   function go(id: string) {
     page = id
     settings = false
+  }
+
+  // Ending the session shuts dtvlt down (and its console, when it runs in a
+  // terminal), so the tombstone asks for a second click within a few seconds.
+  let ending = $state(false)
+  let endTimer: ReturnType<typeof setTimeout> | undefined
+
+  function endClick() {
+    if (!ending) {
+      ending = true
+      clearTimeout(endTimer)
+      endTimer = setTimeout(() => (ending = false), 3000)
+      return
+    }
+    clearTimeout(endTimer)
+    onend()
   }
 
   function isTyping(t: EventTarget | null) {
@@ -64,6 +88,16 @@
         </button>
       {/each}
     </nav>
+    <button
+      class="page end"
+      class:armed={ending}
+      onclick={endClick}
+      onblur={() => (ending = false)}
+      aria-label={ending ? 'end the session: click again to confirm' : 'end the session'}
+    >
+      <Icon name="tomb" />
+      <span class="tip" aria-hidden="true">{ending ? 'click again to end the session' : 'end session'}</span>
+    </button>
   </aside>
 
   <header>
@@ -84,6 +118,9 @@
     </div>
     <div class="page-view" hidden={settings || page !== 'sword'}>
       <Siege active={!settings && page === 'sword'} />
+    </div>
+    <div class="page-view" hidden={settings || page !== 'cross'}>
+      <Vacant icon="cross" title="untitled" />
     </div>
     {#if settings}
       <div class="page-view padded">
@@ -116,6 +153,7 @@
   }
 
   aside {
+    position: relative;
     grid-area: side;
     /* An inset shadow instead of a border keeps the full 64px for the icons,
        so the pixel art lands on whole pixels. */
@@ -161,6 +199,21 @@
     background: var(--fg);
   }
 
+
+  /* The tombstone sits apart at the foot of the sidebar; the pages stay centred. */
+  .end {
+    position: absolute;
+    bottom: 16px;
+  }
+
+  .end.armed {
+    color: var(--accent);
+  }
+
+  .end.armed .tip {
+    opacity: 1;
+    color: var(--accent);
+  }
 
   .tip {
     position: absolute;

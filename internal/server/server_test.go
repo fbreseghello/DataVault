@@ -133,6 +133,29 @@ func TestMutationsNeedSameOrigin(t *testing.T) {
 	}
 }
 
+func TestEndSession(t *testing.T) {
+	s := startServer(t)
+	stopped := make(chan struct{})
+	s.opts.OnStop = func() { close(stopped) }
+	c := browser(t)
+	signIn(t, s, c)
+	if r := post(t, s, c, "/api/session/end", "", map[string]string{"Origin": "http://evil.example", "X-Dtvlt": "1"}); r.StatusCode != http.StatusForbidden {
+		t.Fatalf("foreign origin ended the session: %s", r.Status)
+	}
+	post(t, s, c, "/api/unlock", `{"keyword":"kw","password":"pw"}`, sameOrigin)
+	if r := post(t, s, c, "/api/session/end", "", sameOrigin); r.StatusCode != http.StatusNoContent {
+		t.Fatalf("end: %s", r.Status)
+	}
+	select {
+	case <-stopped:
+	case <-time.After(2 * time.Second):
+		t.Fatal("the session was not stopped")
+	}
+	if s.opts.Session.Unlocked() {
+		t.Fatal("ending the session should lock the vault")
+	}
+}
+
 func TestUnlockAndItems(t *testing.T) {
 	s := startServer(t)
 	c := browser(t)
