@@ -8,7 +8,8 @@ logins, chaves de API, chaves SSH, seeds, notas seguras e comandos de servidor.
 - Você inicia pelo terminal com `dtvlt`, e a interface abre no navegador em `127.0.0.1`.
 - Windows e Linux.
 
-A visão completa e as decisões de design estão em [docs/VISAO.md](docs/VISAO.md).
+A visão completa e as decisões de design estão em [docs/VISAO.md](docs/VISAO.md),
+e o guia visual (cores, ícones, arte ASCII, tom) em [docs/ESTILO.md](docs/ESTILO.md).
 
 > Projeto em estágio inicial (0.x). O formato do arquivo ainda pode mudar.
 

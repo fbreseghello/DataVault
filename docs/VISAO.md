@@ -141,13 +141,18 @@ Todos os itens têm tags e campos personalizados.
 
 ## Estética
 
-O clima é de ferramenta de terminal séria, **sem "hacker cringe"**.
+O clima é de ferramenta de terminal séria, **sem "hacker cringe"**, com um tom gótico
+contido (o tema **souls**: ruínas, lápides, ossos e livros antigos como natureza-morta).
 
 - **Sim:** monocromático (branco e cinza sobre preto), uma cor de destaque usada com
   muita parcimônia, fonte monoespaçada de qualidade, linguagem seca e técnica no estilo
-  de CLIs modernos (`gh`, `fly`, ferramentas da Charm), animações lentas e sutis.
-- **Não:** verde Matrix, "ACCESS GRANTED", glitch, caveiras, chuva de caracteres,
-  mensagens dramáticas.
+  de CLIs modernos (`gh`, `fly`, ferramentas da Charm), animações lentas e sutis,
+  imagens paradas.
+- **Não:** verde Matrix, "ACCESS GRANTED", glitch, caveiras animadas ou "assustadoras",
+  chuva de caracteres, mensagens dramáticas.
+
+Os detalhes (cores, tipografia, layout, ícones, arte ASCII, tom e terminal) estão no
+[guia de estilo](ESTILO.md).
 
 ## Stack
 
