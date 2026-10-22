@@ -12,6 +12,12 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 - O coração do Unspoken ficou visivelmente partido: as duas metades se separam por
   uma fenda em zigue-zague de 2 pixels, em vez de uma rachadura fina que sumia no
   tamanho pequeno.
+- Os dois crânios da tela de descanso agora olham para a esquerda.
+
+### Corrigido
+
+- Na tela settings, as opções do "rest style" quebravam linha e passavam por cima
+  da descrição. A escolha agora é um dropdown, alinhado com os outros campos.
 
 ## [0.12.0] - 2026-10-22
 
