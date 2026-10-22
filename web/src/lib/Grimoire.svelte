@@ -316,7 +316,7 @@
 
           </div>
 
-          <p class="meta">updated {new Date(opened.updated_at).toLocaleString()}</p>
+          <p class="meta">updated {new Date(opened.updated_at).toLocaleString('en-GB')}</p>
 
           <div class="buttons">
             <button onclick={() => (editing = opened)}>edit</button>

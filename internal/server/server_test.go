@@ -395,3 +395,59 @@ func TestNotes(t *testing.T) {
 		t.Fatalf("delete buried: %d", code)
 	}
 }
+
+func TestTasks(t *testing.T) {
+	s := startServer(t)
+	c := browser(t)
+	signIn(t, s, c)
+	call(t, s, c, "POST", "/api/unlock", `{"keyword":"kw","password":"pw"}`, nil, nil)
+
+	var old vault.Task
+	if code := call(t, s, c, "POST", "/api/tasks", `{"title":"yesterday","day":"2026-10-21"}`, nil, &old); code != http.StatusCreated {
+		t.Fatalf("create: %d", code)
+	}
+	if code := call(t, s, c, "POST", "/api/tasks", `{"title":"","day":"2026-10-22"}`, nil, nil); code != http.StatusBadRequest {
+		t.Fatalf("empty title: %d", code)
+	}
+	var today vault.Task
+	call(t, s, c, "POST", "/api/tasks", `{"title":"today","day":"2026-10-22"}`, nil, &today)
+
+	var board struct {
+		Tasks         []vault.Task `json:"tasks"`
+		PendingBefore int          `json:"pending_before"`
+		PendingDay    string       `json:"pending_day"`
+	}
+	call(t, s, c, "GET", "/api/tasks?day=2026-10-22", "", nil, &board)
+	if len(board.Tasks) != 1 || board.PendingBefore != 1 || board.PendingDay != "2026-10-21" {
+		t.Fatalf("board: %+v", board)
+	}
+	if code := call(t, s, c, "GET", "/api/tasks?day=bad", "", nil, nil); code != http.StatusBadRequest {
+		t.Fatalf("bad day: %d", code)
+	}
+
+	var moved vault.Task
+	call(t, s, c, "POST", "/api/tasks/"+today.ID+"/move", `{"column":"conquered","index":0}`, nil, &moved)
+	if moved.Column != vault.Conquered {
+		t.Fatalf("move: %+v", moved)
+	}
+	if code := call(t, s, c, "POST", "/api/tasks/"+today.ID+"/move", `{"column":"retreat","index":0}`, nil, nil); code != http.StatusBadRequest {
+		t.Fatalf("bad column: %d", code)
+	}
+
+	var carried map[string]int
+	call(t, s, c, "POST", "/api/tasks/carry", `{"day":"2026-10-22"}`, nil, &carried)
+	if carried["moved"] != 1 {
+		t.Fatalf("carry: %v", carried)
+	}
+	call(t, s, c, "GET", "/api/tasks?day=2026-10-22", "", nil, &board)
+	if len(board.Tasks) != 2 || board.PendingBefore != 0 {
+		t.Fatalf("board after carry: %+v", board)
+	}
+
+	if code := call(t, s, c, "PUT", "/api/tasks/"+old.ID, `{"title":"renamed","note":"n"}`, nil, nil); code != http.StatusOK {
+		t.Fatalf("edit: %d", code)
+	}
+	if code := call(t, s, c, "DELETE", "/api/tasks/"+old.ID, "", nil, nil); code != http.StatusNoContent {
+		t.Fatalf("delete: %d", code)
+	}
+}

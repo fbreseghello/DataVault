@@ -28,6 +28,8 @@ type payload struct {
 	Items []Item `json:"items"`
 	// Notes are the Unspoken entries.
 	Notes []Note `json:"notes,omitempty"`
+	// Tasks are the Siege boards, one per day.
+	Tasks []Task `json:"tasks,omitempty"`
 	// SealPIN is the Argon2id hash of the PIN that opens sealed items.
 	SealPIN string `json:"seal_pin,omitempty"`
 }

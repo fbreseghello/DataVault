@@ -121,6 +121,30 @@ async function saveNote(method: string, path: string, note: NoteInput, token: st
 
 const notePath = (id: string) => '/api/notes/' + encodeURIComponent(id)
 
+/** Siege columns, in board order. */
+export type Column = 'orders' | 'in_battle' | 'conquered' | 'fallen'
+
+export interface Task {
+  id: string
+  title: string
+  note: string
+  column: Column
+  /** The local date the task belongs to, YYYY-MM-DD. */
+  day: string
+  position: number
+  created_at: string
+  updated_at: string
+}
+
+export interface Board {
+  tasks: Task[]
+  /** Unfinished tasks left on earlier days, and the latest of those days. */
+  pending_before: number
+  pending_day: string
+}
+
+const taskPath = (id: string) => '/api/tasks/' + encodeURIComponent(id)
+
 export interface Settings {
   pin_enabled: boolean
   keep_terminal: boolean
@@ -138,6 +162,14 @@ export type SettingsInput = Omit<Settings, 'config_path' | 'vault_path'> & {
 }
 
 export const api = {
+  board: (day: string) => request<Board>('GET', '/api/tasks?day=' + encodeURIComponent(day)),
+  createTask: (title: string, day: string, column: Column = 'orders') =>
+    request<Task>('POST', '/api/tasks', { title, note: '', column, day }),
+  updateTask: (id: string, title: string, note: string) => request<Task>('PUT', taskPath(id), { title, note }),
+  moveTask: (id: string, column: Column, index: number) =>
+    request<Task>('POST', taskPath(id) + '/move', { column, index }),
+  deleteTask: (id: string) => request<void>('DELETE', taskPath(id)),
+  carryTasks: (day: string) => request<{ moved: number }>('POST', '/api/tasks/carry', { day }),
   notes: (buried: boolean) => request<NoteSummary[]>('GET', '/api/notes' + (buried ? '?buried=1' : '')),
   note: (id: string, token = '') => request<Note>('GET', notePath(id), undefined, token),
   createNote: (note: NoteInput) => saveNote('POST', '/api/notes', note, ''),

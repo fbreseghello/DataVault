@@ -216,7 +216,7 @@ do celular para isso; aqui o texto fica criptografado no vault.
 - **Dados:** uma coleção própria de notas dentro do payload criptografado do vault.
   As regras do selo (token por nota, que morre no lock) são as mesmas das credenciais.
 
-### Siege (planejado)
+### Siege
 
 O plano de batalha do dia. **Um quadro por dia**, com quatro colunas:
 

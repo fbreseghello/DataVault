@@ -266,8 +266,8 @@
     const d = new Date(iso)
     const today = new Date().toDateString() === d.toDateString()
     return today
-      ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      : d.toLocaleDateString([], { day: '2-digit', month: 'short', year: 'numeric' })
+      ? d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+      : d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
   }
 </script>
 

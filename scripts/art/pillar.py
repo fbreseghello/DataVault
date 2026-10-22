@@ -8,7 +8,6 @@ wide). Each cell averages several samples, so silhouettes are antialiased, and
 brightness 0..1 maps onto a long character ramp from sparse to dense.
 """
 import math
-import os
 import sys
 
 W, H = 172, 84
@@ -208,83 +207,45 @@ def ground_band(x, y):
         b = (0.13 + 0.10 * stone(x * 0.7, y * 3)) * fade
         if cx + steps[0] < x < cx + steps[0] + 14:
             b *= 0.3
-        if SKX + 1.0 * SKU < x < SKX + 1.7 * SKU:
+        if SKULL_COL + SKULL_W < x < SKULL_COL + SKULL_W + 8:
             b *= 0.3
         return b if b > 0.03 else None
     return None
 
 
-# A skull without its jaw, resting on the ground right of the column and turned
-# a little to its left (our left): the features slide left of the cranium, the
-# far (left) orbit is foreshortened and the right temple turns into shadow.
-# u, v are normalised: the cranium is about 2 wide; v grows downward.
-# Real scale would make it about a tenth of the column width, too small to read
-# in characters; this is the smallest size where the orbits and teeth still show.
-SKU = float(os.environ.get("SKULL_UNIT", "7.5"))   # columns per unit
-SKX = cx + 61.0
-SKY = ground - 1.12 * SKU / 2.0             # teeth rest on the ground
-TURN = -0.16
+# A skull without its jaw, drawn by hand: at this size, computed shading turns
+# into a blob, so the orbits, nasal cavity, cheekbones and upper teeth are placed
+# character by character. Lit from the left and turned a little to its left:
+# the left orbit is narrower and the right side falls into shadow. Spaces inside
+# the outline are holes and stay dark.
+SKULL = """\
+      .:=+*##**+=:.
+    :*%@@@@@@%%%##*+:
+   +@@@@@@@@@%%%%##**=
+  =@@%*=-=*%@%#+=-=+*#+:
+  %@*.    .*@%-     :*+:
+  *@%+:..:+%@@#=.  .:+*=.
+  :#@@@%%%#=. .=#%%##*+:
+   .*%@@%%-    -#%#**=.
+     :*%%#*+:=*##*+:
+      -#:#*:#*:#*:+.
+      .+ .+ .+ .+ ."""
+SKULL_COL = int(cx + 50)            # left edge of the drawing
+SKULL_W = max(len(l) for l in SKULL.split("\n"))
 
 
-def skull(x, y):
-    u = (x - SKX) / SKU
-    v = (y - SKY) * 2.0 / SKU
-    t = TURN
-
-    cranium = ((u - 0.07) / 1.0) ** 2 + ((v + 0.33) / 0.97) ** 2 <= 1.0
-    face = False
-    if 0.0 <= v <= 0.92:
-        if v < 0.48:
-            hw = 0.86 + 0.08 * math.sin(v / 0.48 * math.pi / 2)   # out to the cheekbones
-        else:
-            hw = 0.94 - (v - 0.48) / 0.44 * 0.40                  # in to the teeth
-        face = abs(u - t * 0.55) <= hw
-    tu = u - t
-    teeth = 0.86 <= v <= 1.11 + 0.03 * math.sin(tu * 40) and abs(tu) <= 0.44
-    if not (cranium or face or teeth):
-        return None
-
-    # One rounded volume for the light: bone faces us, lit from the upper left.
-    nx, ny = (u - 0.04) / 1.05, (v - 0.12) / 1.30
-    nz = math.sqrt(max(0.0, 1 - min(1.0, nx * nx + ny * ny)))
-    lx, ly, lz = -0.50, -0.42, 0.76
-    diffuse = max(0.0, nx * lx + ny * ly + nz * lz)
-    b = 0.22 + 0.74 * diffuse + 0.09 * stone(x * 1.5, y * 1.5)
-
-    if teeth and not face:
-        if (tu + 0.02) % 0.105 < 0.03:
-            return 0.03                                         # gaps between teeth
-        return 0.70 + 0.22 * (1 - (v - 0.86) / 0.25) + 0.05 * stone(x * 3, y * 3)
-
-    # Orbits: deep holes, the far one narrower; their rims fall into shadow.
-    for ex, rx in ((t - 0.40, 0.235), (t + 0.42, 0.30)):
-        o = ((u - ex) / rx) ** 2 + ((v - 0.27) / 0.255) ** 2
-        if o <= 1.0:
-            return 0.02 + 0.08 * o ** 4
-        if o <= 1.45:
-            b *= 0.45 + 0.55 * (o - 1.0) / 0.45
-        brow = ((u - ex) / (rx + 0.06)) ** 2 + ((v + 0.04) / 0.07) ** 2
-        if brow <= 1.0:
-            b = min(1.0, b + 0.1)
-
-    # Nasal cavity: an upside-down pear below and between the orbits.
-    if 0.50 <= v <= 0.80:
-        k = (v - 0.50) / 0.30
-        w = 0.03 + 0.10 * math.sin(k * math.pi * 0.78)
-        if abs(u - t + 0.01) <= w:
-            return 0.03
-    # Hollows: under the cheekbones, and the temple turned away on the right.
-    for hx, hy, hrx, hry, f in ((t - 0.66, 0.66, 0.16, 0.16, 0.7), (t + 0.70, 0.66, 0.2, 0.18, 0.6),
-                                (0.86, 0.08, 0.16, 0.30, 0.55)):
-        if ((u - hx) / hrx) ** 2 + ((v - hy) / hry) ** 2 <= 1.0:
-            b *= f
-    # A suture line across the dome.
-    if cranium and v < -0.35 and abs(v + 0.75 - 0.18 * (u - 0.2) - 0.03 * math.sin(u * 30)) < 0.022:
-        b *= 0.3
-    return b
+def place_skull(rows):
+    art = SKULL.split("\n")
+    top = int(ground) - len(art) + 1   # the last row sits on the ground line
+    for i, line in enumerate(art):
+        row = rows[top + i]
+        first = len(line) - len(line.lstrip())
+        for j, ch in enumerate(line):
+            if j >= first:
+                row[SKULL_COL + j] = ch
 
 
-LAYERS = [skull, shaft, rocks, base, ground_band]
+LAYERS = [shaft, rocks, base, ground_band]
 
 
 def sample(x, y):
@@ -295,7 +256,7 @@ def sample(x, y):
     return None
 
 
-lines = []
+grid = []
 for row in range(H):
     out = []
     for col in range(W):
@@ -313,7 +274,10 @@ for row in range(H):
         b = total / n
         i = max(1, min(len(RAMP) - 1, int(round(b * (len(RAMP) - 1)))))
         out.append(RAMP[i])
-    lines.append("".join(out).rstrip())
+    grid.append(out)
+
+place_skull(grid)
+lines = ["".join(r).rstrip() for r in grid]
 
 while lines and not lines[0]:
     lines.pop(0)

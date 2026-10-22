@@ -92,7 +92,8 @@ atalho `Ctrl+Shift+L` faz isso na hora e, com o vault aberto, também trava o va
 - **Grimoire** (livro): logins, chaves, seeds, notas seguras e comandos de servidor.
 - **Unspoken** (coração partido): notas para o que não se diz em voz alta. Salvam
   sozinhas, podem ser seladas e podem ser enterradas em **Dead Words**.
-- **Siege** (espada): kanban das tarefas do dia. Em breve.
+- **Siege** (espada): kanban das tarefas do dia, um quadro por dia com as colunas
+  Orders, In Battle, Conquered e Fallen. Tarefas se movem arrastando ou pelo teclado.
 
 No Grimoire, uma credencial pode ser **selada**: para abri-la, é preciso o PIN
 de selo, que é único para todas as seladas e fica guardado dentro do vault. É

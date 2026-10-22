@@ -3,20 +3,20 @@
   import Grimoire from './Grimoire.svelte'
   import Icon from './Icon.svelte'
   import type { IconName } from './icons'
-  import Sealed from './Sealed.svelte'
   import Settings from './Settings.svelte'
+  import Siege from './Siege.svelte'
   import Unspoken from './Unspoken.svelte'
   import { showVersion } from './version'
 
   let { info, onlock, onrefresh }: { info: SessionInfo; onlock: () => void; onrefresh: () => void } = $props()
 
-  type Page = { id: string; label: string; icon: IconName; sealed?: boolean }
+  type Page = { id: string; label: string; icon: IconName }
 
   // The sidebar shows icons only; label is for the hover tip and screen readers.
   const pages: Page[] = [
     { id: 'grimoire', label: 'grimoire', icon: 'book' },
     { id: 'heart', label: 'unspoken', icon: 'heart' },
-    { id: 'sword', label: 'sealed', icon: 'sword', sealed: true },
+    { id: 'sword', label: 'siege', icon: 'sword' },
   ]
 
   let page = $state('grimoire')
@@ -55,7 +55,6 @@
         <button
           class="page"
           class:active={!settings && page === p.id}
-          class:sealed={p.sealed}
           onclick={() => go(p.id)}
           aria-label={p.label}
           aria-current={!settings && page === p.id ? 'page' : undefined}
@@ -83,12 +82,13 @@
     <div class="page-view" hidden={settings || page !== 'heart'}>
       <Unspoken active={!settings && page === 'heart'} />
     </div>
+    <div class="page-view" hidden={settings || page !== 'sword'}>
+      <Siege active={!settings && page === 'sword'} />
+    </div>
     {#if settings}
       <div class="page-view padded">
         <Settings onsaved={onrefresh} onclose={() => (settings = false)} />
       </div>
-    {:else if current.sealed}
-      <div class="page-view"><Sealed icon={current.icon} /></div>
     {/if}
   </main>
 
@@ -97,6 +97,7 @@
     <span class="spacer"></span>
     {#if !settings && page === 'grimoire'}<span>n new · / search · esc close ·</span>{/if}
     {#if !settings && page === 'heart'}<span>n new · esc close · saves as you write ·</span>{/if}
+    {#if !settings && page === 'sword'}<span>n order · arrows select · shift+arrows move · [ ] days ·</span>{/if}
     <span>1–{pages.length} pages · ctrl+shift+l rest</span>
     <span class="version">{showVersion(info.version)}</span>
   </footer>
@@ -160,13 +161,6 @@
     background: var(--fg);
   }
 
-  .page.sealed:not(.active) {
-    color: #333;
-  }
-
-  .page.sealed:not(.active):hover {
-    color: var(--dim);
-  }
 
   .tip {
     position: absolute;

@@ -7,6 +7,23 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- **Siege** (espada): o kanban do dia, um quadro por dia com as colunas
+  **Orders**, **In Battle**, **Conquered** e **Fallen**.
+  - Arrastar entre colunas e dentro delas, ou pelo teclado: setas escolhem,
+    `Shift`+setas movem, `n` cria uma ordem, `Enter` edita, `Delete` apaga (duas vezes).
+  - Navegação entre dias com `[` e `]`, e `t` volta para hoje.
+  - Tarefas que ficaram em Orders ou In Battle em dias anteriores podem ser trazidas
+    para hoje; o que foi conquistado ou caiu fica no histórico do dia.
+  - As tarefas ficam criptografadas no vault.
+
+### Alterado
+
+- O crânio da tela de descanso foi redesenhado à mão para ser reconhecível no
+  tamanho pequeno: órbitas, cavidade nasal, maçãs do rosto e dentes de cima.
+- Datas em inglês em todas as telas, como o resto da interface.
+
 ## [0.10.0] - 2026-10-22
 
 ### Adicionado
