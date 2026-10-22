@@ -7,6 +7,11 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Alterado
+
+- O console não mostra mais a dica "type ,,, to open DataVault in the browser" ao abrir.
+  Os comandos continuam no `help`.
+
 ## [0.7.0] - 2026-10-22
 
 ### Adicionado

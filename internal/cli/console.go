@@ -59,9 +59,7 @@ const consoleHelp = `  ,,,       open DataVault in the browser
 // the session: leaving the console then ends it. Otherwise the session keeps
 // running in the background.
 func console(u *ui, paths config.Paths, ctl controller, owns bool) error {
-	u.println("  %s", u.dim("type "+openKey+" to open DataVault in the browser · help for commands"))
-	u.println("")
-	prompt := "  " + u.dim("dtvlt") + " › "
+	prompt :="  " + u.dim("dtvlt") + " › "
 	for {
 		line, err := u.command(prompt)
 		if err != nil {
