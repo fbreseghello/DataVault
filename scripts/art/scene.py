@@ -2,7 +2,7 @@
 image into ASCII.
 
 Everything is modelled in metres at real scale (the shaft is about 0.9 m across
-and breaks off near 3 m) and raymarched with a signed distance field: soft
+and breaks off around 2.4 m) and raymarched with a signed distance field: soft
 shadows, ambient occlusion, weathered stone. The break is ragged, with chips torn
 out below it, cracks zigzag down the lit face and pieces of it lie on the steps
 and the ground. The ground fades to black like a spotlight.
@@ -90,32 +90,42 @@ FLUTES = 20
 FLUTE_DEPTH = 0.028
 
 
+# The break seen from the front, left to right across the shaft (-1..1): it
+# snapped unevenly, so it is a run of jagged chunks at roughly the same height,
+# with a tooth standing up and a bite out of the right, never one clean slope.
+BREAK = [(-1.0, 2.5), (-0.84, 2.53), (-0.7, 2.54), (-0.62, 2.42), (-0.46, 2.4), (-0.34, 2.44),
+         (-0.24, 2.43), (-0.18, 2.58), (-0.02, 2.6), (0.08, 2.56), (0.14, 2.38), (0.32, 2.34),
+         (0.42, 2.36), (0.48, 2.22), (0.66, 2.19), (0.76, 2.24), (0.9, 2.16), (1.0, 2.17)]
+
+
 def column_top(qx, qz):
-    """Height of the fracture: higher on the left, falling away to the right,
-    with a deep bite out of the front and a rough, stepped edge."""
-    u = qx / R_BOTTOM
+    """Height of the fracture: the chunks of BREAK, lower toward the front, and
+    rough at every scale."""
+    u = np.clip(qx / R_BOTTOM, -1, 1)
     flat = np.stack([qx, qz, np.zeros_like(qx)], -1)
-    bite = 0.42 * np.exp(-((qx - 0.08) ** 2 + (qz - 0.3) ** 2) / 0.03)
-    return (2.72 - 0.34 * u - 0.42 * np.maximum(u - 0.1, 0) - bite
-            + 0.5 * fbm(flat * 2.2 + 3.0, 3) + 0.12 * fbm(flat * 11.0, 2))
+    xs, hs = zip(*BREAK)
+    return (np.interp(u, xs, hs) - 0.1 * qz / R_BOTTOM
+            + 0.09 * fbm(flat * 4.0 + 3.0, 3) + 0.04 * fbm(flat * 16.0, 2))
 
 
 # Cracks on the lit face the camera sees, as paths of (angle around the shaft,
 # height) and a half width in metres. Each one is a groove a few cm deep.
 CRACKS = [
     # the main crack, zigzagging down from the break across the flutes
-    ([(2.02, 2.56), (1.76, 2.36), (1.96, 2.16), (1.62, 1.96), (1.86, 1.76), (1.56, 1.52), (1.76, 1.3), (1.62, 1.1)], 0.015),
+    ([(2.02, 2.42), (1.76, 2.26), (1.96, 2.08), (1.62, 1.92), (1.86, 1.72), (1.56, 1.5), (1.76, 1.28), (1.62, 1.06)], 0.027),
     # its branches
-    ([(1.62, 1.96), (1.38, 1.86), (1.3, 1.64)], 0.01),
-    ([(1.86, 1.76), (2.14, 1.62), (2.3, 1.42), (2.5, 1.32)], 0.011),
+    ([(1.62, 1.92), (1.38, 1.82), (1.3, 1.6)], 0.018),
+    ([(1.86, 1.72), (2.14, 1.6), (2.3, 1.4), (2.5, 1.3)], 0.02),
     # a shorter one near the top, and one in the lowest drum
-    ([(1.36, 2.32), (1.52, 2.12), (1.32, 1.96)], 0.01),
-    ([(2.24, 1.04), (2.06, 0.86), (2.22, 0.62)], 0.009),
+    ([(1.36, 2.28), (1.52, 2.1), (1.32, 1.94)], 0.018),
+    ([(2.24, 1.04), (2.06, 0.86), (2.22, 0.62)], 0.016),
+    # a crack down from the bite on the right
+    ([(1.22, 2.34), (1.12, 2.12), (1.24, 1.9)], 0.016),
 ]
 
 # Chips torn out of the shaft near the break: shallow scoops, wide and ragged.
 # (angle, height, half width, half height, depth)
-SPALLS = [(2.05, 2.3, 0.15, 0.1, 0.05), (1.5, 2.08, 0.1, 0.07, 0.04), (2.5, 2.48, 0.12, 0.09, 0.045)]
+SPALLS = [(2.05, 2.22, 0.15, 0.1, 0.05), (1.5, 2.04, 0.1, 0.07, 0.04), (2.5, 2.36, 0.12, 0.09, 0.045)]
 
 # Fallen pieces on the steps and on the ground, angular: centre, half sizes,
 # turn around the vertical and tilt (radians).
@@ -148,7 +158,7 @@ def crack_groove(q):
         for i, ((a0, y0), (a1, y1)) in enumerate(zip(path, path[1:])):
             dd = seg_dist(arc, yy, a0 * R_BOTTOM, y0, a1 * R_BOTTOM, y1)
             # widest where it starts, a hairline at its tip
-            taper = 1.0 - 0.75 * (i + 0.5) / n
+            taper = 1.0 - 0.65 * (i + 0.5) / n
             groove = np.minimum(groove, dd - w * taper * ragged)
     return groove
 
@@ -309,7 +319,7 @@ def render(cam=(0.45, 1.25, 5.4), look=(0.0, 1.42, 0.0), fov_deg=34, cols=COLS, 
     inside = (mat == COLUMN) & (q[:, 1] > SHAFT_BOTTOM)
     if inside.any():
         g = crack_groove(q[inside])
-        albedo[inside] *= np.clip(0.18 + g / 0.012, 0.18, 1.0)
+        albedo[inside] *= np.clip(0.06 + g / 0.012, 0.06, 1.0)
     spec = np.clip((n * norm(light - rd[idx])).sum(-1), 0, 1) ** 30 * (mat != GROUND)
     b = albedo * (0.10 * ao + 0.90 * diff * sh * (0.55 + 0.45 * ao)) + 0.18 * spec * sh
     # spotlight: the ground fades out away from the ruins

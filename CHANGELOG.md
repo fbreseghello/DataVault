@@ -15,10 +15,11 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
-- O pilar da tela de descanso ficou visivelmente partido: rachaduras em zigue-zague
-  descem pela face iluminada (largas na quebra, finas na ponta), lascas foram
-  arrancadas perto do topo, a fratura ficou mais recortada e pedaços da coluna
-  caíram nos degraus e no chão.
+- O pilar da tela de descanso ficou visivelmente partido: rachaduras largas e
+  escuras em zigue-zague descem pela face iluminada, lascas foram arrancadas perto
+  do topo e pedaços da coluna caíram nos degraus e no chão. O topo deixou de ser uma
+  diagonal reta (que de longe parecia uma lâmina): agora é uma quebra irregular, em
+  blocos, mais ou menos na mesma altura.
 
 ## [0.12.1] - 2026-10-22
 
