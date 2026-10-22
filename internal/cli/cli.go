@@ -19,11 +19,22 @@ const serveCommand = "__serve"
 //go:embed banner.txt
 var banner string
 
+// printBanner prints the art with the running version under its right edge.
 func printBanner(u *ui) {
+	lines := strings.Split(strings.TrimRight(banner, "\n"), "\n")
+	width := 0
+	for _, line := range lines {
+		width = max(width, len(line))
+	}
 	u.println("")
-	for _, line := range strings.Split(strings.TrimRight(banner, "\n"), "\n") {
+	for _, line := range lines {
 		u.println("  %s", line)
 	}
+	ver := version.Version
+	if !version.IsDev() {
+		ver = "v" + ver
+	}
+	u.println("  %s%s", strings.Repeat(" ", max(0, width-len(ver))), u.dim(ver))
 	u.println("")
 }
 
