@@ -61,6 +61,11 @@ necessárias e **não existe recuperação**.
 O PIN opcional no terminal só impede que alguém inicie o `dtvlt` casualmente.
 Ele não criptografa nada.
 
+No Grimoire, uma credencial pode ser **selada**: para abri-la, é preciso o PIN
+de selo, que é único para todas as seladas e fica guardado dentro do vault. É
+uma segunda trava para quando o vault já está aberto (alguém olhando a tela, um
+computador deixado destravado). Ela volta a selar quando você sai dela.
+
 ### Atualizar
 
 `dtvlt update` busca a release mais nova no GitHub, baixa o binário da sua

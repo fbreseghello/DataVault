@@ -239,3 +239,95 @@ func TestSettings(t *testing.T) {
 		t.Fatal("pin not saved")
 	}
 }
+
+// call sends a same-origin request and decodes a JSON reply into out (if given).
+func call(t *testing.T, s *Server, c *http.Client, method, path, body string, headers map[string]string, out any) int {
+	t.Helper()
+	req, _ := http.NewRequest(method, s.URL()+path, strings.NewReader(body))
+	req.Header.Set("X-Dtvlt", "1")
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+	resp, err := c.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	if out != nil {
+		json.NewDecoder(resp.Body).Decode(out)
+	}
+	return resp.StatusCode
+}
+
+func TestSealedItems(t *testing.T) {
+	s := startServer(t)
+	c := browser(t)
+	signIn(t, s, c)
+	call(t, s, c, "POST", "/api/unlock", `{"keyword":"kw","password":"pw"}`, nil, nil)
+
+	sealed := `{"type":"login","name":"bank","sealed":true,"fields":[{"name":"password","value":"hunter2","secret":true}]}`
+	if code := call(t, s, c, "POST", "/api/items", sealed, nil, nil); code != http.StatusBadRequest {
+		t.Fatalf("sealing without a seal pin: %d", code)
+	}
+	if code := call(t, s, c, "PUT", "/api/seal", `{"pin":"1234"}`, nil, nil); code != http.StatusNoContent {
+		t.Fatalf("set seal pin: %d", code)
+	}
+	var item vault.Item
+	if code := call(t, s, c, "POST", "/api/items", sealed, nil, &item); code != http.StatusCreated {
+		t.Fatalf("create sealed: %d", code)
+	}
+	path := "/api/items/" + item.ID
+
+	var list []vault.Summary
+	call(t, s, c, "GET", "/api/items", "", nil, &list)
+	if len(list) != 1 || !list[0].Sealed {
+		t.Fatalf("list: %+v", list)
+	}
+
+	var got map[string]any
+	if code := call(t, s, c, "GET", path, "", nil, &got); code != http.StatusForbidden || got["fields"] != nil {
+		t.Fatalf("sealed item leaked without pin: %d %v", code, got)
+	}
+	if code := call(t, s, c, "POST", path+"/unseal", `{"pin":"0000"}`, nil, nil); code != http.StatusForbidden {
+		t.Fatalf("wrong pin: %d", code)
+	}
+	var opened struct {
+		Item  vault.Item `json:"item"`
+		Token string     `json:"token"`
+	}
+	if code := call(t, s, c, "POST", path+"/unseal", `{"pin":"1234"}`, nil, &opened); code != http.StatusOK || opened.Token == "" {
+		t.Fatalf("unseal: %d %+v", code, opened)
+	}
+	if opened.Item.Fields[0].Value != "hunter2" {
+		t.Fatalf("unsealed item: %+v", opened.Item)
+	}
+	grant := map[string]string{unsealHeader: opened.Token}
+
+	if code := call(t, s, c, "GET", path, "", grant, nil); code != http.StatusOK {
+		t.Fatalf("get with token: %d", code)
+	}
+	edit := `{"type":"login","name":"bank","sealed":false,"fields":[]}`
+	if code := call(t, s, c, "PUT", path, edit, nil, nil); code != http.StatusForbidden {
+		t.Fatalf("unsealing by edit without token: %d", code)
+	}
+	if code := call(t, s, c, "DELETE", path, "", nil, nil); code != http.StatusForbidden {
+		t.Fatalf("delete without token: %d", code)
+	}
+	if code := call(t, s, c, "PUT", path, sealed, grant, nil); code != http.StatusOK {
+		t.Fatalf("edit with token: %d", code)
+	}
+
+	// The token dies with the lock.
+	call(t, s, c, "POST", "/api/lock", "", nil, nil)
+	call(t, s, c, "POST", "/api/unlock", `{"keyword":"kw","password":"pw"}`, nil, nil)
+	if code := call(t, s, c, "GET", path, "", grant, nil); code != http.StatusForbidden {
+		t.Fatalf("token survived a lock: %d", code)
+	}
+
+	if code := call(t, s, c, "PUT", "/api/seal", `{"current":"9999","pin":"5678"}`, nil, nil); code != http.StatusForbidden {
+		t.Fatalf("changing the seal pin without the current one: %d", code)
+	}
+	if code := call(t, s, c, "PUT", "/api/seal", `{"current":"1234","pin":"5678"}`, nil, nil); code != http.StatusNoContent {
+		t.Fatalf("change seal pin: %d", code)
+	}
+}

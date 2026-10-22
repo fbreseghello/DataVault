@@ -27,6 +27,7 @@ type Session struct {
 	mu       sync.Mutex
 	v        *vault.Vault
 	activity time.Time
+	gen      uint64 // bumped on every unlock, so per-unlock grants die with the lock
 }
 
 func New(vaultPath string, idle time.Duration, log Logger) *Session {
@@ -55,8 +56,8 @@ func (s *Session) emit(event string) {
 // Log records an event coming from the frontend (copies and similar).
 func (s *Session) Log(event string) { s.emit(event) }
 
-// backoff grows with consecutive failures: 0, 0.5s, 1s, 2s ... up to 8s.
-func backoff(failures int) time.Duration {
+// Backoff grows with consecutive failures: 0, 0.5s, 1s, 2s ... up to 8s.
+func Backoff(failures int) time.Duration {
 	if failures == 0 {
 		return 0
 	}
@@ -72,7 +73,7 @@ func (s *Session) Unlock(keyword, password []byte) error {
 	if s.Unlocked() {
 		return nil
 	}
-	time.Sleep(backoff(s.failures))
+	time.Sleep(Backoff(s.failures))
 	v, err := vault.Open(s.vaultPath, keyword, password)
 	if err != nil {
 		if err == vault.ErrInvalidCredentials {
@@ -85,6 +86,7 @@ func (s *Session) Unlock(keyword, password []byte) error {
 	s.mu.Lock()
 	s.v = v
 	s.activity = time.Now()
+	s.gen++
 	s.mu.Unlock()
 	s.emit("unlocked")
 	return nil
@@ -122,6 +124,14 @@ func (s *Session) Vault() (*vault.Vault, error) {
 	}
 	s.activity = time.Now()
 	return s.v, nil
+}
+
+// Generation identifies the current unlock; it changes every time the vault
+// is unlocked again. ok is false while locked.
+func (s *Session) Generation() (gen uint64, ok bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.gen, s.v != nil
 }
 
 // SetIdle changes the auto-lock timeout for the running session.

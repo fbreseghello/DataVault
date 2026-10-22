@@ -34,12 +34,14 @@ type Field struct {
 }
 
 type Item struct {
-	ID        string    `json:"id"`
-	Type      ItemType  `json:"type"`
-	Name      string    `json:"name"`
-	Fields    []Field   `json:"fields"`
-	Tags      []string  `json:"tags"`
-	Notes     string    `json:"notes"`
+	ID     string   `json:"id"`
+	Type   ItemType `json:"type"`
+	Name   string   `json:"name"`
+	Fields []Field  `json:"fields"`
+	Tags   []string `json:"tags"`
+	Notes  string   `json:"notes"`
+	// Sealed items need the seal PIN before their fields are shown.
+	Sealed    bool      `json:"sealed"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -50,11 +52,12 @@ type Summary struct {
 	Type      ItemType  `json:"type"`
 	Name      string    `json:"name"`
 	Tags      []string  `json:"tags"`
+	Sealed    bool      `json:"sealed"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func (it Item) summary() Summary {
-	return Summary{ID: it.ID, Type: it.Type, Name: it.Name, Tags: it.Tags, UpdatedAt: it.UpdatedAt}
+	return Summary{ID: it.ID, Type: it.Type, Name: it.Name, Tags: it.Tags, Sealed: it.Sealed, UpdatedAt: it.UpdatedAt}
 }
 
 // normalize trims user input and rejects items the vault should not store.

@@ -134,3 +134,32 @@ func TestInvalidItem(t *testing.T) {
 		}
 	}
 }
+
+func TestSealPINSurvivesItemChanges(t *testing.T) {
+	v, path := newVault(t)
+	if err := v.SetSealPIN("hash"); err != nil {
+		t.Fatal(err)
+	}
+	it, _ := v.Add(Item{Type: TypeNote, Name: "a", Sealed: true})
+	v.Update(it.ID, Item{Type: TypeNote, Name: "b", Sealed: true})
+	v.Add(Item{Type: TypeNote, Name: "c"})
+	v.Delete(it.ID)
+	v.Lock()
+
+	v2, err := Open(path, []byte("keyword"), []byte("password"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if h, _ := v2.SealPIN(); h != "hash" {
+		t.Fatalf("seal pin lost: %q", h)
+	}
+}
+
+func TestSummaryShowsSealed(t *testing.T) {
+	v, _ := newVault(t)
+	v.Add(Item{Type: TypeLogin, Name: "bank", Sealed: true, Fields: []Field{{Name: "password", Value: "x", Secret: true}}})
+	list, _ := v.List("")
+	if len(list) != 1 || !list[0].Sealed {
+		t.Fatalf("summary: %+v", list)
+	}
+}

@@ -26,6 +26,8 @@ var (
 
 type payload struct {
 	Items []Item `json:"items"`
+	// SealPIN is the Argon2id hash of the PIN that opens sealed items.
+	SealPIN string `json:"seal_pin,omitempty"`
 }
 
 // Vault is an unlocked vault. Its DEK lives only in memory until Lock.
@@ -179,7 +181,8 @@ func (v *Vault) Add(it Item) (Item, error) {
 	it.ID = hex.EncodeToString(randomBytes(8))
 	it.CreatedAt, it.UpdatedAt = now, now
 
-	next := payload{Items: append(slices.Clone(v.data.Items), it)}
+	next := v.data
+	next.Items = append(slices.Clone(v.data.Items), it)
 	if err := v.save(next); err != nil {
 		return Item{}, err
 	}
@@ -205,7 +208,8 @@ func (v *Vault) Update(id string, it Item) (Item, error) {
 	it.CreatedAt = v.data.Items[i].CreatedAt
 	it.UpdatedAt = time.Now().UTC()
 
-	next := payload{Items: slices.Clone(v.data.Items)}
+	next := v.data
+	next.Items = slices.Clone(v.data.Items)
 	next.Items[i] = it
 	if err := v.save(next); err != nil {
 		return Item{}, err
@@ -224,7 +228,34 @@ func (v *Vault) Delete(id string) error {
 	if i < 0 {
 		return ErrNotFound
 	}
-	next := payload{Items: slices.Delete(slices.Clone(v.data.Items), i, i+1)}
+	next := v.data
+	next.Items = slices.Delete(slices.Clone(v.data.Items), i, i+1)
+	if err := v.save(next); err != nil {
+		return err
+	}
+	v.data = next
+	return nil
+}
+
+// SealPIN returns the stored seal PIN hash, "" when none is set.
+func (v *Vault) SealPIN() (string, error) {
+	v.mu.Lock()
+	defer v.mu.Unlock()
+	if v.dek == nil {
+		return "", ErrLocked
+	}
+	return v.data.SealPIN, nil
+}
+
+// SetSealPIN stores a new seal PIN hash. The caller hashes and checks the PIN.
+func (v *Vault) SetSealPIN(hash string) error {
+	v.mu.Lock()
+	defer v.mu.Unlock()
+	if v.dek == nil {
+		return ErrLocked
+	}
+	next := v.data
+	next.SealPIN = hash
 	if err := v.save(next); err != nil {
 		return err
 	}

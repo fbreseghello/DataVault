@@ -3,11 +3,18 @@
   import { isMultiline, template, TYPES } from './items'
 
   // The parent remounts the editor per item, so reading props once is intended.
+  // hasSealPin: when false, sealing asks for a new seal PIN, passed to onsave.
   let {
     item,
+    hasSealPin,
     onsave,
     oncancel,
-  }: { item: Item | null; onsave: (input: ItemInput) => Promise<void>; oncancel: () => void } = $props()
+  }: {
+    item: Item | null
+    hasSealPin: boolean
+    onsave: (input: ItemInput, newSealPin: string) => Promise<void>
+    oncancel: () => void
+  } = $props()
 
   // svelte-ignore state_referenced_locally
   const initial = item
@@ -16,6 +23,9 @@
   let fields = $state<Field[]>(initial ? initial.fields.map((f) => ({ ...f })) : template('login'))
   let tags = $state(initial?.tags.join(', ') ?? '')
   let notes = $state(initial?.notes ?? '')
+  let sealed = $state(initial?.sealed ?? false)
+  let sealPin = $state('')
+  let sealPinConfirm = $state('')
   let shown = $state<Record<number, boolean>>({})
   let busy = $state(false)
   let error = $state('')
@@ -29,16 +39,25 @@
 
   async function submit(e: SubmitEvent) {
     e.preventDefault()
-    busy = true
     error = ''
+    const newPin = sealed && !hasSealPin
+    if (newPin && sealPin !== sealPinConfirm) {
+      error = "the pins don't match"
+      return
+    }
+    busy = true
     try {
-      await onsave({
-        type,
-        name,
-        fields,
-        tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
-        notes,
-      })
+      await onsave(
+        {
+          type,
+          name,
+          fields,
+          tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
+          notes,
+          sealed,
+        },
+        newPin ? sealPin : '',
+      )
     } catch (err) {
       error = err instanceof Error ? err.message : String(err)
     } finally {
@@ -102,6 +121,27 @@
     <textarea bind:value={notes}></textarea>
   </label>
 
+  <div class="row">
+    <span>sealed</span>
+    <button type="button" class="toggle" class:on={sealed} onclick={() => (sealed = !sealed)} aria-pressed={sealed}>
+      {sealed ? 'on' : 'off'}
+    </button>
+    <span class="unit">{sealed ? 'opening it asks for the seal pin' : 'opens without a pin'}</span>
+  </div>
+  {#if sealed && !hasSealPin}
+    <p class="note">no seal pin yet. choose one; it opens every sealed entry.</p>
+    <label class="row">
+      <span>seal pin</span>
+      <input type="password" bind:value={sealPin} minlength="4" required autocomplete="new-password" />
+      <span></span>
+    </label>
+    <label class="row">
+      <span>confirm pin</span>
+      <input type="password" bind:value={sealPinConfirm} required autocomplete="new-password" />
+      <span></span>
+    </label>
+  {/if}
+
   {#if error}<p class="error" role="alert">{error}</p>{/if}
 
   <div class="buttons">
@@ -143,8 +183,20 @@
     gap: 10px;
     font-size: 12px;
   }
-  .actions .on {
+  .actions .on,
+  .toggle.on {
     color: var(--accent);
+  }
+  .toggle {
+    justify-self: start;
+  }
+  .unit,
+  .note {
+    color: var(--dim);
+    font-size: 12px;
+  }
+  .note {
+    margin: 0 0 10px 122px;
   }
   .add {
     margin: 2px 0 18px 122px;

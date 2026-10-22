@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { api, ApiError, type Settings } from './api'
+  import SealPinSettings from './SealPinSettings.svelte'
 
   let { onsaved, onclose }: { onsaved: () => void; onclose: () => void } = $props()
 
@@ -139,6 +140,9 @@
     <button type="button" onclick={onclose}>close</button>
   </div>
 </form>
+
+<!-- A separate form: the seal PIN is stored in the vault and saved on its own. -->
+<SealPinSettings />
 
 <style>
   h2 {

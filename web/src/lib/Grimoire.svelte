@@ -1,21 +1,36 @@
 <script lang="ts">
+  import { onMount, untrack } from 'svelte'
   import { api, ApiError, type Item, type ItemInput, type SessionInfo, type Summary } from './api'
   import { copy } from './clipboard'
   import Editor from './Editor.svelte'
+  import Icon from './Icon.svelte'
   import { isMultiline, typeShort } from './items'
+  import Placard from './Placard.svelte'
+  import SealGate from './SealGate.svelte'
 
-  // active is false while another page is shown; the grimoire stays mounted to keep its state.
+  // active is false while another page is shown; the grimoire stays mounted but
+  // returns to its front page every time it becomes active again.
   let { info, active }: { info: SessionInfo; active: boolean } = $props()
 
   let query = $state('')
   let items = $state<Summary[]>([])
-  let selected = $state<Item | null>(null)
+  let selectedId = $state<string | null>(null)
+  // opened holds the fields of the selected entry. For a sealed entry it stays
+  // null until the seal PIN is given, and token keeps it open on the server.
+  let opened = $state<Item | null>(null)
+  let token = $state('')
   let editing = $state<Item | 'new' | null>(null)
+  let hasSealPin = $state(false)
+  let sealPrompt = $state(false)
+  let sealPin = $state('')
+  let sealPinConfirm = $state('')
   let revealed = $state<Record<number, boolean>>({})
   let copied = $state<number | null>(null)
   let confirmDelete = $state(false)
   let error = $state('')
   let search = $state<HTMLInputElement>()
+
+  const selected = $derived(items.find((it) => it.id === selectedId) ?? null)
 
   function fail(e: unknown) {
     // 423 means the vault locked; App already switches back to the login.
@@ -33,37 +48,109 @@
     return () => clearTimeout(t)
   })
 
-  async function select(id: string) {
+  onMount(() => {
+    api.sealStatus().then((r) => (hasSealPin = r.has_pin), fail)
+  })
+
+  // Entering the grimoire never resumes an open entry or an unsaved draft.
+  $effect(() => {
+    if (active) untrack(close)
+  })
+
+  // close drops the open entry, which also seals it again.
+  function close() {
+    selectedId = null
+    editing = null
+    reseal()
     error = ''
+  }
+
+  function reseal() {
+    opened = null
+    token = ''
+    revealed = {}
+    copied = null
+    confirmDelete = false
+    sealPrompt = false
+    sealPin = sealPinConfirm = ''
+  }
+
+  async function select(it: Summary) {
+    close()
+    selectedId = it.id
+    if (it.sealed) return // the seal gate asks for the PIN
     try {
-      selected = await api.get(id)
-      revealed = {}
-      copied = null
-      confirmDelete = false
-      editing = null
+      opened = await api.get(it.id)
     } catch (e) {
       fail(e)
     }
   }
 
-  async function save(input: ItemInput) {
-    const saved = editing === 'new' || editing === null ? await api.create(input) : await api.update(editing.id, input)
+  async function unseal(pin: string) {
+    if (!selectedId) return
+    const res = await api.unseal(selectedId, pin)
+    opened = res.item
+    token = res.token
+  }
+
+  function inputOf(it: Item): ItemInput {
+    const { id: _id, created_at: _c, updated_at: _u, ...rest } = it
+    return rest
+  }
+
+  async function ensureSealPin(pin: string) {
+    if (hasSealPin || !pin) return
+    await api.setSealPin('', pin)
+    hasSealPin = true
+  }
+
+  async function save(input: ItemInput, newSealPin: string) {
+    await ensureSealPin(newSealPin)
+    const res =
+      editing === 'new' || editing === null ? await api.create(input) : await api.update(editing.id, input, token)
     editing = null
-    selected = saved
+    selectedId = res.item.id
+    opened = res.item
+    token = res.token
     revealed = {}
     await load()
   }
 
+  // sealNow seals an entry that was open without a PIN, creating the seal PIN
+  // first when there is none, and leaves it sealed.
+  async function sealNow(e?: SubmitEvent) {
+    e?.preventDefault()
+    if (!opened) return
+    error = ''
+    if (!hasSealPin) {
+      if (!sealPrompt) {
+        sealPrompt = true
+        return
+      }
+      if (sealPin !== sealPinConfirm) {
+        error = "the pins don't match"
+        return
+      }
+    }
+    try {
+      await ensureSealPin(sealPin)
+      await api.update(opened.id, { ...inputOf(opened), sealed: true }, token)
+      reseal()
+      await load()
+    } catch (err) {
+      fail(err)
+    }
+  }
+
   async function remove() {
-    if (!selected) return
+    if (!opened) return
     if (!confirmDelete) {
       confirmDelete = true
       return
     }
     try {
-      await api.remove(selected.id)
-      selected = null
-      confirmDelete = false
+      await api.remove(opened.id, token)
+      close()
       await load()
     } catch (e) {
       fail(e)
@@ -71,8 +158,8 @@
   }
 
   async function copyField(i: number) {
-    if (!selected) return
-    const field = selected.fields[i]
+    if (!opened) return
+    const field = opened.fields[i]
     try {
       await copy(field.value, info.clipboard_clear_seconds)
     } catch {
@@ -83,7 +170,7 @@
     setTimeout(() => {
       if (copied === i) copied = null
     }, 1500)
-    api.copied(selected.name, field.name).catch(() => {})
+    api.copied(opened.name, field.name).catch(() => {})
   }
 
   function isTyping(t: EventTarget | null) {
@@ -94,8 +181,8 @@
     if (!active) return
     if (e.key === 'Escape') {
       if (editing) editing = null
-      else if (isTyping(e.target)) (e.target as HTMLElement).blur()
-      else selected = null
+      else if (isTyping(e.target) && !selected?.sealed) (e.target as HTMLElement).blur()
+      else close()
       return
     }
     if (isTyping(e.target) || e.ctrlKey || e.metaKey || e.altKey) return
@@ -104,6 +191,7 @@
       search?.focus()
     } else if (e.key === 'n') {
       e.preventDefault()
+      close()
       editing = 'new'
     }
   }
@@ -117,21 +205,24 @@
   <div class="toolbar">
     <span class="dim" aria-hidden="true">/</span>
     <input type="search" bind:this={search} bind:value={query} placeholder="search" aria-label="search" spellcheck="false" />
-    <button onclick={() => (editing = 'new')}>+ new</button>
+    <button onclick={() => (close(), (editing = 'new'))}>+ new</button>
     <span class="spacer"></span>
-    <span class="dim count">{items.length} {items.length === 1 ? 'item' : 'items'}</span>
+    <span class="dim count">{items.length} {items.length === 1 ? 'entry' : 'entries'}</span>
   </div>
 
   <div class="body">
-    <nav aria-label="items">
+    <nav aria-label="entries">
       {#each items as it (it.id)}
-        <button class="item" class:active={selected?.id === it.id} onclick={() => select(it.id)}>
+        <button class="item" class:active={selectedId === it.id} onclick={() => select(it)}>
           <span class="type">{typeShort(it.type)}</span>
-          <span class="name">{it.name}</span>
+          <span class="name">
+            {it.name}
+            {#if it.sealed}<span class="mark" title="sealed"><Icon name="seal" size={16} /></span>{/if}
+          </span>
           <span class="tags">{it.tags.join(' ')}</span>
         </button>
       {:else}
-        <p class="empty">{query ? 'no matches' : 'empty vault · press n to add the first item'}</p>
+        <p class="empty">{query ? 'no matches' : 'empty · press n to write the first entry'}</p>
       {/each}
     </nav>
 
@@ -139,59 +230,93 @@
       {#if error}<p class="error" role="alert">{error}</p>{/if}
 
       {#if editing}
-        {#key editing}
-          <Editor item={editing === 'new' ? null : editing} onsave={save} oncancel={() => (editing = null)} />
-        {/key}
-      {:else if selected}
-        <div class="detail">
+        <div class="page">
+          {#key editing}
+            <Editor item={editing === 'new' ? null : editing} {hasSealPin} onsave={save} oncancel={() => (editing = null)} />
+          {/key}
+        </div>
+      {:else if opened}
+        <div class="page">
           <h2>
-            {selected.name}
-            <span class="dim">{typeShort(selected.type)}</span>
+            {opened.name}
+            <span class="dim">{typeShort(opened.type)}</span>
+            <span class="spacer"></span>
+            <button
+              class="seal"
+              class:on={opened.sealed}
+              onclick={() => (opened?.sealed ? reseal() : sealNow())}
+              title={opened.sealed ? 'seal again' : 'seal this entry'}
+              aria-label={opened.sealed ? 'seal again' : 'seal this entry'}
+            >
+              <Icon name="seal" size={32} />
+            </button>
           </h2>
 
-          {#each selected.fields as field, i (i)}
+          {#if sealPrompt}
+            <form class="sealpin" onsubmit={sealNow}>
+              <p class="dim">no seal pin yet. choose one; it opens every sealed entry.</p>
+              <label class="field">
+                <span class="label">seal pin</span>
+                <input type="password" bind:value={sealPin} minlength="4" required autocomplete="new-password" />
+                <span></span>
+              </label>
+              <label class="field">
+                <span class="label">confirm pin</span>
+                <input type="password" bind:value={sealPinConfirm} required autocomplete="new-password" />
+                <span></span>
+              </label>
+              <div class="buttons">
+                <button type="submit" class="primary">seal</button>
+                <button type="button" onclick={() => (sealPrompt = false)}>cancel</button>
+              </div>
+            </form>
+          {/if}
+
+          {#each opened.fields as field, i (i)}
             {#if field.value}
-            <div class="field">
-              <span class="label">{field.name}</span>
-              {#if field.secret && !revealed[i]}
-                <span class="value masked">{masked}</span>
-              {:else if isMultiline(field)}
-                <pre class="value">{field.value}</pre>
-              {:else}
-                <span class="value">{field.value}</span>
-              {/if}
-              <span class="actions">
-                {#if field.secret}
-                  <button onclick={() => (revealed[i] = !revealed[i])}>{revealed[i] ? 'hide' : 'show'}</button>
+              <div class="field">
+                <span class="label">{field.name}</span>
+                {#if field.secret && !revealed[i]}
+                  <span class="value masked">{masked}</span>
+                {:else if isMultiline(field)}
+                  <pre class="value">{field.value}</pre>
+                {:else}
+                  <span class="value">{field.value}</span>
                 {/if}
-                <button onclick={() => copyField(i)} class:done={copied === i}>{copied === i ? 'copied' : 'copy'}</button>
-              </span>
-            </div>
+                <span class="actions">
+                  {#if field.secret}
+                    <button onclick={() => (revealed[i] = !revealed[i])}>{revealed[i] ? 'hide' : 'show'}</button>
+                  {/if}
+                  <button onclick={() => copyField(i)} class:done={copied === i}>{copied === i ? 'copied' : 'copy'}</button>
+                </span>
+              </div>
             {/if}
           {/each}
 
-          {#if selected.tags.length}
+          {#if opened.tags.length}
             <div class="field">
               <span class="label">tags</span>
-              <span class="value">{selected.tags.join(', ')}</span>
+              <span class="value">{opened.tags.join(', ')}</span>
             </div>
           {/if}
-          {#if selected.notes}
+          {#if opened.notes}
             <div class="field">
               <span class="label">notes</span>
-              <pre class="value">{selected.notes}</pre>
+              <pre class="value">{opened.notes}</pre>
             </div>
           {/if}
 
-          <p class="meta">updated {new Date(selected.updated_at).toLocaleString()}</p>
+          <p class="meta">updated {new Date(opened.updated_at).toLocaleString()}</p>
 
           <div class="buttons">
-            <button onclick={() => (editing = selected)}>edit</button>
+            <button onclick={() => (editing = opened)}>edit</button>
             <button onclick={remove} class:danger={confirmDelete}>{confirmDelete ? 'delete? click again' : 'delete'}</button>
           </div>
         </div>
-      {:else}
-        <p class="empty">select an item</p>
+      {:else if selected?.sealed}
+        <SealGate name={selected.name} onunseal={unseal} />
+      {:else if !selected}
+        <Placard icon="book" title="grimoire" hint="select an entry · n to write a new one" />
       {/if}
     </section>
   </div>
@@ -287,6 +412,10 @@
   section {
     padding: 16px 32px;
     overflow-y: auto;
+    min-height: 0;
+  }
+
+  .page {
     max-width: 820px;
   }
 
@@ -295,17 +424,46 @@
     padding: 0 24px;
   }
 
-  section .empty {
-    padding: 0;
-  }
-
   h2 {
     margin: 0 0 20px;
     font-size: 15px;
     font-weight: 700;
     display: flex;
     gap: 12px;
-    align-items: baseline;
+    align-items: center;
+  }
+
+  /* The padlock in an open entry: dim when the entry opens freely, lit when it
+     is sealed and was opened with the PIN. Clicking seals it (again). */
+  .seal {
+    color: var(--dim);
+  }
+
+  .seal.on {
+    color: var(--accent);
+  }
+
+  .seal:hover {
+    color: var(--fg);
+  }
+
+  .mark {
+    display: inline-block;
+    vertical-align: -3px;
+    margin-left: 6px;
+    color: var(--dim);
+  }
+
+  .sealpin {
+    margin: 0 0 20px;
+  }
+
+  .sealpin input {
+    width: 100%;
+  }
+
+  .primary {
+    color: var(--fg);
   }
 
   h2 .dim {

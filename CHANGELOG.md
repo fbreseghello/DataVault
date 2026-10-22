@@ -7,6 +7,21 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- Credenciais seladas: abrir uma credencial selada pede o **PIN de selo**, um PIN
+  único guardado (como hash) dentro do vault. Sem ele, o servidor não entrega os
+  campos nem deixa editar ou apagar. Ela volta a ficar selada ao selecionar outra,
+  trocar de tela ou travar o vault; trocar de aba do navegador não fecha.
+- Cadeado no detalhe da credencial para selar (ou selar de novo) na hora, e chave
+  "sealed" no editor.
+- Troca do PIN de selo na tela settings, exigindo o PIN atual.
+
+### Alterado
+
+- Entrar no Grimoire sempre mostra a tela de abertura, sem reabrir a última
+  credencial nem o editor.
+
 ## [0.4.0] - 2026-10-21
 
 ### Adicionado

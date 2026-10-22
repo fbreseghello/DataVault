@@ -46,6 +46,7 @@ func (s *Server) handleUnlock(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleLock(w http.ResponseWriter, r *http.Request) {
 	s.opts.Session.Lock("")
+	s.dropGrants()
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -74,6 +75,10 @@ func (s *Server) handleGetItem(w http.ResponseWriter, r *http.Request) {
 		writeVaultError(w, err)
 		return
 	}
+	if it.Sealed && !s.granted(r, it.ID) {
+		writeError(w, http.StatusForbidden, "sealed")
+		return
+	}
 	writeJSON(w, http.StatusOK, it)
 }
 
@@ -87,12 +92,16 @@ func (s *Server) handleCreateItem(w http.ResponseWriter, r *http.Request) {
 		writeVaultError(w, err)
 		return
 	}
+	if it.Sealed && !requireSealPIN(w, v) {
+		return
+	}
 	created, err := v.Add(it)
 	if err != nil {
 		writeVaultError(w, err)
 		return
 	}
 	s.opts.Session.Log("added   " + printable(created.Name))
+	s.grantSaved(w, r, created)
 	writeJSON(w, http.StatusCreated, created)
 }
 
@@ -106,12 +115,27 @@ func (s *Server) handleUpdateItem(w http.ResponseWriter, r *http.Request) {
 		writeVaultError(w, err)
 		return
 	}
-	updated, err := v.Update(r.PathValue("id"), it)
+	id := r.PathValue("id")
+	current, err := v.Get(id)
+	if err != nil {
+		writeVaultError(w, err)
+		return
+	}
+	// Editing or unsealing a sealed item needs it opened with the PIN first.
+	if current.Sealed && !s.granted(r, id) {
+		writeError(w, http.StatusForbidden, "sealed")
+		return
+	}
+	if it.Sealed && !current.Sealed && !requireSealPIN(w, v) {
+		return
+	}
+	updated, err := v.Update(id, it)
 	if err != nil {
 		writeVaultError(w, err)
 		return
 	}
 	s.opts.Session.Log("updated " + printable(updated.Name))
+	s.grantSaved(w, r, updated)
 	writeJSON(w, http.StatusOK, updated)
 }
 
@@ -123,10 +147,15 @@ func (s *Server) handleDeleteItem(w http.ResponseWriter, r *http.Request) {
 	}
 	id := r.PathValue("id")
 	it, err := v.Get(id)
-	if err == nil {
-		err = v.Delete(id)
-	}
 	if err != nil {
+		writeVaultError(w, err)
+		return
+	}
+	if it.Sealed && !s.granted(r, id) {
+		writeError(w, http.StatusForbidden, "sealed")
+		return
+	}
+	if err := v.Delete(id); err != nil {
 		writeVaultError(w, err)
 		return
 	}

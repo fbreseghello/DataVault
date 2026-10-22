@@ -54,6 +54,11 @@ type Server struct {
 
 	cfgMu sync.Mutex
 	cfg   config.Config // current settings; the settings screen can change them
+
+	sealMu       sync.Mutex // serializes seal PIN attempts so the backoff holds
+	sealFailures int
+	grantsMu     sync.Mutex
+	grants       map[string]grant // sha256(unseal token) -> item it opens
 }
 
 // New listens on a random port of 127.0.0.1. Call Serve to start handling requests.
@@ -74,6 +79,7 @@ func New(opts Options) (*Server, error) {
 		launch:       map[string]time.Time{},
 		cookies:      map[string]bool{},
 		cfg:          opts.Config,
+		grants:       map[string]grant{},
 	}
 	s.http = &http.Server{
 		Handler:           s.routes(),
@@ -130,6 +136,9 @@ func (s *Server) routes() http.Handler {
 	api.HandleFunc("GET /api/items/{id}", s.handleGetItem)
 	api.HandleFunc("PUT /api/items/{id}", s.handleUpdateItem)
 	api.HandleFunc("DELETE /api/items/{id}", s.handleDeleteItem)
+	api.HandleFunc("POST /api/items/{id}/unseal", s.handleUnseal)
+	api.HandleFunc("GET /api/seal", s.handleSealStatus)
+	api.HandleFunc("PUT /api/seal", s.handleSetSealPIN)
 	api.HandleFunc("POST /api/events", s.handleEvent)
 	api.HandleFunc("GET /api/settings", s.handleGetSettings)
 	api.HandleFunc("PUT /api/settings", s.handlePutSettings)
