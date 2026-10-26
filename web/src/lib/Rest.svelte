@@ -1,14 +1,15 @@
 <script lang="ts">
   import { untrack } from 'svelte'
   import type { RestStyle } from './api'
+  import CandleScene from './CandleScene.svelte'
   import pillar from './pillar.txt?raw'
   import skullI from './skull-i.txt?raw'
   import skullII from './skull-ii.txt?raw'
 
-  // The idle screen of the login: one still image on black, in the lower right.
-  // Random draws one of the images each time the screen rests. Any click or key
-  // wakes the login; the key itself is swallowed so it does not end up in the
-  // keyword.
+  // The idle screen of the login, on black, in the lower right: one still image,
+  // one of them drawn at random each time the screen rests, or the candle, the
+  // one that moves. Any click or key wakes the login; the key itself is
+  // swallowed so it does not end up in the keyword.
   let { style, onwake }: { style: RestStyle; onwake: () => void } = $props()
 
   const images = { pillar, 'skull-i': skullI, 'skull-ii': skullII }
@@ -16,7 +17,9 @@
   const names = Object.keys(images) as Image[]
 
   // Drawn once, when the screen starts resting: it never changes under a viewer.
-  const image: Image = untrack(() => (style === 'random' ? names[Math.floor(Math.random() * names.length)] : style))
+  const image: Image | 'candle' = untrack(() =>
+    style === 'random' ? names[Math.floor(Math.random() * names.length)] : style,
+  )
 
   function onkeydown(e: KeyboardEvent) {
     e.preventDefault()
@@ -28,7 +31,11 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div class="rest" onclick={onwake}>
-  <pre class={image} aria-hidden="true">{images[image]}</pre>
+  {#if image === 'candle'}
+    <CandleScene />
+  {:else}
+    <pre class={image} aria-hidden="true">{images[image]}</pre>
+  {/if}
   <span class="sr-only">DataVault is resting. Click or press a key to continue.</span>
 </div>
 

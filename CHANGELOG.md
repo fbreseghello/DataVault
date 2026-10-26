@@ -12,9 +12,17 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 - Seção "appearance" na tela settings com a opção **theme**, por enquanto fixa em
   **souls** (o tema atual). Os temas vão trocar os ícones e os nomes das páginas
   numa versão futura; a opção ainda não muda nada nem é salva.
+- Tela de descanso **candle**, a primeira que se mexe: um crânio numa prateleira,
+  iluminado por uma vela derretida, contra uma parede de tijolos que só aparece até
+  onde a luz chega. A chama balança e muda de força; a luz no crânio, na vela e na
+  parede acompanha, e o crânio ganha ou perde detalhe conforme a luz. Com "reduzir
+  movimento" no sistema, a cena fica parada. O **random** continua sorteando só as
+  imagens paradas.
 
 ### Alterado
 
+- Novo ícone do Grimoire: um livro fechado visto de cima, girado sobre a quina, com
+  a capa em cima, as bordas das páginas em linhas diagonais e uma fita pendurada.
 - O pilar da tela de descanso ficou visivelmente partido: rachaduras largas e
   escuras em zigue-zague descem pela face iluminada, lascas foram arrancadas perto
   do topo e pedaços da coluna caíram nos degraus e no chão. O topo deixou de ser uma

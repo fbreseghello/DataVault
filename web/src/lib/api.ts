@@ -32,8 +32,8 @@ export interface SessionInfo {
   rest_style: RestStyle
 }
 
-/** What the rest screen shows: one of the still images, or one of them at random. */
-export type RestStyle = 'pillar' | 'skull-i' | 'skull-ii' | 'random'
+/** What the rest screen shows: a still image, one of them at random, or the candle. */
+export type RestStyle = 'pillar' | 'skull-i' | 'skull-ii' | 'random' | 'candle'
 
 export class ApiError extends Error {
   constructor(

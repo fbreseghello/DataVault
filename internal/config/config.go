@@ -29,16 +29,18 @@ type Config struct {
 }
 
 // Rest screen styles: one of the still images (the broken pillar or one of
-// two skulls), or one of them drawn at random each time the screen rests.
+// two skulls), one of them drawn at random each time the screen rests, or the
+// candle, the one that moves: a skull lit by a flickering candle.
 const (
 	RestPillar  = "pillar"
 	RestSkullI  = "skull-i"
 	RestSkullII = "skull-ii"
 	RestRandom  = "random"
+	RestCandle  = "candle"
 )
 
 // RestStyles lists every rest style, in the order the screens offer them.
-var RestStyles = []string{RestPillar, RestSkullI, RestSkullII, RestRandom}
+var RestStyles = []string{RestPillar, RestSkullI, RestSkullII, RestRandom, RestCandle}
 
 // MaxRestMinutes caps the rest screen delay.
 const MaxRestMinutes = 240

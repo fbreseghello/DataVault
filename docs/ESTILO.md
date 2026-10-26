@@ -84,7 +84,7 @@ crispEdges`.
 
 | Ícone | Nome | Onde |
 |---|---|---|
-| livro fechado com crânio, páginas e fita | `book` | Grimoire |
+| livro fechado visto de cima, girado, com páginas e fita | `book` | Grimoire |
 | coração partido, metades separadas | `heart` | Unspoken |
 | espada, ponta para cima e à direita | `sword` | Siege |
 | cruz sobre um monte de terra | `cross` | página ainda sem nome |
@@ -128,7 +128,9 @@ O DataVault quase não se mexe. Tudo que se mexe é lento e respeita
   (ciclo de 4 s, só opacidade). De vez em quando, a cada 20–45 s ao acaso, o tubo
   gagueja por 0,9 s sem apagar de todo. Com "reduzir movimento", nada disso acontece.
 - **Cursor:** pisca em degrau (sem fade), a cada 1,6 s.
-- **Tela de descanso:** completamente parada. Sem neon, sem animação.
+- **Tela de descanso:** parada, sem neon nem animação, exceto o estilo `candle`, a
+  única cena que se mexe: a chama balança a cerca de 15 quadros por segundo e a luz
+  ao redor muda junto. Com "reduzir movimento", ela fica parada também.
 - Sem transições de página, sem slides, sem efeitos de digitação.
 
 ## Arte ASCII
@@ -136,13 +138,21 @@ O DataVault quase não se mexe. Tudo que se mexe é lento e respeita
 - **Login:** "DataVault" em letra gótica ([`art.txt`](../web/src/lib/art.txt)), branca
   com neon. As letras são montadas uma a uma na mesma linha de base.
 - **CLI:** o banner do `dtvlt` com a versão alinhada à direita, embaixo, em `dim`.
-- **Tela de descanso:** uma imagem parada no canto inferior direito, sobre o preto:
+- **Tela de descanso:** uma imagem no canto inferior direito, sobre o preto:
   - `pillar` ([`pillar.txt`](../web/src/lib/pillar.txt)): a coluna dórica partida,
     renderizada em 3D e convertida em ASCII por
     [`scripts/art/scene.py`](../scripts/art/scene.py);
   - `skull-i` e `skull-ii` ([`skull-i.txt`](../web/src/lib/skull-i.txt),
     [`skull-ii.txt`](../web/src/lib/skull-ii.txt)): o crânio sem mandíbula, em traços
-    e em pó, olhando para a esquerda.
+    e em pó, olhando para a esquerda;
+  - `candle` ([`candle.ts`](../web/src/lib/candle.ts)): o crânio numa prateleira, iluminado
+    por uma vela derretida, contra uma parede de tijolos que só aparece até onde a luz
+    chega. A vela é renderizada em 3D por
+    [`scripts/art/candle3d.py`](../scripts/art/candle3d.py) para algumas posições da
+    chama; o crânio tem três níveis de detalhe e um relevo do osso, feitos por
+    [`scripts/art/skull_light.py`](../scripts/art/skull_light.py). A cada quadro, cada
+    célula recebe a luz que chega da chama: quanto mais luz, mais denso o caractere e
+    mais fino o traço do crânio.
 
 Regras para uma arte nova:
 
@@ -188,7 +198,7 @@ O tema atual. Um tema define **os ícones e os nomes das páginas**; o resto des
 
 | Página | Ícone | Nomes |
 |---|---|---|
-| Grimoire | livro com crânio | credenciais, comandos de servidor |
+| Grimoire | livro fechado em perspectiva | credenciais, comandos de servidor |
 | Unspoken | coração partido | notas; **Dead Words** para as enterradas |
 | Siege | espada | colunas **Orders**, **In Battle**, **Conquered**, **Fallen** |
 | untitled | cruz | ainda sem função |

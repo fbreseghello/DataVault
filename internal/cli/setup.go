@@ -87,7 +87,7 @@ func askPreferences(u *ui, cur config.Config) (config.Config, error) {
 	if cfg.RestMinutes, err = u.number("rest screen (minutes)", cur.RestMinutes, 0, config.MaxRestMinutes); err != nil {
 		return cfg, err
 	}
-	u.println("  %s", u.dim("the rest screen shows the pillar, one of two skulls, or one of them at random."))
+	u.println("  %s", u.dim("the rest screen shows the pillar, one of two skulls, one of them at random, or the candle (it moves)."))
 	if cfg.RestStyle, err = u.choose("rest screen art", cur.RestStyle, config.RestStyles); err != nil {
 		return cfg, err
 	}

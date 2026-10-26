@@ -2,24 +2,25 @@
 // turns each grid into a single SVG path. Edit the art here, not in the markup.
 
 const grids = {
-  // Grimoire: a closed book seen from the front, a skull on the cover, the
-  // edge of the pages below and a ribbon marker hanging out of them.
+  // Grimoire: a closed book seen from above, turned on its corner: a plain cover
+  // on top, the spine's edge cut along its lower left, the page edges in
+  // diagonal lines at the lower right, and a ribbon hanging out below.
   book: `
 ................
-.#############..
-.#..........##..
-.#..######..##..
-.#.########.##..
-.#.#..##..#.##..
-.#.#..##..#.##..
-.#.########.##..
-.#..#.##.#..##..
-.#..........##..
-.#############..
 ................
-.#.###.#######..
-...###..........
-...#.#..........
+.......##.......
+......####......
+.....######.....
+....########....
+...##########...
+...#.#########..
+...##.#######.#.
+...###.#####.#..
+....###.###.#.#.
+.....###.#.#.#..
+......###.#.#...
+.......##..#....
+........#.#.....
 ................`,
 
   // Broken heart: the two halves apart, split by a jagged gap.

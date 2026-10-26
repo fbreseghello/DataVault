@@ -17,7 +17,8 @@
     pillar: 'the broken pillar',
     'skull-i': 'the skull, drawn in lines',
     'skull-ii': 'the skull, drawn in dust',
-    random: 'one of the three, drawn each time it rests',
+    random: 'one of the three still images, drawn each time it rests',
+    candle: 'a skull lit by a flickering candle · moves',
   }
   let pin = $state('')
   let pinConfirm = $state('')
