@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-10-26
+
 ### Corrigido
 
 - Na tela settings, ao salvar (ou em janelas mais baixas) aparecia a barra de rolagem
@@ -312,7 +314,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.13.0...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.13.1...HEAD
+[0.13.1]: https://github.com/fbreseghello/DataVault/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/fbreseghello/DataVault/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/fbreseghello/DataVault/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/fbreseghello/DataVault/compare/v0.11.2...v0.12.0
