@@ -16,11 +16,14 @@
     onend,
   }: { info: SessionInfo; onlock: () => void; onrefresh: () => void; onend: () => void } = $props()
 
-  type Page = { id: string; label: string; icon: IconName }
+  // size: the icon's size in the sidebar, a multiple of 16 so it stays crisp.
+  type Page = { id: string; label: string; icon: IconName; size?: number }
 
   // The sidebar shows icons only; label is for the hover tip and screen readers.
   const pages: Page[] = [
-    { id: 'grimoire', label: 'grimoire', icon: 'book' },
+    // the book leaves more of its grid empty than the others, so it is drawn a
+    // step larger to stand level with them
+    { id: 'grimoire', label: 'grimoire', icon: 'book', size: 48 },
     { id: 'heart', label: 'unspoken', icon: 'heart' },
     { id: 'sword', label: 'siege', icon: 'sword' },
     { id: 'cross', label: 'crypt', icon: 'cross' },
@@ -82,7 +85,7 @@
           aria-label={p.label}
           aria-current={!settings && page === p.id ? 'page' : undefined}
         >
-          <Icon name={p.icon} />
+          <Icon name={p.icon} size={p.size ?? 32} />
           <span class="tip" aria-hidden="true">{p.label} <span class="key">{i + 1}</span></span>
         </button>
       {/each}

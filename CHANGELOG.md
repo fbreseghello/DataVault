@@ -19,6 +19,11 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
   até uma data fixa. A lista marca o que vence em até 14 dias ou já venceu, o topo
   mostra quantas precisam de renovação e o botão **renewed** registra a renovação.
 
+### Alterado
+
+- O livro do Grimoire aparece maior na barra lateral (48 px em vez de 32), com o mesmo
+  desenho, para ficar do tamanho dos outros ícones.
+
 ## [0.13.3] - 2026-10-26
 
 ### Corrigido
