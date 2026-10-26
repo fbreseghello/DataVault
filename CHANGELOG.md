@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.13.3] - 2026-10-26
+
 ### Corrigido
 
 - O livro do Grimoire voltou ao desenho da 0.13.1. O aumento da 0.13.2 deixou os
@@ -326,7 +328,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.13.2...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.13.3...HEAD
+[0.13.3]: https://github.com/fbreseghello/DataVault/compare/v0.13.2...v0.13.3
 [0.13.2]: https://github.com/fbreseghello/DataVault/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/fbreseghello/DataVault/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/fbreseghello/DataVault/compare/v0.12.1...v0.13.0
