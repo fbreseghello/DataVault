@@ -7,6 +7,11 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Alterado
+
+- O livro do Grimoire ficou maior, com o mesmo peso visual dos outros ícones da
+  barra lateral.
+
 ## [0.13.1] - 2026-10-26
 
 ### Corrigido
