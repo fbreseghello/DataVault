@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-10-26
+
 ### Adicionado
 
 - **Crypt** (a cruz, tecla `4`): documentos e arquivos guardados criptografados, até
@@ -345,7 +347,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.13.3...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/fbreseghello/DataVault/compare/v0.13.3...v0.14.0
 [0.13.3]: https://github.com/fbreseghello/DataVault/compare/v0.13.2...v0.13.3
 [0.13.2]: https://github.com/fbreseghello/DataVault/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/fbreseghello/DataVault/compare/v0.13.0...v0.13.1
