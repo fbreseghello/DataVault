@@ -24,6 +24,8 @@
   let tags = $state(initial?.tags.join(', ') ?? '')
   let notes = $state(initial?.notes ?? '')
   let sealed = $state(initial?.sealed ?? false)
+  let renewEvery = $state<number | null>(initial?.renew_every || null)
+  let renewBy = $state(initial?.renew_by ?? '')
   let sealPin = $state('')
   let sealPinConfirm = $state('')
   let shown = $state<Record<number, boolean>>({})
@@ -55,6 +57,8 @@
           tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
           notes,
           sealed,
+          renew_every: renewEvery && renewEvery > 0 ? Math.round(renewEvery) : 0,
+          renew_by: renewBy,
         },
         newPin ? sealPin : '',
       )
@@ -121,6 +125,17 @@
     <textarea bind:value={notes}></textarea>
   </label>
 
+  <label class="row">
+    <span>renew every</span>
+    <input type="number" min="1" max="3650" bind:value={renewEvery} placeholder="off" />
+    <span class="unit">days, from the last renewal</span>
+  </label>
+  <label class="row">
+    <span>renew by</span>
+    <input type="date" bind:value={renewBy} />
+    <span class="unit">{renewBy ? 'a fixed date wins over the interval' : 'or a fixed date'}</span>
+  </label>
+
   <div class="row">
     <span>sealed</span>
     <button type="button" class="toggle" class:on={sealed} onclick={() => (sealed = !sealed)} aria-pressed={sealed}>
@@ -174,6 +189,22 @@
   }
   .static {
     color: var(--muted);
+  }
+  input[type='number'],
+  input[type='date'] {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 4px 0;
+    outline: none;
+  }
+  input[type='number']:focus,
+  input[type='date']:focus {
+    border-bottom-color: var(--muted);
+  }
+  input::placeholder {
+    color: var(--dim);
   }
   .fname {
     color: var(--dim);

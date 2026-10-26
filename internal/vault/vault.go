@@ -30,6 +30,8 @@ type payload struct {
 	Notes []Note `json:"notes,omitempty"`
 	// Tasks are the Siege boards, one per day.
 	Tasks []Task `json:"tasks,omitempty"`
+	// Files are the crypt's documents; their contents live in the crypt folder.
+	Files []File `json:"files,omitempty"`
 	// SealPIN is the Argon2id hash of the PIN that opens sealed items.
 	SealPIN string `json:"seal_pin,omitempty"`
 }
@@ -210,6 +212,8 @@ func (v *Vault) Update(id string, it Item) (Item, error) {
 	}
 	it.ID = id
 	it.CreatedAt = v.data.Items[i].CreatedAt
+	// only Renewed moves the last renewal
+	it.RenewedAt = v.data.Items[i].RenewedAt
 	it.UpdatedAt = time.Now().UTC()
 
 	next := v.data

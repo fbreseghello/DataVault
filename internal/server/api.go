@@ -177,6 +177,33 @@ func (s *Server) handleDeleteItem(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// handleRenewed marks an item as renewed today. Like editing, a sealed item
+// has to be opened with the PIN first.
+func (s *Server) handleRenewed(w http.ResponseWriter, r *http.Request) {
+	v, err := s.opts.Session.Vault()
+	if err != nil {
+		writeVaultError(w, err)
+		return
+	}
+	id := r.PathValue("id")
+	it, err := v.Get(id)
+	if err != nil {
+		writeVaultError(w, err)
+		return
+	}
+	if it.Sealed && !s.granted(r, id) {
+		writeError(w, http.StatusForbidden, "sealed")
+		return
+	}
+	renewed, err := v.Renewed(id)
+	if err != nil {
+		writeVaultError(w, err)
+		return
+	}
+	s.opts.Session.Log("renewed " + printable(renewed.Name))
+	writeJSON(w, http.StatusOK, renewed)
+}
+
 // handleEvent lets the frontend report things only it sees, like copies, to the terminal log.
 func (s *Server) handleEvent(w http.ResponseWriter, r *http.Request) {
 	var ev struct {

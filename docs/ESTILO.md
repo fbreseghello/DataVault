@@ -87,7 +87,7 @@ crispEdges`.
 | livro fechado visto de cima, girado, com páginas e fita | `book` | Grimoire |
 | coração partido, metades separadas | `heart` | Unspoken |
 | espada, ponta para cima e à direita | `sword` | Siege |
-| cruz sobre um monte de terra | `cross` | página ainda sem nome |
+| cruz sobre um monte de terra | `cross` | Crypt |
 | lápide com inscrição em degraus | `tomb` | encerrar sessão, tela "session ended" |
 | cadeado com buraco de chave | `seal` | itens selados |
 
@@ -201,7 +201,7 @@ O tema atual. Um tema define **os ícones e os nomes das páginas**; o resto des
 | Grimoire | livro fechado em perspectiva | credenciais, comandos de servidor |
 | Unspoken | coração partido | notas; **Dead Words** para as enterradas |
 | Siege | espada | colunas **Orders**, **In Battle**, **Conquered**, **Fallen** |
-| untitled | cruz | ainda sem função |
+| Crypt | cruz | documentos e arquivos guardados |
 | — | lápide | encerrar a sessão |
 
 A escolha de tema aparece na tela settings, fixa em **souls** até existir outro.

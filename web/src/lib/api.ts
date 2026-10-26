@@ -15,11 +15,20 @@ export interface Item {
   notes: string
   /** Sealed items need the seal PIN before their fields are shown. */
   sealed: boolean
+  /** Renew every this many days, counted from the last renewal; 0 or absent is off. */
+  renew_every?: number
+  /** Renew by this date (YYYY-MM-DD); wins over the interval. */
+  renew_by?: string
+  /** When it was last renewed; only the server moves it. */
+  renewed_at?: string
   created_at: string
   updated_at: string
 }
 
-export type Summary = Pick<Item, 'id' | 'type' | 'name' | 'tags' | 'sealed' | 'updated_at'>
+export type Summary = Pick<Item, 'id' | 'type' | 'name' | 'tags' | 'sealed' | 'updated_at'> & {
+  /** When the entry is due for renewal (YYYY-MM-DD), if ever. */
+  renew_due?: string
+}
 
 export interface SessionInfo {
   id: string
@@ -62,6 +71,12 @@ async function send(method: string, path: string, body?: unknown, token = '', ke
     cache: 'no-store',
     keepalive,
   })
+  return checked(res)
+}
+
+// checked raises an ApiError for any answer that is not ok, and tells the app
+// when the vault locked.
+async function checked(res: Response): Promise<Response> {
   if (res.status === 423) window.dispatchEvent(new Event(LOCKED_EVENT))
   if (!res.ok) {
     let msg = res.statusText
@@ -73,6 +88,48 @@ async function send(method: string, path: string, body?: unknown, token = '', ke
     throw new ApiError(res.status, msg)
   }
   return res
+}
+
+/** A document kept in the crypt; its contents are fetched only to take it out. */
+export interface CryptFile {
+  id: string
+  title: string
+  name: string
+  type: string
+  size: number
+  created_at: string
+  updated_at: string
+}
+
+/** The largest file the crypt keeps. */
+export const MAX_FILE_BYTES = 25 * 1024 * 1024
+
+/** Buries a file: its bytes go as the body, its name and title in headers. */
+async function addFile(file: File, title = ''): Promise<CryptFile> {
+  const res = await fetch('/api/files', {
+    method: 'POST',
+    headers: {
+      'X-Dtvlt': '1',
+      'Content-Type': file.type || 'application/octet-stream',
+      'X-File-Name': encodeURIComponent(file.name),
+      'X-File-Title': encodeURIComponent(title),
+    },
+    body: file,
+    credentials: 'same-origin',
+    cache: 'no-store',
+  })
+  return (await checked(res)).json()
+}
+
+/** Takes a file out of the crypt and hands it to the browser as a download. */
+async function takeFile(f: CryptFile): Promise<void> {
+  const res = await checked(await fetch(`/api/files/${encodeURIComponent(f.id)}/content`, { credentials: 'same-origin', cache: 'no-store' }))
+  const url = URL.createObjectURL(await res.blob())
+  const a = document.createElement('a')
+  a.href = url
+  a.download = f.name
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(url), 10_000)
 }
 
 async function request<T>(method: string, path: string, body?: unknown, token = ''): Promise<T> {
@@ -195,6 +252,13 @@ export const api = {
   create: (item: ItemInput) => saveItem('POST', '/api/items', item, ''),
   update: (id: string, item: ItemInput, token = '') => saveItem('PUT', '/api/items/' + encodeURIComponent(id), item, token),
   remove: (id: string, token = '') => request<void>('DELETE', '/api/items/' + encodeURIComponent(id), undefined, token),
+  files: () => request<CryptFile[]>('GET', '/api/files'),
+  addFile,
+  takeFile,
+  renameFile: (id: string, title: string) => request<CryptFile>('PUT', '/api/files/' + encodeURIComponent(id), { title }),
+  removeFile: (id: string) => request<void>('DELETE', '/api/files/' + encodeURIComponent(id)),
+  /** Marks an entry renewed today. */
+  renewed: (id: string, token = '') => request<Item>('POST', '/api/items/' + encodeURIComponent(id) + '/renewed', undefined, token),
   unseal: (id: string, pin: string) =>
     request<{ item: Item; token: string }>('POST', '/api/items/' + encodeURIComponent(id) + '/unseal', { pin }),
   sealStatus: () => request<{ has_pin: boolean }>('GET', '/api/seal'),

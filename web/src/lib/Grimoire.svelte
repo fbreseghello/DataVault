@@ -6,6 +6,7 @@
   import Icon from './Icon.svelte'
   import { commandLines, isCommand, isMultiline, typeShort } from './items'
   import Placard from './Placard.svelte'
+  import { longDue, needsRenewal, shortDue, showDate } from './renew'
   import SealGate from './SealGate.svelte'
 
   // active is false while another page is shown; the grimoire stays mounted but
@@ -31,6 +32,9 @@
   let search = $state<HTMLInputElement>()
 
   const selected = $derived(items.find((it) => it.id === selectedId) ?? null)
+  const dueCount = $derived(items.filter((it) => needsRenewal(it.renew_due)).length)
+  // the due date of the open entry, as the list computed it
+  const openedDue = $derived(opened ? items.find((it) => it.id === opened!.id)?.renew_due : undefined)
 
   function fail(e: unknown) {
     // 423 means the vault locked; App already switches back to the login.
@@ -162,6 +166,16 @@
     }
   }
 
+  async function renewed() {
+    if (!opened) return
+    try {
+      opened = await api.renewed(opened.id, token)
+      await load()
+    } catch (e) {
+      fail(e)
+    }
+  }
+
   async function copyField(i: number) {
     if (!opened) return
     const field = opened.fields[i]
@@ -211,6 +225,7 @@
     <span class="dim" aria-hidden="true">/</span>
     <input type="search" bind:this={search} bind:value={query} placeholder="search" aria-label="search" spellcheck="false" />
     <span class="spacer"></span>
+    {#if dueCount}<span class="count due">{dueCount} to renew</span>{/if}
     <span class="count">{items.length} {items.length === 1 ? 'entry' : 'entries'}</span>
     <button class="new" onclick={() => (close(), (editing = 'new'))}>+ new</button>
   </div>
@@ -223,6 +238,7 @@
           <span class="name">
             {it.name}
             {#if it.sealed}<span class="mark" title="sealed"><Icon name="seal" size={16} /></span>{/if}
+            {#if it.renew_due && needsRenewal(it.renew_due)}<span class="due">{shortDue(it.renew_due)}</span>{/if}
           </span>
           <span class="tags">{it.tags.join(' ')}</span>
         </button>
@@ -311,6 +327,18 @@
             <div class="field">
               <span class="label">notes</span>
               <pre class="value">{opened.notes}</pre>
+            </div>
+          {/if}
+          {#if openedDue}
+            <div class="field">
+              <span class="label">renewal</span>
+              <span class="value">
+                {opened.renew_every && !opened.renew_by ? `every ${opened.renew_every} days · ` : ''}due {showDate(openedDue)}
+                <span class:due={needsRenewal(openedDue)} class:dim={!needsRenewal(openedDue)}>· {longDue(openedDue)}</span>
+              </span>
+              <span class="actions">
+                <button onclick={renewed} title={opened.renew_every ? 'renewed today: the interval starts again' : 'renewed: set the next date in edit'}>renewed</button>
+              </span>
             </div>
           {/if}
 
@@ -445,6 +473,17 @@
     vertical-align: -3px;
     margin-left: 6px;
     color: var(--dim);
+  }
+
+  /* due for renewal soon, or overdue: a state that wants attention */
+  .due,
+  .toolbar .count.due {
+    color: var(--accent);
+  }
+
+  .name .due {
+    margin-left: 8px;
+    font-size: 11px;
   }
 
   .sealpin {

@@ -201,6 +201,19 @@ A barra lateral tem uma página por ícone. Os nomes seguem a estética do Grimo
 | livro | **Grimoire** | credenciais, chaves, comandos de servidor |
 | coração partido | **Unspoken** | notas íntimas, o que não foi dito em voz alta |
 | espada | **Siege** | kanban das tarefas do dia: ir para a guerra |
+| cruz | **Crypt** | documentos e arquivos guardados criptografados |
+
+### Grimoire: renovação
+
+Algumas chaves vencem e precisam ser trocadas. Cada entrada do Grimoire pode ter:
+
+- **renew every:** renovar a cada N dias, contando da última renovação (ou da
+  criação, se nunca foi renovada);
+- **renew by:** uma data fixa, que vale mais que o intervalo.
+
+A lista marca em âmbar o que vence em até 14 dias e o que já venceu, e o topo mostra
+quantas entradas precisam de renovação. No detalhe, o botão **renewed** registra a
+renovação de hoje: o intervalo recomeça e uma data fixa, já usada, é apagada.
 
 ### Unspoken
 
@@ -238,6 +251,23 @@ O plano de batalha do dia. **Um quadro por dia**, com quatro colunas:
   `n` para uma ordem nova, `Enter` para editar.
 - **Contagem:** o topo do quadro mostra quantas tarefas há em cada coluna.
 - **Dados:** uma coleção de tarefas dentro do payload criptografado do vault.
+
+### Crypt
+
+Um lugar para guardar documentos e arquivos (contratos, documentos escaneados,
+chaves `.pem`, comprovantes), junto com o resto.
+
+- **Arquivos:** aparecem como blocos com o tipo e o tamanho; o título aparece por
+  cima do arquivo ao passar o mouse. Um arquivo sem título usa o nome sem extensão.
+- **Enterrar:** `+ new`, a tecla `n` ou arrastar arquivos para a página. Até 25 MB
+  por arquivo.
+- **Detalhe:** nome do arquivo, tipo, tamanho e data. **take** baixa uma cópia,
+  **rename** troca o título e **destroy** apaga de vez, com confirmação.
+- **Dados:** cada arquivo é criptografado com a chave do vault (XChaCha20-Poly1305,
+  com o id do arquivo no AAD) num arquivo próprio, na pasta `crypt` ao lado do vault.
+  Só a lista (título, nome, tipo, tamanho, datas) fica no payload do vault, que assim
+  continua leve. O conteúdo nunca é mostrado dentro da página: sempre sai como
+  download.
 
 Cada página deve sair numa versão MINOR própria.
 

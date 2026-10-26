@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { SessionInfo } from './api'
+  import Crypt from './Crypt.svelte'
   import Grimoire from './Grimoire.svelte'
   import Icon from './Icon.svelte'
   import type { IconName } from './icons'
   import Settings from './Settings.svelte'
   import Siege from './Siege.svelte'
   import Unspoken from './Unspoken.svelte'
-  import Vacant from './Vacant.svelte'
   import { showVersion } from './version'
 
   let {
@@ -23,8 +23,7 @@
     { id: 'grimoire', label: 'grimoire', icon: 'book' },
     { id: 'heart', label: 'unspoken', icon: 'heart' },
     { id: 'sword', label: 'siege', icon: 'sword' },
-    // Not decided yet: the cross holds its place in the sidebar.
-    { id: 'cross', label: 'untitled', icon: 'cross' },
+    { id: 'cross', label: 'crypt', icon: 'cross' },
   ]
 
   let page = $state('grimoire')
@@ -120,7 +119,7 @@
       <Siege active={!settings && page === 'sword'} />
     </div>
     <div class="page-view" hidden={settings || page !== 'cross'}>
-      <Vacant icon="cross" title="untitled" />
+      <Crypt active={!settings && page === 'cross'} />
     </div>
     {#if settings}
       <div class="page-view scroll">
@@ -137,6 +136,7 @@
     {#if !settings && page === 'grimoire'}<span>n new · / search · esc close ·</span>{/if}
     {#if !settings && page === 'heart'}<span>n new · esc close · saves as you write ·</span>{/if}
     {#if !settings && page === 'sword'}<span>n order · arrows select · shift+arrows move · [ ] days ·</span>{/if}
+    {#if !settings && page === 'cross'}<span>n bury · drop files here · esc close ·</span>{/if}
     <span>1–{pages.length} pages · ctrl+shift+l rest</span>
     <span class="version">{showVersion(info.version)}</span>
   </footer>

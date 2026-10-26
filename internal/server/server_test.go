@@ -2,8 +2,10 @@ package server
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/cookiejar"
+	"net/url"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -153,6 +155,83 @@ func TestEndSession(t *testing.T) {
 	}
 	if s.opts.Session.Unlocked() {
 		t.Fatal("ending the session should lock the vault")
+	}
+}
+
+func TestCrypt(t *testing.T) {
+	s := startServer(t)
+	c := browser(t)
+	signIn(t, s, c)
+	post(t, s, c, "/api/unlock", `{"keyword":"kw","password":"pw"}`, sameOrigin)
+	upload := func(body, name string, headers map[string]string) *http.Response {
+		req, _ := http.NewRequest(http.MethodPost, s.URL()+"/api/files", strings.NewReader(body))
+		req.Header.Set("Content-Type", "application/pdf")
+		req.Header.Set("X-File-Name", url.PathEscape(name))
+		for k, v := range headers {
+			req.Header.Set(k, v)
+		}
+		resp, err := c.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return resp
+	}
+	if r := upload("%PDF", "a.pdf", nil); r.StatusCode != http.StatusForbidden {
+		t.Fatalf("an upload without the custom header: %s", r.Status)
+	}
+	r := upload("%PDF contract", "contrato de aluguel.pdf", map[string]string{"X-Dtvlt": "1", "X-File-Title": url.PathEscape("aluguel")})
+	var f vault.File
+	json.NewDecoder(r.Body).Decode(&f)
+	r.Body.Close()
+	if r.StatusCode != http.StatusCreated || f.Title != "aluguel" || f.Name != "contrato de aluguel.pdf" {
+		t.Fatalf("upload: %s %+v", r.Status, f)
+	}
+	if r := upload(strings.Repeat("x", vault.MaxFileSize+1), "big.bin", sameOrigin); r.StatusCode != http.StatusRequestEntityTooLarge {
+		t.Fatalf("an oversized upload: %s", r.Status)
+	}
+	resp, err := c.Get(s.URL() + "/api/files/" + f.ID + "/content")
+	if err != nil {
+		t.Fatal(err)
+	}
+	body, _ := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if string(body) != "%PDF contract" || resp.Header.Get("Content-Type") != "application/octet-stream" ||
+		!strings.HasPrefix(resp.Header.Get("Content-Disposition"), "attachment") {
+		t.Fatalf("download: %q %v", body, resp.Header)
+	}
+	if code := call(t, s, c, http.MethodPut, "/api/files/"+f.ID, `{"title":"rent"}`, nil, &f); code != http.StatusOK || f.Title != "rent" {
+		t.Fatalf("rename: %d %+v", code, f)
+	}
+	if code := call(t, s, c, http.MethodDelete, "/api/files/"+f.ID, "", nil, nil); code != http.StatusNoContent {
+		t.Fatalf("delete: %d", code)
+	}
+	var files []vault.File
+	call(t, s, c, http.MethodGet, "/api/files", "", nil, &files)
+	if len(files) != 0 {
+		t.Fatalf("files left: %+v", files)
+	}
+}
+
+func TestRenewed(t *testing.T) {
+	s := startServer(t)
+	c := browser(t)
+	signIn(t, s, c)
+	post(t, s, c, "/api/unlock", `{"keyword":"kw","password":"pw"}`, sameOrigin)
+	var it vault.Item
+	if code := call(t, s, c, http.MethodPost, "/api/items", `{"type":"api_key","name":"stripe","renew_every":30}`, nil, &it); code != http.StatusCreated {
+		t.Fatalf("create: %d", code)
+	}
+	var list []vault.Summary
+	call(t, s, c, http.MethodGet, "/api/items", "", nil, &list)
+	if len(list) != 1 || list[0].RenewDue == "" {
+		t.Fatalf("the listing should carry the due date: %+v", list)
+	}
+	var renewed vault.Item
+	if code := call(t, s, c, http.MethodPost, "/api/items/"+it.ID+"/renewed", "", nil, &renewed); code != http.StatusOK || renewed.RenewedAt == nil {
+		t.Fatalf("renewed: %d %+v", code, renewed)
+	}
+	if code := call(t, s, c, http.MethodPost, "/api/items/nope/renewed", "", nil, nil); code != http.StatusNotFound {
+		t.Fatalf("unknown item: %d", code)
 	}
 }
 

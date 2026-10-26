@@ -7,6 +7,18 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- **Crypt** (a cruz, tecla `4`): documentos e arquivos guardados criptografados, até
+  25 MB cada. Cada arquivo aparece como um bloco com o tipo e o tamanho, e o título
+  aparece por cima dele ao passar o mouse. Enterre com `+ new`, `n` ou arrastando
+  arquivos para a página; **take** baixa uma cópia, **rename** troca o título e
+  **destroy** apaga de vez, com confirmação. Os arquivos ficam criptografados com a
+  chave do vault, cada um num arquivo próprio na pasta `crypt` ao lado do vault.
+- Renovação de chaves no Grimoire: cada entrada pode ser renovada a cada N dias ou
+  até uma data fixa. A lista marca o que vence em até 14 dias ou já venceu, o topo
+  mostra quantas precisam de renovação e o botão **renewed** registra a renovação.
+
 ## [0.13.3] - 2026-10-26
 
 ### Corrigido
