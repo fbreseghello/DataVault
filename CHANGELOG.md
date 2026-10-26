@@ -7,6 +7,11 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Corrigido
+
+- O livro do Grimoire voltou ao desenho da 0.13.1. O aumento da 0.13.2 deixou os
+  detalhes quebrados (pontos soltos nas páginas e bordas irregulares).
+
 ## [0.13.2] - 2026-10-26
 
 ### Alterado
