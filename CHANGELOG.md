@@ -7,6 +7,13 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Corrigido
+
+- Na tela settings, ao salvar (ou em janelas mais baixas) aparecia a barra de rolagem
+  padrão do navegador, cinza e com setas, no meio da tela. Agora a rolagem ocupa toda
+  a área da página, com a barra na borda da janela, e as barras de rolagem do app são
+  finas, no cinza das dicas e sem setas.
+
 ## [0.13.0] - 2026-10-26
 
 ### Adicionado

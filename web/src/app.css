@@ -39,6 +39,12 @@ body {
   min-height: 100%;
 }
 
+/* Scroll bars stay out of the way: thin, in the grey of the hints, no arrows. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--dim) transparent;
+}
+
 ::selection {
   background: var(--fg);
   color: var(--bg);

@@ -123,8 +123,10 @@
       <Vacant icon="cross" title="untitled" />
     </div>
     {#if settings}
-      <div class="page-view padded">
-        <Settings onsaved={onrefresh} onclose={() => (settings = false)} />
+      <div class="page-view scroll">
+        <div class="padded">
+          <Settings onsaved={onrefresh} onclose={() => (settings = false)} />
+        </div>
       </div>
     {/if}
   </main>
@@ -288,9 +290,14 @@
     display: none;
   }
 
+  /* The whole pane scrolls, so a scroll bar sits at the window's edge; the
+     settings themselves keep a readable width inside it. */
+  .scroll {
+    overflow-y: auto;
+  }
+
   .padded {
     padding: 16px 32px;
-    overflow-y: auto;
     max-width: 880px;
   }
 
