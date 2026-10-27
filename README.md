@@ -47,6 +47,8 @@ dtvlt status     mostra a sessão em execução
 dtvlt lock       trava o vault e mantém a sessão
 dtvlt stop       encerra a sessão
 dtvlt config     altera as preferências
+dtvlt note       escreve uma nota no Unspoken: dtvlt note "título" "conteúdo"
+dtvlt task       põe uma tarefa no Siege de hoje: dtvlt task "título" "detalhe"
 dtvlt pwgen      gera uma senha (dtvlt pwgen 32 --plain; veja --help)
 dtvlt update     baixa e instala a versão mais nova
 dtvlt uninstall  remove o dtvlt (o vault é mantido)
@@ -63,6 +65,9 @@ console espera comandos:
 ,,,       abre o DataVault no navegador
 status    mostra a sessão
 lock      trava o vault e mantém a sessão
+note      escreve uma nota no Unspoken (note "título" "conteúdo")
+task      põe uma tarefa no Siege de hoje (task "título" "detalhe")
+pwgen     gera uma senha (pwgen 32 --plain)
 update    baixa e instala a versão mais nova
 config    altera as preferências
 version   mostra a versão

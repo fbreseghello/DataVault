@@ -74,6 +74,13 @@ O processo do `dtvlt` é o dono da sessão.
   ```
 - **Terminal fechado:** o processo vai para segundo plano. `dtvlt status` mostra
   a sessão ativa, `dtvlt lock` trava o vault e `dtvlt stop` encerra tudo.
+- **Escrita rápida:** `dtvlt note "título" "conteúdo"` e `dtvlt task "título"
+  "detalhe"` gravam na sessão aberta pela API de controle (o mesmo token de
+  `status`, `lock` e `stop`), sem abrir o navegador. A nota entra no Unspoken, sem
+  selo (selar pede o PIN, que fica no navegador), e a tarefa entra em Orders no
+  Siege do dia. O segundo argumento é opcional, e `"título(conteúdo)"` também vale.
+  Com o vault travado, o comando avisa e não grava nada. O log da sessão não mostra
+  o título das notas.
 
 ## Tela de login
 

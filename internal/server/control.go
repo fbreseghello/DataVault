@@ -1,14 +1,17 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
 
+	"github.com/fbreseghello/DataVault/internal/vault"
 	"github.com/fbreseghello/DataVault/internal/version"
 )
 
@@ -102,31 +105,64 @@ func Dial(statePath string) (*Client, error) {
 
 func (c *Client) Status() (Status, error) {
 	var st Status
-	return st, c.do(http.MethodGet, "/control/status", &st)
+	return st, c.do(http.MethodGet, "/control/status", nil, &st)
 }
 
-func (c *Client) Lock() error { return c.do(http.MethodPost, "/control/lock", nil) }
-func (c *Client) Stop() error { return c.do(http.MethodPost, "/control/stop", nil) }
+func (c *Client) Lock() error { return c.do(http.MethodPost, "/control/lock", nil, nil) }
+func (c *Client) Stop() error { return c.do(http.MethodPost, "/control/stop", nil, nil) }
 
 func (c *Client) LaunchURL() (string, error) {
 	var res struct {
 		URL string `json:"url"`
 	}
-	return res.URL, c.do(http.MethodPost, "/control/launch", &res)
+	return res.URL, c.do(http.MethodPost, "/control/launch", nil, &res)
 }
 
-func (c *Client) do(method, path string, out any) error {
-	req, err := http.NewRequest(method, fmt.Sprintf("http://127.0.0.1:%d%s", c.st.Port, path), nil)
+func (c *Client) WriteNote(title, body string) (vault.Note, error) {
+	var n vault.Note
+	return n, c.do(http.MethodPost, "/control/note", map[string]string{"title": title, "body": body}, &n)
+}
+
+func (c *Client) WriteTask(title, note, day string) (vault.Task, error) {
+	var t vault.Task
+	return t, c.do(http.MethodPost, "/control/task", map[string]string{"title": title, "note": note, "day": day}, &t)
+}
+
+// ErrVaultLocked is what a write through the control API gets while the vault is locked.
+var ErrVaultLocked = errors.New("the vault is locked · open it in the browser (,,, in the console) and try again")
+
+func (c *Client) do(method, path string, in, out any) error {
+	var body io.Reader
+	if in != nil {
+		b, err := json.Marshal(in)
+		if err != nil {
+			return err
+		}
+		body = bytes.NewReader(b)
+	}
+	req, err := http.NewRequest(method, fmt.Sprintf("http://127.0.0.1:%d%s", c.st.Port, path), body)
 	if err != nil {
 		return err
 	}
 	req.Header.Set("Authorization", "Bearer "+c.st.ControlToken)
+	if in != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
 	resp, err := c.http.Do(req)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusLocked {
+		return ErrVaultLocked
+	}
 	if resp.StatusCode >= 300 {
+		var e struct {
+			Error string `json:"error"`
+		}
+		if json.NewDecoder(resp.Body).Decode(&e) == nil && e.Error != "" {
+			return errors.New(e.Error)
+		}
 		return fmt.Errorf("control %s: %s", path, resp.Status)
 	}
 	if out != nil {

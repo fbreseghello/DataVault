@@ -12,6 +12,7 @@ import (
 	"github.com/fbreseghello/DataVault/internal/install"
 	"github.com/fbreseghello/DataVault/internal/server"
 	"github.com/fbreseghello/DataVault/internal/session"
+	"github.com/fbreseghello/DataVault/internal/vault"
 	"github.com/fbreseghello/DataVault/internal/version"
 )
 
@@ -25,6 +26,7 @@ type controller interface {
 	Status() (server.Status, error)
 	Lock() error
 	Stop() error
+	writer
 }
 
 // localSession is a session served by this process.
@@ -47,11 +49,21 @@ func (l localSession) Status() (server.Status, error) {
 }
 
 func (l localSession) Lock() error { l.sess.Lock("console"); return nil }
+
+func (l localSession) WriteNote(title, body string) (vault.Note, error) {
+	return l.srv.WriteNote(title, body)
+}
+
+func (l localSession) WriteTask(title, note, day string) (vault.Task, error) {
+	return l.srv.WriteTask(title, note, day)
+}
 func (l localSession) Stop() error { l.stop(); return nil }
 
 const consoleHelp = `  ,,,       open DataVault in the browser
   status    show the session
   lock      lock the vault, keep the session
+  note      write a note in unspoken (note "title" "content")
+  task      order a task for today (task "title" "detail")
   pwgen     forge a password (pwgen 32 --plain)
   update    download and install the latest release
   config    change preferences
@@ -72,12 +84,23 @@ func console(u *ui, paths config.Paths, ctl controller, owns bool) error {
 			u.println("")
 			return leave(u, ctl, owns)
 		}
-		fields := strings.Fields(line)
-		if len(fields) > 0 && strings.EqualFold(fields[0], "pwgen") {
-			if err := pwgen(u, fields[1:]); err != nil {
-				u.fail("%v", err)
+		// commands that take arguments
+		if fields := splitArgs(line); len(fields) > 0 {
+			var run func() error
+			switch strings.ToLower(fields[0]) {
+			case "pwgen":
+				run = func() error { return pwgen(u, fields[1:]) }
+			case "note":
+				run = func() error { return quickNote(u, ctl, fields[1:]) }
+			case "task":
+				run = func() error { return quickTask(u, ctl, fields[1:]) }
 			}
-			continue
+			if run != nil {
+				if err := run(); err != nil {
+					u.fail("%v", err)
+				}
+				continue
+			}
 		}
 		switch cmd := strings.ToLower(strings.TrimSpace(line)); cmd {
 		case "":

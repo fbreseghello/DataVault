@@ -24,6 +24,11 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
   tamanho e as opções `--plain`, `--no-upper`, `--no-lower`, `--no-digits` e
   `--no-symbols` (ex.: `dtvlt pwgen 32 --plain`). Também funciona dentro do console.
   Quando a saída vai para outro comando, imprime só a senha.
+- `dtvlt note` e `dtvlt task`: escrevem direto do terminal na sessão aberta, sem
+  passar pelo navegador. `dtvlt note "título" "conteúdo"` cria uma nota no Unspoken
+  e `dtvlt task "título" "detalhe"` põe uma tarefa em Orders no Siege de hoje. O
+  conteúdo e o detalhe são opcionais, e a forma `"título(conteúdo)"` também
+  funciona. Funcionam também dentro do console. O vault precisa estar destravado.
 
 ## [0.14.0] - 2026-10-26
 

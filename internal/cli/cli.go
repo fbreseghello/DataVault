@@ -43,6 +43,8 @@ const usage = `usage: dtvlt [command]
   (none)    open the console (,,, opens DataVault in the browser)
   status    show the running session
   lock      lock the vault, keep the session
+  note      write a note in unspoken: dtvlt note "title" "content"
+  task      order a task for today: dtvlt task "title" "detail"
   pwgen     forge a password (dtvlt pwgen --help)
   stop      end the session
   config    change preferences
@@ -115,6 +117,10 @@ func run(u *ui, cmd string, args []string) int {
 		err = configure(u, paths)
 	case "pwgen":
 		err = pwgen(u, args[1:])
+	case "note":
+		err = withWriter(u, paths, func(w writer) error { return quickNote(u, w, args[1:]) })
+	case "task":
+		err = withWriter(u, paths, func(w writer) error { return quickTask(u, w, args[1:]) })
 	case "version", "--version", "-v":
 		u.println("dtvlt %s", version.Version)
 	case "help", "--help", "-h":

@@ -173,6 +173,8 @@ func (s *Server) routes() http.Handler {
 	control.HandleFunc("POST /control/lock", s.handleControlLock)
 	control.HandleFunc("POST /control/stop", s.handleControlStop)
 	control.HandleFunc("POST /control/launch", s.handleControlLaunch)
+	control.HandleFunc("POST /control/note", s.handleControlNote)
+	control.HandleFunc("POST /control/task", s.handleControlTask)
 	mux.Handle("/control/", s.requireControlToken(control))
 
 	mux.Handle("/", s.requireCookie(s.static()))
