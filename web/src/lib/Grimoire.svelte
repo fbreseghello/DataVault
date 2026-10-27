@@ -5,7 +5,7 @@
   import Editor from './Editor.svelte'
   import Forge from './Forge.svelte'
   import Icon from './Icon.svelte'
-  import { commandLines, isCommand, isMultiline, typeShort } from './items'
+  import { commandLines, isCommand, isMultiline, isRecovery, LOW_CODES, recoveryCodes, toggleUsed, typeShort } from './items'
   import Placard from './Placard.svelte'
   import { longDue, needsRenewal, shortDue, showDate } from './renew'
   import SealGate from './SealGate.svelte'
@@ -30,6 +30,8 @@
   let sealPinConfirm = $state('')
   let revealed = $state<Record<number, boolean>>({})
   let copied = $state<number | null>(null)
+  // the recovery code last copied, by its line
+  let copiedCode = $state<number | null>(null)
   let confirmDelete = $state(false)
   let error = $state('')
   let search = $state<HTMLInputElement>()
@@ -83,6 +85,7 @@
     token = ''
     revealed = {}
     copied = null
+    copiedCode = null
     confirmDelete = false
     sealPrompt = false
     sealPin = sealPinConfirm = ''
@@ -175,6 +178,34 @@
     try {
       opened = await api.renewed(opened.id, token)
       await load()
+    } catch (e) {
+      fail(e)
+    }
+  }
+
+  async function copyCode(code: string, n: number) {
+    if (!opened) return
+    try {
+      await copy(code, info.clipboard_clear_seconds)
+    } catch {
+      error = 'clipboard not available'
+      return
+    }
+    copiedCode = n
+    setTimeout(() => {
+      if (copiedCode === n) copiedCode = null
+    }, 1500)
+    api.copied(opened.name, 'recovery code').catch(() => {})
+  }
+
+  // Marks a recovery code spent, or not, and saves the entry.
+  async function markUsed(i: number, n: number) {
+    if (!opened) return
+    const fields = opened.fields.map((f, k) => (k === i ? { ...f, value: toggleUsed(f.value, n) } : f))
+    try {
+      const res = await api.update(opened.id, { ...inputOf(opened), fields }, token)
+      opened = res.item
+      if (res.token) token = res.token
     } catch (e) {
       fail(e)
     }
@@ -312,7 +343,28 @@
             {#if field.value}
               <div class="field">
                 <span class="label">{field.name}</span>
-                {#if field.secret && !revealed[i]}
+                {#if isRecovery(opened.type, field)}
+                  {@const codes = recoveryCodes(field.value)}
+                  {@const left = codes.filter((c) => !c.used).length}
+                  <div class="value">
+                    <span class:due={left <= LOW_CODES} class:dim={left > LOW_CODES}>
+                      {`${left} of ${codes.length} left${left <= LOW_CODES ? ' · time to generate new ones' : ''}`}
+                    </span>
+                    {#if revealed[i]}
+                      <ol class="codes">
+                        {#each codes as c, n (n)}
+                          <li class:used={c.used}>
+                            <span class="code">{c.code}</span>
+                            <button onclick={() => copyCode(c.code, n)} class:done={copiedCode === n} disabled={c.used}>
+                              {copiedCode === n ? 'copied' : 'copy'}
+                            </button>
+                            <button onclick={() => markUsed(i, n)}>{c.used ? 'unused' : 'used'}</button>
+                          </li>
+                        {/each}
+                      </ol>
+                    {/if}
+                  </div>
+                {:else if field.secret && !revealed[i]}
                   <span class="value masked">{masked}</span>
                 {:else if isCommand(opened.type, field)}
                   <pre class="value command">{#each commandLines(field.value) as line, n (n)}<span class="line"><span class="prompt" aria-hidden="true">$</span>{line}</span>{/each}</pre>
@@ -325,7 +377,9 @@
                   {#if field.secret}
                     <button onclick={() => (revealed[i] = !revealed[i])}>{revealed[i] ? 'hide' : 'show'}</button>
                   {/if}
-                  <button onclick={() => copyField(i)} class:done={copied === i}>{copied === i ? 'copied' : 'copy'}</button>
+                  {#if !isRecovery(opened.type, field)}
+                    <button onclick={() => copyField(i)} class:done={copied === i}>{copied === i ? 'copied' : 'copy'}</button>
+                  {/if}
                 </span>
               </div>
             {/if}
@@ -577,6 +631,33 @@
     color: var(--dim);
     margin-right: 1ch;
     user-select: none;
+  }
+
+  /* recovery codes: one per row, each copied or marked used on its own */
+  .codes {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 2px;
+  }
+
+  .codes li {
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+    font-size: 12px;
+  }
+
+  .code {
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    min-width: 16ch;
+  }
+
+  .codes .used .code {
+    color: var(--dim);
+    text-decoration: line-through;
   }
 
   .masked {

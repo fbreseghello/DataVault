@@ -143,6 +143,7 @@ Outros processos e outras abas do navegador também alcançam portas locais. Por
 | TOTP (2FA) | serviço, secret → gera o código |
 | Nota segura | texto livre |
 | Comando de servidor | comando (várias linhas), servidor, diretório; só guarda e copia, nunca executa |
+| Códigos de recuperação | conta, códigos (um por linha); cada código se copia sozinho e pode ser marcado como usado |
 
 Todos os itens têm tags e campos personalizados.
 
@@ -228,6 +229,19 @@ painel da direita.
   `pwgen`. Com a saída redirecionada, imprime só a senha.
 - **Depois:** frases-senha (palavras aleatórias), que pedem uma lista de palavras no
   app.
+
+### Grimoire: códigos de recuperação
+
+Os códigos de backup que os serviços dão ao ligar o 2FA (GitHub, Google,
+Discord...) para entrar quando o autenticador não está à mão.
+
+- **Entrada:** tipo **recovery codes**, com a conta e os códigos colados um por
+  linha. O campo é secreto: fica escondido até **show**.
+- **Lista:** cada código numa linha, com **copy** só para ele e **used** para
+  marcá-lo como gasto. Um código usado fica riscado e não se copia mais; **unused**
+  desfaz. A marca é salva no próprio campo, como uma linha que começa com `used`.
+- **Aviso:** o topo mostra quantos sobram ("3 of 10 left"). Com 2 ou menos, avisa
+  que é hora de gerar códigos novos no serviço.
 
 ### Grimoire: renovação
 

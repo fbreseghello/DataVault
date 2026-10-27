@@ -20,6 +20,11 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
   cartão ou conta usada. A lista vem na ordem das próximas cobranças, com destaque
   para as dos próximos 7 dias, e o topo mostra o total por mês e por ano de cada
   moeda. **strike** apaga a conta quando ela é cancelada.
+- Códigos de recuperação no Grimoire: um tipo novo de entrada, **recovery codes**,
+  para os códigos de backup do 2FA. Os códigos são colados um por linha e ficam
+  escondidos até **show**. Cada um tem **copy** próprio e **used** para marcá-lo como
+  gasto (fica riscado), e a entrada mostra quantos sobram, avisando quando restam 2
+  ou menos.
 - `dtvlt pwgen`: o mesmo gerador no terminal, sem precisar de sessão. Aceita o
   tamanho e as opções `--plain`, `--no-upper`, `--no-lower`, `--no-digits` e
   `--no-symbols` (ex.: `dtvlt pwgen 32 --plain`). Também funciona dentro do console.

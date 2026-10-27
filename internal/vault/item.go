@@ -18,11 +18,13 @@ const (
 	TypeNote   ItemType = "note"
 	// TypeCommand is a saved server command; dtvlt stores and copies it, never runs it.
 	TypeCommand ItemType = "command"
+	// TypeRecovery holds an account's recovery (backup) codes, one per line.
+	TypeRecovery ItemType = "recovery"
 )
 
 func (t ItemType) valid() bool {
 	switch t {
-	case TypeLogin, TypeAPIKey, TypeSSHKey, TypeSeed, TypeNote, TypeCommand:
+	case TypeLogin, TypeAPIKey, TypeSSHKey, TypeSeed, TypeNote, TypeCommand, TypeRecovery:
 		return true
 	}
 	return false

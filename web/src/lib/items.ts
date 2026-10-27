@@ -7,6 +7,7 @@ export const TYPES: { type: ItemType; label: string; short: string }[] = [
   { type: 'seed', label: 'seed / passphrase', short: 'seed' },
   { type: 'note', label: 'secure note', short: 'note' },
   { type: 'command', label: 'server command', short: 'cmd' },
+  { type: 'recovery', label: 'recovery codes', short: 'codes' },
 ]
 
 export function typeShort(t: ItemType): string {
@@ -29,10 +30,12 @@ export function template(t: ItemType): Field[] {
       return []
     case 'command':
       return [f('command'), f('server'), f('workdir')]
+    case 'recovery':
+      return [f('account'), f('codes', true)]
   }
 }
 
-const MULTILINE = new Set(['private_key', 'public_key', 'words', 'command'])
+const MULTILINE = new Set(['private_key', 'public_key', 'words', 'command', 'codes'])
 
 /** The field of a command entry shown as a terminal line, with a prompt. */
 export function isCommand(type: ItemType, field: Field): boolean {
@@ -46,3 +49,34 @@ export function commandLines(value: string): string[] {
 export function isMultiline(field: Field): boolean {
   return MULTILINE.has(field.name) || field.value.includes('\n')
 }
+
+// Recovery codes: one per line. A code spent on a sign-in is kept, marked by a
+// line that starts with "used", so the list still shows what is left.
+const USED = /^used\s+/i
+
+export interface RecoveryCode {
+  code: string
+  used: boolean
+}
+
+/** The codes field of a recovery entry. */
+export function isRecovery(type: ItemType, field: Field): boolean {
+  return type === 'recovery' && field.name === 'codes'
+}
+
+export function recoveryCodes(value: string): RecoveryCode[] {
+  return commandLines(value)
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => ({ code: l.replace(USED, ''), used: USED.test(l) }))
+}
+
+/** The field value with the n-th code marked used, or unused again. */
+export function toggleUsed(value: string, n: number): string {
+  return recoveryCodes(value)
+    .map((c, k) => ((k === n ? !c.used : c.used) ? `used ${c.code}` : c.code))
+    .join('\n')
+}
+
+/** Few enough codes left that it is time to generate new ones. */
+export const LOW_CODES = 2
