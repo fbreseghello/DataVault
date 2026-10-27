@@ -32,6 +32,8 @@ type payload struct {
 	Tasks []Task `json:"tasks,omitempty"`
 	// Files are the crypt's documents; their contents live in the crypt folder.
 	Files []File `json:"files,omitempty"`
+	// Bills are the ledger: subscriptions and fixed expenses.
+	Bills []Bill `json:"bills,omitempty"`
 	// SealPIN is the Argon2id hash of the PIN that opens sealed items.
 	SealPIN string `json:"seal_pin,omitempty"`
 }

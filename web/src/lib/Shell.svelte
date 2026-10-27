@@ -4,6 +4,7 @@
   import Grimoire from './Grimoire.svelte'
   import Icon from './Icon.svelte'
   import type { IconName } from './icons'
+  import Ledger from './Ledger.svelte'
   import Settings from './Settings.svelte'
   import Siege from './Siege.svelte'
   import Unspoken from './Unspoken.svelte'
@@ -27,6 +28,7 @@
     { id: 'heart', label: 'unspoken', icon: 'heart' },
     { id: 'sword', label: 'siege', icon: 'sword' },
     { id: 'cross', label: 'crypt', icon: 'cross' },
+    { id: 'sack', label: 'ledger', icon: 'sack' },
   ]
 
   let page = $state('grimoire')
@@ -124,6 +126,9 @@
     <div class="page-view" hidden={settings || page !== 'cross'}>
       <Crypt active={!settings && page === 'cross'} />
     </div>
+    <div class="page-view" hidden={settings || page !== 'sack'}>
+      <Ledger active={!settings && page === 'sack'} />
+    </div>
     {#if settings}
       <div class="page-view scroll">
         <div class="padded">
@@ -140,6 +145,7 @@
     {#if !settings && page === 'heart'}<span>n new · esc close · saves as you write ·</span>{/if}
     {#if !settings && page === 'sword'}<span>n order · arrows select · shift+arrows move · [ ] days ·</span>{/if}
     {#if !settings && page === 'cross'}<span>n bury · drop files here · esc close ·</span>{/if}
+    {#if !settings && page === 'sack'}<span>n new · esc close ·</span>{/if}
     <span>1–{pages.length} pages · ctrl+shift+l rest</span>
     <span class="version">{showVersion(info.version)}</span>
   </footer>

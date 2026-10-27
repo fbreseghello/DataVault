@@ -202,6 +202,7 @@ A barra lateral tem uma página por ícone. Os nomes seguem a estética do Grimo
 | coração partido | **Unspoken** | notas íntimas, o que não foi dito em voz alta |
 | espada | **Siege** | kanban das tarefas do dia: ir para a guerra |
 | cruz | **Crypt** | documentos e arquivos guardados criptografados |
+| saco de moedas | **Ledger** | assinaturas e gastos fixos |
 
 ### Grimoire: forge
 
@@ -215,6 +216,9 @@ painel da direita.
 - **Força:** em bits (tamanho × log2 do conjunto de caracteres).
 - **Copiar:** como os outros campos, limpa a área de transferência depois do tempo
   configurado. A senha não é guardada em lugar nenhum.
+- **Terminal:** `dtvlt pwgen [tamanho] [--plain] [--no-upper|--no-lower|--no-digits|--no-symbols]`
+  gera a senha com as mesmas regras (`internal/forge`), sem sessão. No console é
+  `pwgen`. Com a saída redirecionada, imprime só a senha.
 - **Depois:** frases-senha (palavras aleatórias), que pedem uma lista de palavras no
   app.
 
@@ -283,6 +287,25 @@ chaves `.pem`, comprovantes), junto com o resto.
   Só a lista (título, nome, tipo, tamanho, datas) fica no payload do vault, que assim
   continua leve. O conteúdo nunca é mostrado dentro da página: sempre sai como
   download.
+
+### Ledger
+
+O livro-razão das assinaturas e gastos fixos: streaming, servidores, domínios,
+academia. Mostra quanto vai embora todo mês e o que cobra nos próximos dias.
+
+- **Conta:** nome, valor, moeda (código de três letras, como BRL ou USD), ciclo
+  (mensal, anual ou semanal), data da primeira cobrança, cartão ou conta usada e
+  uma nota.
+- **Próxima cobrança:** calculada na página a partir da primeira cobrança e do
+  ciclo, no calendário do navegador. Num mês sem o dia (31 em fevereiro) a cobrança
+  cai no último dia.
+- **Lista:** em ordem de cobrança; o que vence em até 7 dias fica destacado.
+- **Totais:** no topo, por mês e por ano, separados por moeda. Contas anuais
+  contam 1/12 por mês, e semanais 52/12.
+- **Strike:** apaga a conta (com confirmação), para quando ela for cancelada.
+- **Dados:** uma coleção dentro do payload criptografado do vault; o valor é
+  guardado em centavos.
+- **Depois:** as cobranças no calendário, quando ele existir.
 
 Cada página deve sair numa versão MINOR própria.
 

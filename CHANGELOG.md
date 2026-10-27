@@ -15,6 +15,15 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
   caractere e deixar de fora os que se confundem (`0 O o 1 l I |`); a força aparece em
   bits. **copy** copia e limpa a área de transferência como os outros campos, e
   **again** gera outra. A senha não é guardada.
+- **Ledger**, a 5ª página (ícone de saco de moedas): assinaturas e gastos fixos. Cada
+  conta tem valor, moeda, ciclo (mensal, anual ou semanal), primeira cobrança e o
+  cartão ou conta usada. A lista vem na ordem das próximas cobranças, com destaque
+  para as dos próximos 7 dias, e o topo mostra o total por mês e por ano de cada
+  moeda. **strike** apaga a conta quando ela é cancelada.
+- `dtvlt pwgen`: o mesmo gerador no terminal, sem precisar de sessão. Aceita o
+  tamanho e as opções `--plain`, `--no-upper`, `--no-lower`, `--no-digits` e
+  `--no-symbols` (ex.: `dtvlt pwgen 32 --plain`). Também funciona dentro do console.
+  Quando a saída vai para outro comando, imprime só a senha.
 
 ## [0.14.0] - 2026-10-26
 

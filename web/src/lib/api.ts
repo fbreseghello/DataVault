@@ -206,6 +206,30 @@ export interface Board {
 
 const taskPath = (id: string) => '/api/tasks/' + encodeURIComponent(id)
 
+export type Cycle = 'weekly' | 'monthly' | 'yearly'
+
+/** A ledger entry: a subscription or fixed expense. */
+export interface Bill {
+  id: string
+  name: string
+  /** In cents of currency. */
+  amount: number
+  /** ISO 4217 code, like BRL. */
+  currency: string
+  cycle: Cycle
+  /** The first charge, YYYY-MM-DD; the next follow from it and the cycle. */
+  since: string
+  /** The card or account it is paid with. */
+  method: string
+  note: string
+  created_at: string
+  updated_at: string
+}
+
+export type BillInput = Omit<Bill, 'id' | 'created_at' | 'updated_at'>
+
+const billPath = (id: string) => '/api/bills/' + encodeURIComponent(id)
+
 export interface Settings {
   pin_enabled: boolean
   keep_terminal: boolean
@@ -257,6 +281,10 @@ export const api = {
   takeFile,
   renameFile: (id: string, title: string) => request<CryptFile>('PUT', '/api/files/' + encodeURIComponent(id), { title }),
   removeFile: (id: string) => request<void>('DELETE', '/api/files/' + encodeURIComponent(id)),
+  bills: () => request<Bill[]>('GET', '/api/bills'),
+  createBill: (b: BillInput) => request<Bill>('POST', '/api/bills', b),
+  updateBill: (id: string, b: BillInput) => request<Bill>('PUT', billPath(id), b),
+  removeBill: (id: string) => request<void>('DELETE', billPath(id)),
   /** Marks an entry renewed today. */
   renewed: (id: string, token = '') => request<Item>('POST', '/api/items/' + encodeURIComponent(id) + '/renewed', undefined, token),
   unseal: (id: string, pin: string) =>
