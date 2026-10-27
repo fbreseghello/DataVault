@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-10-27
+
 ### Adicionado
 
 - Gerador de senhas no Grimoire: o botão **forge**, à esquerda do `+ new` (ou a
@@ -375,7 +377,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/fbreseghello/DataVault/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/fbreseghello/DataVault/compare/v0.13.3...v0.14.0
 [0.13.3]: https://github.com/fbreseghello/DataVault/compare/v0.13.2...v0.13.3
 [0.13.2]: https://github.com/fbreseghello/DataVault/compare/v0.13.1...v0.13.2
