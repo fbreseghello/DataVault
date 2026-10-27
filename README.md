@@ -47,6 +47,7 @@ dtvlt status     mostra a sessão em execução
 dtvlt lock       trava o vault e mantém a sessão
 dtvlt stop       encerra a sessão
 dtvlt config     altera as preferências
+dtvlt pwgen      gera uma senha (dtvlt pwgen 32 --plain; veja --help)
 dtvlt update     baixa e instala a versão mais nova
 dtvlt uninstall  remove o dtvlt (o vault é mantido)
 dtvlt version    mostra a versão

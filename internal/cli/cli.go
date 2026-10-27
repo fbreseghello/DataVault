@@ -43,6 +43,7 @@ const usage = `usage: dtvlt [command]
   (none)    open the console (,,, opens DataVault in the browser)
   status    show the running session
   lock      lock the vault, keep the session
+  pwgen     forge a password (dtvlt pwgen --help)
   stop      end the session
   config    change preferences
   update    download and install the latest release
@@ -58,7 +59,7 @@ func Run(args []string) int {
 	if len(args) > 0 {
 		cmd = args[0]
 	}
-	code := run(u, cmd)
+	code := run(u, cmd, args)
 	if relaunch != "" {
 		return relaunchInto(relaunch)
 	}
@@ -72,7 +73,7 @@ func Run(args []string) int {
 	return code
 }
 
-func run(u *ui, cmd string) int {
+func run(u *ui, cmd string, args []string) int {
 	install.Cleanup()
 	paths, err := config.ResolvePaths()
 	if err != nil {
@@ -112,6 +113,8 @@ func run(u *ui, cmd string) int {
 		})
 	case "config":
 		err = configure(u, paths)
+	case "pwgen":
+		err = pwgen(u, args[1:])
 	case "version", "--version", "-v":
 		u.println("dtvlt %s", version.Version)
 	case "help", "--help", "-h":

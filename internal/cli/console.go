@@ -52,6 +52,7 @@ func (l localSession) Stop() error { l.stop(); return nil }
 const consoleHelp = `  ,,,       open DataVault in the browser
   status    show the session
   lock      lock the vault, keep the session
+  pwgen     forge a password (pwgen 32 --plain)
   update    download and install the latest release
   config    change preferences
   version   print the version
@@ -70,6 +71,13 @@ func console(u *ui, paths config.Paths, ctl controller, owns bool) error {
 			// End of input (ctrl+z on Windows, ctrl+d elsewhere) leaves like exit.
 			u.println("")
 			return leave(u, ctl, owns)
+		}
+		fields := strings.Fields(line)
+		if len(fields) > 0 && strings.EqualFold(fields[0], "pwgen") {
+			if err := pwgen(u, fields[1:]); err != nil {
+				u.fail("%v", err)
+			}
+			continue
 		}
 		switch cmd := strings.ToLower(strings.TrimSpace(line)); cmd {
 		case "":
