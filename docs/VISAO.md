@@ -203,6 +203,21 @@ A barra lateral tem uma página por ícone. Os nomes seguem a estética do Grimo
 | espada | **Siege** | kanban das tarefas do dia: ir para a guerra |
 | cruz | **Crypt** | documentos e arquivos guardados criptografados |
 
+### Grimoire: forge
+
+O botão **forge**, à esquerda do `+ new` (tecla `g`), abre o gerador de senhas no
+painel da direita.
+
+- **Senha:** cada caractere sai de `crypto.getRandomValues`, sem viés, e cada tipo
+  escolhido aparece pelo menos uma vez.
+- **Opções:** tamanho de 8 a 128 (24 por padrão), maiúsculas, minúsculas, dígitos e
+  símbolos, e "no lookalikes", que tira `0 O o 1 l I |` para senhas digitadas à mão.
+- **Força:** em bits (tamanho × log2 do conjunto de caracteres).
+- **Copiar:** como os outros campos, limpa a área de transferência depois do tempo
+  configurado. A senha não é guardada em lugar nenhum.
+- **Depois:** frases-senha (palavras aleatórias), que pedem uma lista de palavras no
+  app.
+
 ### Grimoire: renovação
 
 Algumas chaves vencem e precisam ser trocadas. Cada entrada do Grimoire pode ter:

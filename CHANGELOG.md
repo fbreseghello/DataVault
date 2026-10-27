@@ -7,6 +7,15 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- Gerador de senhas no Grimoire: o botão **forge**, à esquerda do `+ new` (ou a
+  tecla `g`), abre um painel com uma senha nova, feita com a aleatoriedade
+  criptográfica do navegador. Dá para escolher o tamanho (8 a 128), os tipos de
+  caractere e deixar de fora os que se confundem (`0 O o 1 l I |`); a força aparece em
+  bits. **copy** copia e limpa a área de transferência como os outros campos, e
+  **again** gera outra. A senha não é guardada.
+
 ## [0.14.0] - 2026-10-26
 
 ### Adicionado

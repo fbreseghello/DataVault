@@ -3,6 +3,7 @@
   import { api, ApiError, type Item, type ItemInput, type SessionInfo, type Summary } from './api'
   import { copy } from './clipboard'
   import Editor from './Editor.svelte'
+  import Forge from './Forge.svelte'
   import Icon from './Icon.svelte'
   import { commandLines, isCommand, isMultiline, typeShort } from './items'
   import Placard from './Placard.svelte'
@@ -21,6 +22,8 @@
   let opened = $state<Item | null>(null)
   let token = $state('')
   let editing = $state<Item | 'new' | null>(null)
+  // the password generator, open in place of an entry
+  let forging = $state(false)
   let hasSealPin = $state(false)
   let sealPrompt = $state(false)
   let sealPin = $state('')
@@ -70,6 +73,7 @@
   function close() {
     selectedId = null
     editing = null
+    forging = false
     reseal()
     error = ''
   }
@@ -199,7 +203,8 @@
   function onkeydown(e: KeyboardEvent) {
     if (!active) return
     if (e.key === 'Escape') {
-      if (editing) editing = null
+      if (forging) forging = false
+      else if (editing) editing = null
       else if (isTyping(e.target) && !selected?.sealed) (e.target as HTMLElement).blur()
       else close()
       return
@@ -212,6 +217,10 @@
       e.preventDefault()
       close()
       editing = 'new'
+    } else if (e.key === 'g' && !forging) {
+      e.preventDefault()
+      close()
+      forging = true
     }
   }
 
@@ -227,6 +236,7 @@
     <span class="spacer"></span>
     {#if dueCount}<span class="count due">{dueCount} to renew</span>{/if}
     <span class="count">{items.length} {items.length === 1 ? 'entry' : 'entries'}</span>
+    <button class="forge" class:on={forging} onclick={() => (close(), (forging = true))} title="forge a password · g">forge</button>
     <button class="new" onclick={() => (close(), (editing = 'new'))}>+ new</button>
   </div>
 
@@ -250,7 +260,11 @@
     <section>
       {#if error}<p class="error" role="alert">{error}</p>{/if}
 
-      {#if editing}
+      {#if forging}
+        <div class="page">
+          <Forge clipboardSeconds={info.clipboard_clear_seconds} onclose={() => (forging = false)} />
+        </div>
+      {:else if editing}
         <div class="page">
           {#key editing}
             <Editor item={editing === 'new' ? null : editing} {hasSealPin} onsave={save} oncancel={() => (editing = null)} />
@@ -473,6 +487,10 @@
     vertical-align: -3px;
     margin-left: 6px;
     color: var(--dim);
+  }
+
+  .toolbar .forge.on {
+    color: var(--fg);
   }
 
   /* due for renewal soon, or overdue: a state that wants attention */

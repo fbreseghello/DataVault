@@ -136,7 +136,7 @@
   <footer>
     <span>auto-lock {info.auto_lock_minutes}m · clipboard {info.clipboard_clear_seconds}s</span>
     <span class="spacer"></span>
-    {#if !settings && page === 'grimoire'}<span>n new · / search · esc close ·</span>{/if}
+    {#if !settings && page === 'grimoire'}<span>n new · g forge · / search · esc close ·</span>{/if}
     {#if !settings && page === 'heart'}<span>n new · esc close · saves as you write ·</span>{/if}
     {#if !settings && page === 'sword'}<span>n order · arrows select · shift+arrows move · [ ] days ·</span>{/if}
     {#if !settings && page === 'cross'}<span>n bury · drop files here · esc close ·</span>{/if}
