@@ -31,7 +31,7 @@ export function template(t: ItemType): Field[] {
     case 'command':
       return [f('command'), f('server'), f('workdir')]
     case 'recovery':
-      return [f('account'), f('codes', true)]
+      return [f('account'), f('code 1', true)]
   }
 }
 
@@ -50,18 +50,47 @@ export function isMultiline(field: Field): boolean {
   return MULTILINE.has(field.name) || field.value.includes('\n')
 }
 
-// Recovery codes: one per line. A code spent on a sign-in is kept, marked by a
-// line that starts with "used", so the list still shows what is left.
-const USED = /^used\s+/i
+// Recovery codes: each in a field of its own, marked dead once spent. Entries
+// from 0.15.0 may keep them all in one "codes" field, one per line; a spent one
+// there is a line that starts with "dead" (or "used", as 0.15.0 wrote it).
+const USED = /^(dead|used)\s+/i
 
 export interface RecoveryCode {
   code: string
   used: boolean
 }
 
-/** The codes field of a recovery entry. */
+/** The one-per-line codes field of a recovery entry. */
 export function isRecovery(type: ItemType, field: Field): boolean {
-  return type === 'recovery' && field.name === 'codes'
+  return type === 'recovery' && field.name === 'codes' && field.value.includes('\n')
+}
+
+/** A field of a recovery entry that holds a single code. */
+export function isCode(type: ItemType, field: Field): boolean {
+  return type === 'recovery' && field.name !== 'account' && !isRecovery(type, field)
+}
+
+/** How many of an entry's recovery codes are still alive, out of how many. */
+export function codesLeft(type: ItemType, fields: Field[]): { left: number; total: number } {
+  let left = 0
+  let total = 0
+  for (const f of fields) {
+    if (!f.value) continue
+    if (isRecovery(type, f)) {
+      const codes = recoveryCodes(f.value)
+      total += codes.length
+      left += codes.filter((c) => !c.used).length
+    } else if (isCode(type, f)) {
+      total++
+      if (!f.dead) left++
+    }
+  }
+  return { left, total }
+}
+
+/** The name for the next code field: "code 4" after three codes. */
+export function nextCodeName(type: ItemType, fields: Field[]): string {
+  return `code ${fields.filter((f) => isCode(type, f)).length + 1}`
 }
 
 export function recoveryCodes(value: string): RecoveryCode[] {
@@ -74,7 +103,7 @@ export function recoveryCodes(value: string): RecoveryCode[] {
 /** The field value with the n-th code marked used, or unused again. */
 export function toggleUsed(value: string, n: number): string {
   return recoveryCodes(value)
-    .map((c, k) => ((k === n ? !c.used : c.used) ? `used ${c.code}` : c.code))
+    .map((c, k) => ((k === n ? !c.used : c.used) ? `dead ${c.code}` : c.code))
     .join('\n')
 }
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Field, Item, ItemInput, ItemType } from './api'
-  import { isMultiline, template, TYPES } from './items'
+  import { isMultiline, nextCodeName, template, TYPES } from './items'
 
   // The parent remounts the editor per item, so reading props once is intended.
   // hasSealPin: when false, sealing asks for a new seal PIN, passed to onsave.
@@ -113,7 +113,11 @@
       </div>
     </div>
   {/each}
-  <button type="button" class="add" onclick={() => fields.push({ name: '', value: '', secret: false })}>+ field</button>
+  {#if type === 'recovery'}
+    <button type="button" class="add" onclick={() => fields.push({ name: nextCodeName(type, fields), value: '', secret: true })}>+ code</button>
+  {:else}
+    <button type="button" class="add" onclick={() => fields.push({ name: '', value: '', secret: false })}>+ field</button>
+  {/if}
 
   <label class="row">
     <span>tags</span>

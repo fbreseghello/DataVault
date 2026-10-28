@@ -143,7 +143,7 @@ Outros processos e outras abas do navegador também alcançam portas locais. Por
 | TOTP (2FA) | serviço, secret → gera o código |
 | Nota segura | texto livre |
 | Comando de servidor | comando (várias linhas), servidor, diretório; só guarda e copia, nunca executa |
-| Códigos de recuperação | conta, códigos (um por linha); cada código se copia sozinho e pode ser marcado como usado |
+| Códigos de recuperação | conta e um campo por código; cada código se copia sozinho e pode ser marcado como morto |
 
 Todos os itens têm tags e campos personalizados.
 
@@ -235,13 +235,16 @@ painel da direita.
 Os códigos de backup que os serviços dão ao ligar o 2FA (GitHub, Google,
 Discord...) para entrar quando o autenticador não está à mão.
 
-- **Entrada:** tipo **recovery codes**, com a conta e os códigos colados um por
-  linha. O campo é secreto: fica escondido até **show**.
-- **Lista:** cada código numa linha, com **copy** só para ele e **used** para
-  marcá-lo como gasto. Um código usado fica riscado e não se copia mais; **unused**
-  desfaz. A marca é salva no próprio campo, como uma linha que começa com `used`.
-- **Aviso:** o topo mostra quantos sobram ("3 of 10 left"). Com 2 ou menos, avisa
+- **Entrada:** tipo **recovery codes**, com a conta e um campo secreto por código.
+  No editor, **+ code** acrescenta o próximo (`code 2`, `code 3`...).
+- **Morto:** cada código tem **copy** e **dead**, que o marca como gasto. Um código
+  morto fica riscado e não se copia mais; **revive** desfaz. A marca é o `dead` do
+  campo, salvo no vault.
+- **Aviso:** o topo mostra quantos sobram ("3 of 10 codes"). Com 2 ou menos, avisa
   que é hora de gerar códigos novos no serviço.
+- **0.15.0:** entradas com todos os códigos num campo `codes`, um por linha, continuam
+  funcionando: cada linha vira um código com **copy** e **dead**, e a marca é a linha
+  começar com `dead` (ou `used`, como a 0.15.0 gravava).
 
 ### Grimoire: renovação
 

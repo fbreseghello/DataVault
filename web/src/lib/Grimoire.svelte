@@ -5,7 +5,7 @@
   import Editor from './Editor.svelte'
   import Forge from './Forge.svelte'
   import Icon from './Icon.svelte'
-  import { commandLines, isCommand, isMultiline, isRecovery, LOW_CODES, recoveryCodes, toggleUsed, typeShort } from './items'
+  import { codesLeft, commandLines, isCode, isCommand, isMultiline, isRecovery, LOW_CODES, recoveryCodes, toggleUsed, typeShort } from './items'
   import Placard from './Placard.svelte'
   import { longDue, needsRenewal, shortDue, showDate } from './renew'
   import SealGate from './SealGate.svelte'
@@ -198,10 +198,13 @@
     api.copied(opened.name, 'recovery code').catch(() => {})
   }
 
-  // Marks a recovery code spent, or not, and saves the entry.
-  async function markUsed(i: number, n: number) {
+  // Marks a recovery code dead, or alive again, and saves the entry. n is the
+  // line of a one-per-line codes field; without it the whole field is the code.
+  async function markDead(i: number, n?: number) {
     if (!opened) return
-    const fields = opened.fields.map((f, k) => (k === i ? { ...f, value: toggleUsed(f.value, n) } : f))
+    const fields = opened.fields.map((f, k) =>
+      k !== i ? f : n === undefined ? { ...f, dead: !f.dead } : { ...f, value: toggleUsed(f.value, n) },
+    )
     try {
       const res = await api.update(opened.id, { ...inputOf(opened), fields }, token)
       opened = res.item
@@ -339,31 +342,36 @@
           {/if}
 
           <div class="fields">
+          {#if opened.type === 'recovery'}
+            {@const { left, total } = codesLeft(opened.type, opened.fields)}
+            <div class="field">
+              <span class="label">left</span>
+              <span class="value" class:due={left <= LOW_CODES} class:dim={left > LOW_CODES}>
+                {`${left} of ${total} codes${left <= LOW_CODES ? ' · time to generate new ones' : ''}`}
+              </span>
+            </div>
+          {/if}
           {#each opened.fields as field, i (i)}
             {#if field.value}
-              <div class="field">
+              {@const code = isCode(opened.type, field)}
+              <div class="field" class:dead={code && field.dead}>
                 <span class="label">{field.name}</span>
                 {#if isRecovery(opened.type, field)}
-                  {@const codes = recoveryCodes(field.value)}
-                  {@const left = codes.filter((c) => !c.used).length}
-                  <div class="value">
-                    <span class:due={left <= LOW_CODES} class:dim={left > LOW_CODES}>
-                      {`${left} of ${codes.length} left${left <= LOW_CODES ? ' · time to generate new ones' : ''}`}
-                    </span>
-                    {#if revealed[i]}
-                      <ol class="codes">
-                        {#each codes as c, n (n)}
-                          <li class:used={c.used}>
-                            <span class="code">{c.code}</span>
-                            <button onclick={() => copyCode(c.code, n)} class:done={copiedCode === n} disabled={c.used}>
-                              {copiedCode === n ? 'copied' : 'copy'}
-                            </button>
-                            <button onclick={() => markUsed(i, n)}>{c.used ? 'unused' : 'used'}</button>
-                          </li>
-                        {/each}
-                      </ol>
-                    {/if}
-                  </div>
+                  {#if revealed[i]}
+                    <ol class="value codes">
+                      {#each recoveryCodes(field.value) as c, n (n)}
+                        <li class:dead={c.used}>
+                          <span class="code">{c.code}</span>
+                          <button onclick={() => copyCode(c.code, n)} class:done={copiedCode === n} disabled={c.used}>
+                            {copiedCode === n ? 'copied' : 'copy'}
+                          </button>
+                          <button onclick={() => markDead(i, n)}>{c.used ? 'revive' : 'dead'}</button>
+                        </li>
+                      {/each}
+                    </ol>
+                  {:else}
+                    <span class="value masked">{masked}</span>
+                  {/if}
                 {:else if field.secret && !revealed[i]}
                   <span class="value masked">{masked}</span>
                 {:else if isCommand(opened.type, field)}
@@ -378,7 +386,14 @@
                     <button onclick={() => (revealed[i] = !revealed[i])}>{revealed[i] ? 'hide' : 'show'}</button>
                   {/if}
                   {#if !isRecovery(opened.type, field)}
-                    <button onclick={() => copyField(i)} class:done={copied === i}>{copied === i ? 'copied' : 'copy'}</button>
+                    <button onclick={() => copyField(i)} class:done={copied === i} disabled={code && field.dead}>
+                      {copied === i ? 'copied' : 'copy'}
+                    </button>
+                  {/if}
+                  {#if code}
+                    <button onclick={() => markDead(i)} title={field.dead ? 'this code still works' : 'mark this code as spent'}>
+                      {field.dead ? 'revive' : 'dead'}
+                    </button>
                   {/if}
                 </span>
               </div>
@@ -635,7 +650,7 @@
 
   /* recovery codes: one per row, each copied or marked used on its own */
   .codes {
-    margin: 8px 0 0;
+    margin: 0;
     padding: 0;
     list-style: none;
     display: grid;
@@ -655,7 +670,10 @@
     min-width: 16ch;
   }
 
-  .codes .used .code {
+  /* a dead code: spent, struck through, no longer copied */
+  .codes .dead .code,
+  .field.dead .label,
+  .field.dead .value {
     color: var(--dim);
     text-decoration: line-through;
   }

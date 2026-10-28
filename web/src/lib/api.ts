@@ -4,6 +4,8 @@ export interface Field {
   name: string
   value: string
   secret: boolean
+  /** A value that no longer works, like a recovery code already spent. */
+  dead?: boolean
 }
 
 export interface Item {

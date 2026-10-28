@@ -7,6 +7,14 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Alterado
+
+- Códigos de recuperação: cada código agora fica num campo próprio, com **copy**
+  só para ele, e **+ code** no editor acrescenta o próximo. O botão **dead** marca um
+  código gasto como morto: ele fica riscado e não se copia mais, e **revive** desfaz.
+  O topo da entrada conta os que sobram. Entradas da 0.15.0, com todos os códigos
+  num campo só, continuam funcionando e também usam **dead**.
+
 ## [0.15.0] - 2026-10-27
 
 ### Adicionado

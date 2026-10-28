@@ -35,6 +35,8 @@ type Field struct {
 	Name   string `json:"name"`
 	Value  string `json:"value"`
 	Secret bool   `json:"secret"`
+	// Dead marks a value that no longer works, like a recovery code already spent.
+	Dead bool `json:"dead,omitempty"`
 }
 
 type Item struct {
