@@ -31,7 +31,6 @@ fora delas.
 | `--muted` | `#8a8a8a` | botões de texto, valores secundários, hover |
 | `--fg` | `#e4e4e4` | texto principal, valores, item ativo |
 | `--accent` | `#c8a96a` | **só mudança de estado** (ver abaixo) |
-| `--neon-core` / `--neon-glow` / `--neon-haze` | branco | só o neon da arte do login |
 
 **A cor de destaque (âmbar) nunca é decoração.** Ela aparece só quando algo mudou ou
 pede atenção:
@@ -125,9 +124,7 @@ Regras para desenhar um ícone novo:
 O DataVault quase não se mexe. Tudo que se mexe é lento e respeita
 `prefers-reduced-motion`.
 
-- **Neon do login:** a arte "liga" piscando (1,6 s), depois o halo respira devagar
-  (ciclo de 4 s, só opacidade). De vez em quando, a cada 20–45 s ao acaso, o tubo
-  gagueja por 0,9 s sem apagar de todo. Com "reduzir movimento", nada disso acontece.
+- **Arte do login:** parada, sem neon nem brilho.
 - **Cursor:** pisca em degrau (sem fade), a cada 1,6 s.
 - **Tela de descanso:** parada, sem neon nem animação, exceto o estilo `candle`, a
   única cena que se mexe: a chama balança a cerca de 15 quadros por segundo e a luz
@@ -136,8 +133,8 @@ O DataVault quase não se mexe. Tudo que se mexe é lento e respeita
 
 ## Arte ASCII
 
-- **Login:** "DataVault" em letra gótica ([`art.txt`](../web/src/lib/art.txt)), branca
-  com neon. As letras são montadas uma a uma na mesma linha de base.
+- **Login:** "DataVault" na fonte Poison do figlet ([`art.txt`](../web/src/lib/art.txt)),
+  em `--fg`, sem brilho.
 - **CLI:** o banner do `dtvlt` com a versão alinhada à direita, embaixo, em `dim`.
 - **Tela de descanso:** uma imagem no canto inferior direito, sobre o preto:
   - `pillar` ([`pillar.txt`](../web/src/lib/pillar.txt)): a coluna dórica partida,

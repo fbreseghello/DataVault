@@ -20,8 +20,6 @@
   // pillar screen; 0 turns that off (the shortcut still works).
   let resting = $state(false)
   let restTimer: ReturnType<typeof setTimeout> | undefined
-  // Now and then the art stutters like the tube is striking again.
-  let flickering = $state(false)
 
   function scheduleRest() {
     clearTimeout(restTimer)
@@ -58,22 +56,8 @@
     for (const ev of events) window.addEventListener(ev, activity, { passive: true })
     scheduleRest()
 
-    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    let flickerTimer: ReturnType<typeof setTimeout>
-    const nextFlicker = () => {
-      flickerTimer = setTimeout(
-        () => {
-          if (!resting && !calm) flickering = true
-          nextFlicker()
-        },
-        20_000 + Math.random() * 25_000,
-      )
-    }
-    nextFlicker()
-
     return () => {
       clearTimeout(restTimer)
-      clearTimeout(flickerTimer)
       for (const ev of events) window.removeEventListener(ev, activity)
     }
   })
@@ -124,18 +108,7 @@
 <!-- Clicking anywhere returns focus to the hidden input, like a terminal. -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 <main onclick={() => input?.focus()}>
-  <!-- Two copies of the art: the crisp tube on top, a blurred halo behind it that breathes. -->
-  <div
-    class="art"
-    class:flicker={flickering}
-    aria-hidden="true"
-    onanimationend={(e) => {
-      if (e.animationName.endsWith('flicker')) flickering = false
-    }}
-  >
-    <pre class="halo">{art}</pre>
-    <pre class="tube">{art}</pre>
-  </div>
+  <pre class="art" aria-hidden="true">{art}</pre>
   <h1 class="sr-only">DataVault</h1>
 
   <div class="prompt" aria-hidden="true">
@@ -192,39 +165,12 @@
   }
 
   .art {
-    position: relative;
     margin: 0 0 56px;
-    /* The art is 127 columns; shrink it to fit narrow windows. */
-    font-size: min(12px, calc((100vw - 32px) / 127 / 0.6));
+    color: var(--fg);
+    /* The art is 86 columns; shrink it to fit narrow windows. */
+    font-size: min(14px, calc((100vw - 32px) / 86 / 0.6));
     line-height: 1.12;
-    animation: power-on 1.6s linear both;
     user-select: none;
-  }
-
-  .art pre {
-    margin: 0;
-    font: inherit;
-    line-height: inherit;
-  }
-
-  /* The tube: white letters with a glow that hugs them. */
-  .tube {
-    position: relative;
-    color: var(--neon-core);
-    text-shadow:
-      0 0 1px var(--neon-core),
-      0 0 4px var(--neon-glow);
-  }
-
-  /* The halo: the same art blurred behind, breathing slowly. Only its opacity
-     animates, which is cheap for the browser. */
-  .halo {
-    position: absolute;
-    inset: 0;
-    color: var(--neon-haze);
-    filter: blur(6px);
-    opacity: 0.5;
-    animation: breathe 4s ease-in-out 1.6s infinite;
   }
 
   .prompt {
@@ -277,72 +223,5 @@
     right: 16px;
     color: var(--dim);
     font-size: 11px;
-  }
-
-  /* The tube strikes, stutters twice, then holds. */
-  @keyframes power-on {
-    0%,
-    8% {
-      opacity: 0;
-    }
-    10% {
-      opacity: 0.7;
-    }
-    13% {
-      opacity: 0.1;
-    }
-    18% {
-      opacity: 0.9;
-    }
-    21% {
-      opacity: 0.3;
-    }
-    28% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-
-  .art.flicker {
-    animation: flicker 0.9s linear;
-  }
-
-  /* A shorter stutter than power-on: the tube never goes fully dark. */
-  @keyframes flicker {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    8% {
-      opacity: 0.25;
-    }
-    12% {
-      opacity: 0.9;
-    }
-    18% {
-      opacity: 0.35;
-    }
-    26% {
-      opacity: 1;
-    }
-  }
-
-  @keyframes breathe {
-    0%,
-    100% {
-      opacity: 0.45;
-    }
-    50% {
-      opacity: 0.8;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .art,
-    .halo {
-      animation: none;
-    }
   }
 </style>

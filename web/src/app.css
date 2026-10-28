@@ -7,10 +7,6 @@
   --raise: #121212;
   /* The single accent. Use it for state changes only, never decoration. */
   --accent: #c8a96a;
-  /* Neon on the login art: a white tube with a soft white halo. */
-  --neon-core: #f7f7f7;
-  --neon-glow: rgba(255, 255, 255, 0.35);
-  --neon-haze: rgba(255, 255, 255, 0.5);
 
   --font: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
   --blink: 1.6s;
