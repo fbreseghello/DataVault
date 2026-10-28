@@ -12,6 +12,8 @@ import (
 	"strings"
 
 	"github.com/BurntSushi/toml"
+
+	"github.com/fbreseghello/DataVault/internal/theme"
 )
 
 type Config struct {
@@ -26,6 +28,9 @@ type Config struct {
 	RestMinutes int `toml:"rest_minutes"`
 	// RestStyle picks what the rest screen shows: one of RestStyles.
 	RestStyle string `toml:"rest_style"`
+	// Theme is the id of a built-in or imported theme. One that goes missing
+	// falls back to the default theme when drawn.
+	Theme string `toml:"theme"`
 }
 
 // Rest screen styles: one of the still images (the broken pillar or one of
@@ -46,7 +51,7 @@ var RestStyles = []string{RestPillar, RestSkullI, RestSkullII, RestRandom, RestC
 const MaxRestMinutes = 240
 
 func Default() Config {
-	return Config{KeepTerminal: true, AutoLockMinutes: 15, ClipboardClearSeconds: 20, CheckUpdates: true, RestMinutes: 15, RestStyle: RestPillar}
+	return Config{KeepTerminal: true, AutoLockMinutes: 15, ClipboardClearSeconds: 20, CheckUpdates: true, RestMinutes: 15, RestStyle: RestPillar, Theme: theme.Default}
 }
 
 func (c Config) Validate() error {
@@ -61,6 +66,9 @@ func (c Config) Validate() error {
 	}
 	if !slices.Contains(RestStyles, c.RestStyle) {
 		return fmt.Errorf("rest_style must be one of %s", strings.Join(RestStyles, ", "))
+	}
+	if !theme.ValidID(c.Theme) {
+		return errors.New("theme must be 1 to 32 lowercase letters, digits or dashes")
 	}
 	if c.PinEnabled && c.PinHash == "" {
 		return errors.New("pin_enabled is set but no pin is configured")

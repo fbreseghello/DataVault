@@ -9,6 +9,7 @@
   import Placard from './Placard.svelte'
   import { longDue, needsRenewal, shortDue, showDate } from './renew'
   import SealGate from './SealGate.svelte'
+  import { word } from './theme.svelte'
 
   // active is false while another page is shown; the grimoire stays mounted but
   // returns to its front page every time it becomes active again.
@@ -270,7 +271,7 @@
     <span class="spacer"></span>
     {#if dueCount}<span class="count due">{dueCount} to renew</span>{/if}
     <span class="count">{items.length} {items.length === 1 ? 'entry' : 'entries'}</span>
-    <button class="forge" class:on={forging} onclick={() => (close(), (forging = true))} title="forge a password · g">forge</button>
+    <button class="forge" class:on={forging} onclick={() => (close(), (forging = true))} title={`${word('forge')} a password · g`}>{word('forge')}</button>
     <button class="new" onclick={() => (close(), (editing = 'new'))}>+ new</button>
   </div>
 
@@ -281,7 +282,7 @@
           <span class="type">{typeShort(it.type)}</span>
           <span class="name">
             {it.name}
-            {#if it.sealed}<span class="mark" title="sealed"><Icon name="seal" size={16} /></span>{/if}
+            {#if it.sealed}<span class="mark" title={word('sealed')}><Icon name="seal" size={16} /></span>{/if}
             {#if it.renew_due && needsRenewal(it.renew_due)}<span class="due">{shortDue(it.renew_due)}</span>{/if}
           </span>
           <span class="tags">{it.tags.join(' ')}</span>
@@ -314,8 +315,8 @@
               class="seal"
               class:on={opened.sealed}
               onclick={() => (opened?.sealed ? reseal() : sealNow())}
-              title={opened.sealed ? 'seal again' : 'seal this entry'}
-              aria-label={opened.sealed ? 'seal again' : 'seal this entry'}
+              title={opened.sealed ? `${word('seal')} again` : `${word('seal')} this entry`}
+              aria-label={opened.sealed ? `${word('seal')} again` : `${word('seal')} this entry`}
             >
               <Icon name="seal" size={32} />
             </button>
@@ -323,9 +324,9 @@
 
           {#if sealPrompt}
             <form class="sealpin fields" onsubmit={sealNow}>
-              <p class="dim">no seal pin yet. choose one; it opens every sealed entry.</p>
+              <p class="dim">no {word('seal')} pin yet. choose one; it opens every {word('sealed')} entry.</p>
               <label class="field">
-                <span class="label">seal pin</span>
+                <span class="label">{word('seal')} pin</span>
                 <input type="password" bind:value={sealPin} minlength="4" required autocomplete="new-password" />
                 <span></span>
               </label>
@@ -335,7 +336,7 @@
                 <span></span>
               </label>
               <div class="buttons">
-                <button type="submit" class="primary">seal</button>
+                <button type="submit" class="primary">{word('seal')}</button>
                 <button type="button" onclick={() => (sealPrompt = false)}>cancel</button>
               </div>
             </form>
@@ -437,7 +438,7 @@
       {:else if selected?.sealed}
         <SealGate name={selected.name} onunseal={unseal} />
       {:else if !selected}
-        <Placard icon="book" title="grimoire" hint="select an entry · n to write a new one" />
+        <Placard icon="grimoire" title={word('grimoire')} hint="select an entry · n to write a new one" />
       {/if}
     </section>
   </div>

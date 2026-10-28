@@ -1,12 +1,16 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte'
   import { api, type SessionInfo } from './api'
-  import art from './art.txt?raw'
   import Rest from './Rest.svelte'
   import { restRequest } from './restscreen.svelte'
+  import { theme } from './theme.svelte'
   import { showVersion } from './version'
 
   let { info, onunlock }: { info: SessionInfo; onunlock: () => void } = $props()
+
+  // The theme's art; its widest line sets how small it must draw to fit.
+  const art = $derived(theme.current?.login ?? [])
+  const cols = $derived(Math.max(1, ...art.map((line) => [...line].length)))
 
   // One field at a time: the keyword first, then the password.
   let step = $state<'keyword' | 'password'>('keyword')
@@ -108,7 +112,7 @@
 <!-- Clicking anywhere returns focus to the hidden input, like a terminal. -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 <main onclick={() => input?.focus()}>
-  <pre class="art" aria-hidden="true">{art}</pre>
+  <pre class="art" style:--cols={cols} aria-hidden="true">{art.join('\n')}</pre>
   <h1 class="sr-only">DataVault</h1>
 
   <div class="prompt" aria-hidden="true">
@@ -167,9 +171,10 @@
   .art {
     margin: 0 0 56px;
     color: var(--fg);
-    /* The art is 86 columns; shrink it to fit narrow windows. */
-    font-size: min(14px, calc((100vw - 32px) / 86 / 0.6));
-    line-height: 1.12;
+    /* Shrink the art to fit narrow windows. */
+    font-size: min(14px, calc((100vw - 32px) / var(--cols) / 0.6));
+    /* Solid lines, so block letters stack without gaps. */
+    line-height: 1;
     user-select: none;
   }
 

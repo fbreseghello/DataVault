@@ -2,6 +2,7 @@
   import { tick } from 'svelte'
   import { ApiError } from './api'
   import Placard from './Placard.svelte'
+  import { word } from './theme.svelte'
 
   // A sealed entry waiting for the seal PIN, typed on one blinking line like the login.
   let { name, onunseal }: { name: string; onunseal: (pin: string) => Promise<void> } = $props()
@@ -38,10 +39,10 @@
 <div class="gate" onclick={() => input?.focus()}>
   <Placard icon="seal" title={name}>
     <div class="prompt" aria-hidden="true"><span class="cursor" class:busy>_</span></div>
-    <label class="sr-only" for="seal-pin">seal pin for {name}</label>
+    <label class="sr-only" for="seal-pin">{word('seal')} pin for {name}</label>
     <input id="seal-pin" bind:this={input} bind:value={pin} type="password" autocomplete="off" disabled={busy} {onkeydown} />
     <p class="hint" aria-live="polite">
-      {#if busy}checking{:else if error}<span class="error">{error}</span>{:else}seal pin{/if}
+      {#if busy}checking{:else if error}<span class="error">{error}</span>{:else}{word('seal')} pin{/if}
     </p>
   </Placard>
 </div>

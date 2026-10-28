@@ -22,6 +22,7 @@ type settingsView struct {
 	CheckUpdates          bool   `json:"check_updates"`
 	RestMinutes           int    `json:"rest_minutes"`
 	RestStyle             string `json:"rest_style"`
+	Theme                 string `json:"theme"`
 	ConfigPath            string `json:"config_path"`
 	VaultPath             string `json:"vault_path"`
 }
@@ -35,6 +36,7 @@ func (s *Server) viewOf(c config.Config) settingsView {
 		CheckUpdates:          c.CheckUpdates,
 		RestMinutes:           c.RestMinutes,
 		RestStyle:             c.RestStyle,
+		Theme:                 c.Theme,
 		ConfigPath:            s.opts.ConfigPath,
 		VaultPath:             s.opts.VaultPath,
 	}
@@ -69,6 +71,8 @@ func (s *Server) handlePutSettings(w http.ResponseWriter, r *http.Request) {
 		RestMinutes           int    `json:"rest_minutes"`
 		// RestStyle left out keeps the current style.
 		RestStyle string `json:"rest_style"`
+		// Theme left out keeps the current theme.
+		Theme string `json:"theme"`
 	}
 	if !readJSON(w, r, &req) || !s.requireUnlocked(w) {
 		return
@@ -89,6 +93,13 @@ func (s *Server) handlePutSettings(w http.ResponseWriter, r *http.Request) {
 	next.RestMinutes = req.RestMinutes
 	if req.RestStyle != "" {
 		next.RestStyle = req.RestStyle
+	}
+	if req.Theme != "" {
+		if _, err := s.themes().Get(req.Theme); err != nil {
+			writeError(w, http.StatusBadRequest, "no such theme")
+			return
+		}
+		next.Theme = req.Theme
 	}
 	switch {
 	case !req.PinEnabled:

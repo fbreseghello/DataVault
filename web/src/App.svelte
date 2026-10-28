@@ -6,6 +6,7 @@
   import Login from './lib/Login.svelte'
   import { isRestShortcut, requestRest } from './lib/restscreen.svelte'
   import Shell from './lib/Shell.svelte'
+  import { applyTheme } from './lib/theme.svelte'
 
   let info = $state<SessionInfo | null>(null)
   let ended = $state(false)
@@ -19,6 +20,7 @@
       const next = await api.session()
       if (closed) return
       if (info?.unlocked && !next.unlocked) void clearNow()
+      applyTheme(next.theme)
       info = next
       ended = false
     } catch {

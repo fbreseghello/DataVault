@@ -6,8 +6,10 @@
 ## Princípio
 
 Uma ferramenta de terminal séria, com um clima gótico contido: preto, branco e cinza,
-uma única cor de destaque, pixel art de 1 bit e arte ASCII parada. O tema atual se
+uma única cor de destaque, pixel art de 1 bit e arte ASCII parada. O tema padrão se
 chama **souls**: ruínas, lápides, ossos e livros antigos, tratados como natureza-morta.
+Outros temas trocam as cores, os nomes, os ícones e a arte do login (veja
+[Temas](#temas)), mas não esta forma.
 
 - **Sim:** monocromático, silêncio visual, texto curto e seco, movimento lento e raro,
   imagens paradas (memento mori), atalhos de teclado sempre à vista.
@@ -20,7 +22,7 @@ um livro velho aberta num terminal, está certa.
 ## Cores
 
 Todas as cores são variáveis em [`web/src/app.css`](../web/src/app.css). Não use cores
-fora delas.
+fora delas. Os valores abaixo são os do `souls`; cada tema define os seus.
 
 | Variável | Valor | Uso |
 |---|---|---|
@@ -133,7 +135,7 @@ O DataVault quase não se mexe. Tudo que se mexe é lento e respeita
 
 ## Arte ASCII
 
-- **Login:** "DataVault" na fonte Poison do figlet ([`art.txt`](../web/src/lib/art.txt)),
+- **Login:** "DataVault" numa fonte do figlet escolhida pelo tema (Poison no `souls`),
   em `--fg`, sem brilho.
 - **CLI:** o banner do `dtvlt` com a versão alinhada à direita, embaixo, em `dim`.
 - **Tela de descanso:** uma imagem no canto inferior direito, sobre o preto:
@@ -189,10 +191,14 @@ Regras para uma arte nova:
 - Falhas começam com um `!` em negrito.
 - O prompt do console é `dtvlt ›`, com `dtvlt` esmaecido.
 
-## Tema souls
+## Temas
 
-O tema atual. Um tema define **os ícones e os nomes das páginas**; o resto deste guia
-(cores, tipografia, layout, tom) vale para todos.
+Um tema define **as cores, os nomes das páginas e funcionalidades, os ícones e a arte do
+login**; o resto deste guia (tipografia, layout, tom, movimento) vale para todos. Vêm
+três: `souls` (o padrão), `arcane` e `dungeon`. Outros podem ser importados como
+`.json`. O formato e as regras estão em [TEMAS.md](TEMAS.md).
+
+### souls
 
 | Página | Ícone | Nomes |
 |---|---|---|
@@ -203,7 +209,7 @@ O tema atual. Um tema define **os ícones e os nomes das páginas**; o resto des
 | Ledger | saco de moedas | assinaturas e gastos fixos; apagar é **strike** |
 | — | lápide | encerrar a sessão |
 
-A escolha de tema aparece na tela settings, fixa em **souls** até existir outro.
+A escolha de tema fica em settings → appearance.
 
 ## Antes de entregar algo novo
 

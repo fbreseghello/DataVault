@@ -3,10 +3,10 @@
   import Crypt from './Crypt.svelte'
   import Grimoire from './Grimoire.svelte'
   import Icon from './Icon.svelte'
-  import type { IconName } from './icons'
   import Ledger from './Ledger.svelte'
   import Settings from './Settings.svelte'
   import Siege from './Siege.svelte'
+  import { theme, word } from './theme.svelte'
   import Unspoken from './Unspoken.svelte'
   import { showVersion } from './version'
 
@@ -17,19 +17,19 @@
     onend,
   }: { info: SessionInfo; onlock: () => void; onrefresh: () => void; onend: () => void } = $props()
 
-  // size: the icon's size in the sidebar, a multiple of 16 so it stays crisp.
-  type Page = { id: string; label: string; icon: IconName; size?: number }
+  // Each page draws its own icon slot and takes its name from the theme.
+  type Page = { id: 'grimoire' | 'unspoken' | 'siege' | 'crypt' | 'ledger'; label: string; size: number }
 
   // The sidebar shows icons only; label is for the hover tip and screen readers.
-  const pages: Page[] = [
-    // the book leaves more of its grid empty than the others, so it is drawn a
-    // step larger to stand level with them
-    { id: 'grimoire', label: 'grimoire', icon: 'book', size: 48 },
-    { id: 'heart', label: 'unspoken', icon: 'heart' },
-    { id: 'sword', label: 'siege', icon: 'sword' },
-    { id: 'cross', label: 'crypt', icon: 'cross' },
-    { id: 'sack', label: 'ledger', icon: 'sack' },
-  ]
+  // size is a multiple of 16 so the art stays crisp; a theme draws an icon that
+  // leaves more of its grid empty a step larger, to stand level with the others.
+  const pages: Page[] = $derived(
+    (['grimoire', 'unspoken', 'siege', 'crypt', 'ledger'] as const).map((id) => ({
+      id,
+      label: word(id),
+      size: theme.current?.large_icons?.includes(id) ? 48 : 32,
+    })),
+  )
 
   let page = $state('grimoire')
   let settings = $state(false)
@@ -87,7 +87,7 @@
           aria-label={p.label}
           aria-current={!settings && page === p.id ? 'page' : undefined}
         >
-          <Icon name={p.icon} size={p.size ?? 32} />
+          <Icon name={p.id} size={p.size} />
           <span class="tip" aria-hidden="true">{p.label} <span class="key">{i + 1}</span></span>
         </button>
       {/each}
@@ -97,10 +97,10 @@
       class:armed={ending}
       onclick={endClick}
       onblur={() => (ending = false)}
-      aria-label={ending ? 'end the session: click again to confirm' : 'end the session'}
+      aria-label={ending ? `${word('end')}: click again to confirm` : word('end')}
     >
-      <Icon name="tomb" />
-      <span class="tip" aria-hidden="true">{ending ? 'click again to end the session' : 'end session'}</span>
+      <Icon name="end" />
+      <span class="tip" aria-hidden="true">{ending ? `click again to ${word('end')}` : word('end')}</span>
     </button>
   </aside>
 
@@ -117,17 +117,17 @@
     <div class="page-view" hidden={settings || page !== 'grimoire'}>
       <Grimoire {info} active={!settings && page === 'grimoire'} />
     </div>
-    <div class="page-view" hidden={settings || page !== 'heart'}>
-      <Unspoken active={!settings && page === 'heart'} />
+    <div class="page-view" hidden={settings || page !== 'unspoken'}>
+      <Unspoken active={!settings && page === 'unspoken'} />
     </div>
-    <div class="page-view" hidden={settings || page !== 'sword'}>
-      <Siege active={!settings && page === 'sword'} />
+    <div class="page-view" hidden={settings || page !== 'siege'}>
+      <Siege active={!settings && page === 'siege'} />
     </div>
-    <div class="page-view" hidden={settings || page !== 'cross'}>
-      <Crypt active={!settings && page === 'cross'} />
+    <div class="page-view" hidden={settings || page !== 'crypt'}>
+      <Crypt active={!settings && page === 'crypt'} />
     </div>
-    <div class="page-view" hidden={settings || page !== 'sack'}>
-      <Ledger active={!settings && page === 'sack'} />
+    <div class="page-view" hidden={settings || page !== 'ledger'}>
+      <Ledger active={!settings && page === 'ledger'} />
     </div>
     {#if settings}
       <div class="page-view scroll">
@@ -141,11 +141,11 @@
   <footer>
     <span>auto-lock {info.auto_lock_minutes}m · clipboard {info.clipboard_clear_seconds}s</span>
     <span class="spacer"></span>
-    {#if !settings && page === 'grimoire'}<span>n new · g forge · / search · esc close ·</span>{/if}
-    {#if !settings && page === 'heart'}<span>n new · esc close · saves as you write ·</span>{/if}
-    {#if !settings && page === 'sword'}<span>n order · arrows select · shift+arrows move · [ ] days ·</span>{/if}
-    {#if !settings && page === 'cross'}<span>n bury · drop files here · esc close ·</span>{/if}
-    {#if !settings && page === 'sack'}<span>n new · esc close ·</span>{/if}
+    {#if !settings && page === 'grimoire'}<span>n new · g {word('forge')} · / search · esc close ·</span>{/if}
+    {#if !settings && page === 'unspoken'}<span>n new · esc close · saves as you write ·</span>{/if}
+    {#if !settings && page === 'siege'}<span>n new · arrows select · shift+arrows move · [ ] days ·</span>{/if}
+    {#if !settings && page === 'crypt'}<span>n {word('keep')} · drop files here · esc close ·</span>{/if}
+    {#if !settings && page === 'ledger'}<span>n new · esc close ·</span>{/if}
     <span>1–{pages.length} pages · ctrl+shift+l rest</span>
     <span class="version">{showVersion(info.version)}</span>
   </footer>

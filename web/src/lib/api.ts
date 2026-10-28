@@ -41,7 +41,52 @@ export interface SessionInfo {
   /** Idle minutes on the login before the rest screen; 0 is off. */
   rest_minutes: number
   rest_style: RestStyle
+  /** The theme to draw, with its gaps already filled from the default theme. */
+  theme: Theme
 }
+
+/** The 16x16 pixel art slots a theme draws: one per page, the end button and the seal. */
+export type IconSlot = 'grimoire' | 'unspoken' | 'siege' | 'crypt' | 'ledger' | 'end' | 'seal'
+
+/** The names a theme gives to the pages and their features. */
+export type WordKey =
+  | 'grimoire'
+  | 'unspoken'
+  | 'siege'
+  | 'crypt'
+  | 'ledger'
+  | 'forge'
+  | 'seal'
+  | 'sealed'
+  | 'dead_words'
+  | 'bury'
+  | 'unbury'
+  | 'orders'
+  | 'in_battle'
+  | 'conquered'
+  | 'fallen'
+  | 'keep'
+  | 'kept'
+  | 'strike'
+  | 'end'
+
+/** A look DataVault can wear. See docs/TEMAS.md for the file format. */
+export interface Theme {
+  id: string
+  name: string
+  description?: string
+  builtin: boolean
+  colors: Record<string, string>
+  words: Record<WordKey, string>
+  /** 16 rows of 16 characters each: '#' lit, '.' dark. */
+  icons: Record<IconSlot, string[]>
+  /** Drawn a step larger in the sidebar. */
+  large_icons?: IconSlot[]
+  /** The login art, one string per line. */
+  login: string[]
+}
+
+export type ThemeSummary = Pick<Theme, 'id' | 'name' | 'description' | 'builtin'>
 
 /** What the rest screen shows: a still image, one of them at random, or the candle. */
 export type RestStyle = 'pillar' | 'skull-i' | 'skull-ii' | 'random' | 'candle'
@@ -240,6 +285,7 @@ export interface Settings {
   check_updates: boolean
   rest_minutes: number
   rest_style: RestStyle
+  theme: string
   config_path: string
   vault_path: string
 }
@@ -296,4 +342,9 @@ export const api = {
   copied: (item: string, field: string) => request<void>('POST', '/api/events', { type: 'copy', item, field }),
   settings: () => request<Settings>('GET', '/api/settings'),
   saveSettings: (s: SettingsInput) => request<Settings>('PUT', '/api/settings', s),
+  themes: () => request<ThemeSummary[]>('GET', '/api/themes'),
+  /** A theme with every gap filled in, ready to save as a file and edit. */
+  theme: (id: string) => request<Theme>('GET', '/api/themes/' + encodeURIComponent(id)),
+  importTheme: (t: unknown) => request<ThemeSummary>('POST', '/api/themes', t),
+  removeTheme: (id: string) => request<void>('DELETE', '/api/themes/' + encodeURIComponent(id)),
 }

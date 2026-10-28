@@ -166,6 +166,10 @@ func (s *Server) routes() http.Handler {
 	api.HandleFunc("POST /api/events", s.handleEvent)
 	api.HandleFunc("GET /api/settings", s.handleGetSettings)
 	api.HandleFunc("PUT /api/settings", s.handlePutSettings)
+	api.HandleFunc("GET /api/themes", s.handleListThemes)
+	api.HandleFunc("POST /api/themes", s.handleImportTheme)
+	api.HandleFunc("GET /api/themes/{id}", s.handleGetTheme)
+	api.HandleFunc("DELETE /api/themes/{id}", s.handleDeleteTheme)
 	mux.Handle("/api/", s.requireCookie(s.requireSameOrigin(api)))
 
 	control := http.NewServeMux()

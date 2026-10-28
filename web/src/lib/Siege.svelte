@@ -1,18 +1,20 @@
 <script lang="ts">
   import { tick, untrack } from 'svelte'
   import { api, ApiError, type Board, type Column, type Task } from './api'
+  import { word } from './theme.svelte'
 
   // Siege: the day's battle plan. One board per day, four columns. Tasks move
   // by dragging or from the keyboard. The page stays mounted and returns to
   // today each time it opens.
   let { active }: { active: boolean } = $props()
 
-  const COLUMNS: { id: Column; label: string; empty: string }[] = [
-    { id: 'orders', label: 'Orders', empty: 'no orders · n to give one' },
-    { id: 'in_battle', label: 'In Battle', empty: 'nothing in battle' },
-    { id: 'conquered', label: 'Conquered', empty: 'nothing conquered yet' },
-    { id: 'fallen', label: 'Fallen', empty: 'none fallen' },
-  ]
+  // The columns keep their ids; the theme names them.
+  const COLUMNS: { id: Column; label: string; empty: string }[] = $derived(
+    (['orders', 'in_battle', 'conquered', 'fallen'] as const).map((id, i) => {
+      const label = word(id)
+      return { id, label, empty: i ? `nothing ${label.toLowerCase()}` : `no ${label.toLowerCase()} · n to add one` }
+    }),
+  )
 
   function iso(d: Date) {
     const p = (n: number) => String(n).padStart(2, '0')

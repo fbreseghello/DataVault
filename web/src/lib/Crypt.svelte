@@ -2,6 +2,7 @@
   import { untrack } from 'svelte'
   import { api, ApiError, MAX_FILE_BYTES, type CryptFile } from './api'
   import Placard from './Placard.svelte'
+  import { word } from './theme.svelte'
 
   // The crypt: documents and files buried in the vault, each encrypted on its
   // own. Files show as tiles; hovering one shows its title over it. Files come
@@ -52,7 +53,7 @@
     if (tooBig.length) error = `files can be up to 25 MB · ${tooBig.map((f) => f.name).join(', ')} left out`
     let last: CryptFile | null = null
     for (const f of all.filter((f) => f.size <= MAX_FILE_BYTES)) {
-      busy = `burying ${f.name}`
+      busy = `${word('keep')}: ${f.name}`
       try {
         last = await api.addFile(f)
       } catch (e) {
@@ -163,7 +164,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="crypt" class:dragging {ondragover} ondragleave={() => (dragging = false)} {ondrop}>
   <div class="toolbar page-toolbar">
-    <span class="dim">{busy || (dragging ? 'drop to bury' : '')}</span>
+    <span class="dim">{busy || (dragging ? `drop to ${word('keep')}` : '')}</span>
     <span class="spacer"></span>
     <span class="count">{files.length} {files.length === 1 ? 'file' : 'files'}</span>
     <button class="new" onclick={pick}>+ new</button>
@@ -189,7 +190,7 @@
           <span class="title" aria-hidden="true">{f.title}</span>
         </button>
       {:else}
-        <p class="empty">nothing buried yet · n or drop a file</p>
+        <p class="empty">nothing {word('kept')} yet · n or drop a file</p>
       {/each}
     </nav>
 
@@ -215,7 +216,7 @@
             <div class="field"><span class="label">kind</span><span class="value">{selected.type || kind(selected)}</span></div>
             <div class="field"><span class="label">size</span><span class="value">{size(selected.size)}</span></div>
             <div class="field">
-              <span class="label">buried</span>
+              <span class="label">{word('kept')}</span>
               <span class="value">{new Date(selected.created_at).toLocaleString('en-GB')}</span>
             </div>
           </div>
@@ -229,9 +230,9 @@
         </div>
       {:else}
         <Placard
-          icon="cross"
-          title="crypt"
-          hint={files.length ? 'select a file · n or drop one to bury it' : 'documents and files, kept encrypted · n or drop one here'}
+          icon="crypt"
+          title={word('crypt')}
+          hint={files.length ? `select a file · n or drop one to ${word('keep')} it` : 'documents and files, kept encrypted · n or drop one here'}
         />
       {/if}
     </section>

@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
-  import { api, ApiError, type RestStyle, type Settings } from './api'
+  import { onDestroy, onMount } from 'svelte'
+  import { api, ApiError, type RestStyle, type Settings, type Theme, type ThemeSummary } from './api'
   import SealPinSettings from './SealPinSettings.svelte'
+  import { applyTheme, previewTheme } from './theme.svelte'
 
   let { onsaved, onclose }: { onsaved: () => void; onclose: () => void } = $props()
 
@@ -20,6 +21,14 @@
     random: 'one of the three still images, drawn each time it rests',
     candle: 'a skull lit by a flickering candle · moves',
   }
+  let themeId = $state('souls')
+  let themes = $state<ThemeSummary[]>([])
+  const chosen = $derived(themes.find((t) => t.id === themeId))
+  // Picking a theme shows it at once; leaving without saving puts the saved one back.
+  let previewed: Theme | null = null
+  let themeMsg = $state('')
+  let confirmRemove = $state(false)
+  let fileInput = $state<HTMLInputElement>()
   let pin = $state('')
   let pinConfirm = $state('')
   let busy = $state(false)
@@ -38,12 +47,94 @@
     checkUpdates = s.check_updates
     rest = s.rest_minutes
     restStyle = s.rest_style
+    themeId = s.theme
     pin = pinConfirm = ''
   }
 
+  const fail = (e: unknown) => e instanceof Error ? e.message : String(e)
+
+  async function loadThemes() {
+    themes = await api.themes()
+  }
+
   onMount(() => {
-    api.settings().then(load, (e) => (error = e instanceof Error ? e.message : String(e)))
+    api.settings().then(load, (e) => (error = fail(e)))
+    loadThemes().catch((e) => (error = fail(e)))
   })
+
+  onDestroy(() => previewTheme(null))
+
+  async function preview(id: string) {
+    themeId = id
+    themeMsg = ''
+    confirmRemove = false
+    try {
+      previewed = id === saved?.theme ? null : await api.theme(id)
+      previewTheme(previewed)
+    } catch (e) {
+      themeMsg = fail(e)
+    }
+  }
+
+  // An imported theme is a JSON file; see docs/TEMAS.md, or export one to start from.
+  async function importFile() {
+    const file = fileInput?.files?.[0]
+    if (!file) return
+    themeMsg = ''
+    try {
+      let parsed: unknown
+      try {
+        parsed = JSON.parse(await file.text())
+      } catch {
+        throw new Error(`${file.name} is not JSON`)
+      }
+      const t = await api.importTheme(parsed)
+      await loadThemes()
+      await preview(t.id)
+      themeMsg = `imported ${t.name} · save to keep it`
+    } catch (e) {
+      themeMsg = fail(e)
+    } finally {
+      if (fileInput) fileInput.value = ''
+    }
+  }
+
+  // Saves the chosen theme, every gap filled in, as a file to edit and import.
+  async function exportTheme() {
+    themeMsg = ''
+    try {
+      const t = await api.theme(themeId)
+      const url = URL.createObjectURL(new Blob([JSON.stringify(t, null, 2) + '\n'], { type: 'application/json' }))
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${t.id}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (e) {
+      themeMsg = fail(e)
+    }
+  }
+
+  async function removeTheme() {
+    if (!confirmRemove) {
+      confirmRemove = true
+      return
+    }
+    confirmRemove = false
+    try {
+      const gone = chosen?.name ?? themeId
+      await api.removeTheme(themeId)
+      // The server falls back to the default when the removed theme was in use.
+      load(await api.settings())
+      await loadThemes()
+      previewed = null
+      previewTheme(null)
+      onsaved()
+      themeMsg = `removed ${gone}`
+    } catch (e) {
+      themeMsg = fail(e)
+    }
+  }
 
   async function submit(e: SubmitEvent) {
     e.preventDefault()
@@ -65,8 +156,13 @@
           check_updates: checkUpdates,
           rest_minutes: rest,
           rest_style: restStyle,
+          theme: themeId,
         }),
       )
+      // What was previewed is now saved; keep showing it until the session says so too.
+      if (previewed) applyTheme(previewed)
+      previewed = null
+      previewTheme(null)
       done = true
       onsaved()
     } catch (err) {
@@ -108,17 +204,31 @@
       <span class="unit">{restHints[restStyle]}</span>
     </label>
 
-    <h3>appearance <span>coming in a future version</span></h3>
+    <h3>appearance <span>the theme changes the colors, icons, page names and login art</span></h3>
 
-    <!-- Themes will swap the icons and the page names. Only souls exists for
-         now, so the choice is shown but cannot change and is not saved. -->
     <label class="row">
       <span>theme</span>
-      <select disabled aria-describedby="theme-hint">
-        <option value="souls" selected>souls</option>
+      <select bind:value={themeId} onchange={(e) => preview(e.currentTarget.value)} aria-describedby="theme-hint">
+        {#each themes as t (t.id)}
+          <option value={t.id}>{t.name}{t.builtin ? '' : ' · imported'}</option>
+        {/each}
       </select>
-      <span class="unit" id="theme-hint">the current theme · themes will change the icons and page names</span>
+      <span class="unit" id="theme-hint">{chosen?.description ?? ''}</span>
     </label>
+    <div class="row">
+      <span></span>
+      <span class="actions">
+        <button type="button" onclick={() => fileInput?.click()}>import</button>
+        <button type="button" onclick={exportTheme}>export</button>
+        {#if chosen && !chosen.builtin}
+          <button type="button" class:danger={confirmRemove} onclick={removeTheme} onblur={() => (confirmRemove = false)}>
+            {confirmRemove ? 'remove? click again' : 'remove'}
+          </button>
+        {/if}
+      </span>
+      <span class="unit">{themeMsg || 'a theme is a json file · export one to start from it'}</span>
+      <input bind:this={fileInput} type="file" accept=".json,application/json" hidden onchange={importFile} />
+    </div>
 
     <h3>terminal <span>applies the next time dtvlt starts</span></h3>
 
@@ -236,6 +346,13 @@
   select:disabled {
     cursor: default;
     color: var(--muted);
+  }
+  .actions {
+    display: flex;
+    gap: 16px;
+  }
+  .danger {
+    color: var(--accent);
   }
   .path {
     grid-column: 2 / 4;

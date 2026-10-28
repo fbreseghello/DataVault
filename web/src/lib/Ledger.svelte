@@ -4,6 +4,7 @@
   import { amountText, CYCLES, money, nextCharge, parseAmount, perMonth, SOON_DAYS, todayISO, totals } from './ledger'
   import { daysUntil, longDue, showDate } from './renew'
   import Placard from './Placard.svelte'
+  import { word } from './theme.svelte'
 
   // The ledger: subscriptions and fixed expenses. The list runs in the order the
   // bills come due; the toolbar adds up what they cost a month and a year.
@@ -233,17 +234,17 @@
             <button type="button" onclick={close}>close</button>
             {#if selected}
               <button type="button" class="strike" class:danger={confirmStrike} onclick={strike}>
-                {confirmStrike ? 'strike it? click again' : 'strike'}
+                {confirmStrike ? `${word('strike')} it? click again` : word('strike')}
               </button>
             {/if}
           </div>
-          <p class="meta">kept encrypted in the vault · strike a bill once it is cancelled</p>
+          <p class="meta">kept encrypted in the vault · {word('strike')} a bill once it is cancelled</p>
         </form>
       {:else}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         <Placard
-          icon="sack"
-          title="ledger"
+          icon="ledger"
+          title={word('ledger')}
           hint={bills.length ? 'select a bill · n to write a new one' : 'subscriptions and fixed expenses · n to write the first'}
         />
       {/if}

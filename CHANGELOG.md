@@ -7,6 +7,17 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- Temas de verdade. Um tema agora troca as cores, os nomes das páginas e das
+  funcionalidades, os ícones e a arte do login, sempre em pixel art de 1 bit. Além do
+  **souls**, vêm o **arcane** (torre de mago: spellbook, whispers, rituals, reliquary,
+  tithes) e o **dungeon** (dungeon 8-bit: keyring, journal, quest log, chest, upkeep).
+  Em settings → appearance, escolher um tema mostra ele na hora, e **save** guarda.
+- Importar tema: um `.json` com só o que muda; o resto vem do souls. **export** salva o
+  tema escolhido completo, para servir de ponto de partida, e **remove** apaga um tema
+  importado. O formato está em `docs/TEMAS.md`.
+
 ## [0.15.2] - 2026-10-28
 
 ### Alterado

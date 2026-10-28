@@ -2,6 +2,7 @@
   import { api } from './api'
   import { copy } from './clipboard'
   import { bits, DEFAULTS, forge, MAX_LENGTH, MIN_LENGTH, type ForgeOptions } from './forge'
+  import { word } from './theme.svelte'
 
   // The password generator of the grimoire. A new password is forged whenever
   // an option changes; "again" forges another with the same options.
@@ -64,7 +65,7 @@
 <svelte:window {onkeydown} />
 
 <div class="forge">
-  <h2>forge <span class="dim">a new key</span></h2>
+  <h2>{word('forge')} <span class="dim">a new key</span></h2>
 
   <p class="password" class:empty={!password} aria-live="polite">{password || 'choose at least one kind of character'}</p>
 

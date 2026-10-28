@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Field, Item, ItemInput, ItemType } from './api'
   import { isMultiline, nextCodeName, template, TYPES } from './items'
+  import { word } from './theme.svelte'
 
   // The parent remounts the editor per item, so reading props once is intended.
   // hasSealPin: when false, sealing asks for a new seal PIN, passed to onsave.
@@ -141,16 +142,16 @@
   </label>
 
   <div class="row">
-    <span>sealed</span>
+    <span>{word('sealed')}</span>
     <button type="button" class="toggle" class:on={sealed} onclick={() => (sealed = !sealed)} aria-pressed={sealed}>
       {sealed ? 'on' : 'off'}
     </button>
-    <span class="unit">{sealed ? 'opening it asks for the seal pin' : 'opens without a pin'}</span>
+    <span class="unit">{sealed ? `opening it asks for the ${word('seal')} pin` : 'opens without a pin'}</span>
   </div>
   {#if sealed && !hasSealPin}
-    <p class="note">no seal pin yet. choose one; it opens every sealed entry.</p>
+    <p class="note">no {word('seal')} pin yet. choose one; it opens every {word('sealed')} entry.</p>
     <label class="row">
-      <span>seal pin</span>
+      <span>{word('seal')} pin</span>
       <input type="password" bind:value={sealPin} minlength="4" required autocomplete="new-password" />
       <span></span>
     </label>

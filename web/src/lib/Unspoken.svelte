@@ -4,6 +4,7 @@
   import Icon from './Icon.svelte'
   import Placard from './Placard.svelte'
   import SealGate from './SealGate.svelte'
+  import { word } from './theme.svelte'
 
   // Unspoken: notes for what is not said out loud. Notes save themselves while
   // you write; a note can be sealed, or buried in Dead Words. Like the grimoire,
@@ -275,8 +276,8 @@
 
 <div class="unspoken">
   <div class="toolbar page-toolbar">
-    <button class="tab" class:on={view === 'live'} onclick={() => switchView('live')}>unspoken</button>
-    <button class="tab" class:on={view === 'dead'} onclick={() => switchView('dead')}>dead words</button>
+    <button class="tab" class:on={view === 'live'} onclick={() => switchView('live')}>{word('unspoken')}</button>
+    <button class="tab" class:on={view === 'dead'} onclick={() => switchView('dead')}>{word('dead_words')}</button>
     <span class="spacer"></span>
     <span class="count">{list.length} {list.length === 1 ? 'note' : 'notes'}</span>
     <button class="new" onclick={write}>+ new</button>
@@ -289,7 +290,7 @@
           <span class="line">
             {#if n.sealed}
               <span class="sealed">sealed</span>
-              <span class="mark" title="sealed"><Icon name="seal" size={16} /></span>
+              <span class="mark" title={word('sealed')}><Icon name="seal" size={16} /></span>
             {:else}
               <span class="name">{n.title || n.preview || 'untitled'}</span>
             {/if}
@@ -297,7 +298,7 @@
           <span class="date">{when(n.updated_at)}</span>
         </button>
       {:else}
-        <p class="empty">{view === 'dead' ? 'no dead words yet' : 'nothing written · press n'}</p>
+        <p class="empty">{view === 'dead' ? `no ${word('dead_words')} yet` : 'nothing written · press n'}</p>
       {/each}
     </nav>
 
@@ -320,8 +321,8 @@
               class="seal"
               class:on={opened.sealed}
               onclick={() => seal()}
-              title={opened.sealed ? 'seal again' : 'seal this note'}
-              aria-label={opened.sealed ? 'seal again' : 'seal this note'}
+              title={opened.sealed ? `${word('seal')} again` : `${word('seal')} this note`}
+              aria-label={opened.sealed ? `${word('seal')} again` : `${word('seal')} this note`}
             >
               <Icon name="seal" size={32} />
             </button>
@@ -329,10 +330,10 @@
 
           {#if sealPrompt}
             <form class="sealpin" onsubmit={seal}>
-              <p class="dim">no seal pin yet. choose one; it opens every sealed note and entry.</p>
-              <input type="password" bind:value={sealPin} minlength="4" required placeholder="seal pin" autocomplete="new-password" />
+              <p class="dim">no {word('seal')} pin yet. choose one; it opens every {word('sealed')} note and entry.</p>
+              <input type="password" bind:value={sealPin} minlength="4" required placeholder={`${word('seal')} pin`} autocomplete="new-password" />
               <input type="password" bind:value={sealPinConfirm} required placeholder="confirm pin" autocomplete="new-password" />
-              <button type="submit" class="primary">seal</button>
+              <button type="submit" class="primary">{word('seal')}</button>
               <button type="button" onclick={() => (sealPrompt = false)}>cancel</button>
             </form>
           {/if}
@@ -341,7 +342,7 @@
             bind:this={bodyField}
             bind:value={body}
             oninput={edited}
-            placeholder="dead words go here."
+            placeholder={`${word('dead_words')} go here.`}
             spellcheck="false"
             aria-label="note"
           ></textarea>
@@ -351,18 +352,18 @@
               written {when(opened.created_at)}{status === 'saving' ? ' · saving' : status === 'saved' ? ' · saved' : dirty ? ' · …' : ''}
             </span>
             <span class="spacer"></span>
-            <button onclick={bury}>{view === 'live' ? 'bury' : 'unbury'}</button>
+            <button onclick={bury}>{view === 'live' ? word('bury') : word('unbury')}</button>
             {#if view === 'dead'}
               <button onclick={remove} class:danger={confirmDelete}>{confirmDelete ? 'delete forever? click again' : 'delete'}</button>
             {/if}
           </div>
         </div>
       {:else if selected?.sealed}
-        <SealGate name="sealed note" onunseal={unseal} />
+        <SealGate name={`${word('sealed')} note`} onunseal={unseal} />
       {:else if view === 'dead'}
-        <Placard icon="heart" title="dead words" hint={list.length ? 'buried notes rest here' : 'no dead words yet'} />
+        <Placard icon="unspoken" title={word('dead_words')} hint={list.length ? `notes you ${word('bury')} rest here` : `no ${word('dead_words')} yet`} />
       {:else}
-        <Placard icon="heart" title="unspoken" hint="say it here. no one else will read it." />
+        <Placard icon="unspoken" title={word('unspoken')} hint="say it here. no one else will read it." />
       {/if}
     </section>
   </div>

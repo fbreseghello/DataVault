@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { api, ApiError } from './api'
+  import { word } from './theme.svelte'
 
   // Sets or changes the seal PIN, which lives inside the vault, not in config.toml.
   let hasPin = $state<boolean | null>(null)
@@ -24,7 +25,7 @@
     busy = true
     try {
       await api.setSealPin(current, next)
-      message = hasPin ? 'seal pin changed' : 'seal pin set'
+      message = hasPin ? `${word('seal')} pin changed` : `${word('seal')} pin set`
       hasPin = true
       current = next = confirm = ''
     } catch (err) {
@@ -37,16 +38,16 @@
 
 {#if hasPin !== null}
   <form onsubmit={submit}>
-    <h3>grimoire <span>the seal pin opens every sealed entry</span></h3>
+    <h3>{word('grimoire')} <span>the {word('seal')} pin opens every {word('sealed')} entry</span></h3>
     {#if hasPin}
       <label class="row">
-        <span>current seal pin</span>
+        <span>current {word('seal')} pin</span>
         <input type="password" bind:value={current} required autocomplete="current-password" />
         <span></span>
       </label>
     {/if}
     <label class="row">
-      <span>{hasPin ? 'new seal pin' : 'seal pin'}</span>
+      <span>{hasPin ? `new ${word('seal')} pin` : `${word('seal')} pin`}</span>
       <input type="password" bind:value={next} minlength="4" required autocomplete="new-password" />
       <span class="unit">{hasPin ? '' : 'not set yet'}</span>
     </label>
@@ -56,7 +57,7 @@
       <span></span>
     </label>
     <div class="buttons">
-      <button type="submit" disabled={busy}>{hasPin ? 'change seal pin' : 'set seal pin'}</button>
+      <button type="submit" disabled={busy}>{hasPin ? `change ${word('seal')} pin` : `set ${word('seal')} pin`}</button>
       {#if message}<span class="msg" role="status">{message}</span>{/if}
     </div>
   </form>

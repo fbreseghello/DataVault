@@ -7,7 +7,7 @@
 </script>
 
 <main>
-  <Icon name="tomb" size={64} />
+  <Icon name="end" size={64} />
   <p>session ended</p>
   <p class="dim">the vault is locked · run <span class="cmd">dtvlt</span> to start a new one</p>
 </main>

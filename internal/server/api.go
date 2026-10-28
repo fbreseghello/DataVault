@@ -24,6 +24,7 @@ func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 		"clipboard_clear_seconds": s.config().ClipboardClearSeconds,
 		"rest_minutes":            s.config().RestMinutes,
 		"rest_style":              s.config().RestStyle,
+		"theme":                   s.activeTheme(),
 	})
 }
 
