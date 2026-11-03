@@ -20,8 +20,14 @@ func (s *Server) themes() theme.Store {
 
 // activeTheme is the theme every screen draws, the login included, so it is
 // served with the session before the vault is open. A theme holds no secrets.
+// The login art chosen in the settings takes the place of the theme's own.
 func (s *Server) activeTheme() theme.Theme {
-	return s.themes().Active(s.config().Theme)
+	cfg := s.config()
+	t := s.themes().Active(cfg.Theme)
+	if art, ok := theme.LoginArt(cfg.LoginArt); ok {
+		t.Login = art
+	}
+	return t
 }
 
 func (s *Server) handleListThemes(w http.ResponseWriter, r *http.Request) {

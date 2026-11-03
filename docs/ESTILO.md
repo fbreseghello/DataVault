@@ -136,7 +136,8 @@ O DataVault quase não se mexe. Tudo que se mexe é lento e respeita
 ## Arte ASCII
 
 - **Login:** "DataVault" numa fonte do figlet escolhida pelo tema (Poison no `souls`),
-  em `--fg`, sem brilho.
+  em `--fg`, sem brilho. Em settings dá para fixar a Poison ou a letra gótica, qualquer
+  que seja o tema.
 - **CLI:** o banner do `dtvlt` com a versão alinhada à direita, embaixo, em `dim`.
 - **Tela de descanso:** uma imagem no canto inferior direito, sobre o preto:
   - `pillar` ([`pillar.txt`](../web/src/lib/pillar.txt)): a coluna dórica partida,

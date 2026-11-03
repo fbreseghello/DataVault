@@ -23,6 +23,7 @@ type settingsView struct {
 	RestMinutes           int    `json:"rest_minutes"`
 	RestStyle             string `json:"rest_style"`
 	Theme                 string `json:"theme"`
+	LoginArt              string `json:"login_art"`
 	ConfigPath            string `json:"config_path"`
 	VaultPath             string `json:"vault_path"`
 }
@@ -37,6 +38,7 @@ func (s *Server) viewOf(c config.Config) settingsView {
 		RestMinutes:           c.RestMinutes,
 		RestStyle:             c.RestStyle,
 		Theme:                 c.Theme,
+		LoginArt:              c.LoginArt,
 		ConfigPath:            s.opts.ConfigPath,
 		VaultPath:             s.opts.VaultPath,
 	}
@@ -73,6 +75,8 @@ func (s *Server) handlePutSettings(w http.ResponseWriter, r *http.Request) {
 		RestStyle string `json:"rest_style"`
 		// Theme left out keeps the current theme.
 		Theme string `json:"theme"`
+		// LoginArt left out keeps the current art.
+		LoginArt string `json:"login_art"`
 	}
 	if !readJSON(w, r, &req) || !s.requireUnlocked(w) {
 		return
@@ -100,6 +104,9 @@ func (s *Server) handlePutSettings(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		next.Theme = req.Theme
+	}
+	if req.LoginArt != "" {
+		next.LoginArt = req.LoginArt
 	}
 	switch {
 	case !req.PinEnabled:

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import { api, ApiError, type RestStyle, type Settings, type Theme, type ThemeSummary } from './api'
+  import { api, ApiError, type LoginArt, type RestStyle, type Settings, type Theme, type ThemeSummary } from './api'
   import SealPinSettings from './SealPinSettings.svelte'
   import { applyTheme, previewTheme } from './theme.svelte'
 
@@ -22,6 +22,12 @@
     candle: 'a skull lit by a flickering candle · moves',
   }
   let themeId = $state('souls')
+  let loginArt = $state<LoginArt>('theme')
+  const loginHints: Record<LoginArt, string> = {
+    theme: "the chosen theme's own art",
+    poison: 'datavault in poison, whatever the theme',
+    gothic: 'datavault in gothic letters, whatever the theme',
+  }
   let themes = $state<ThemeSummary[]>([])
   const chosen = $derived(themes.find((t) => t.id === themeId))
   // Picking a theme shows it at once; leaving without saving puts the saved one back.
@@ -48,6 +54,7 @@
     rest = s.rest_minutes
     restStyle = s.rest_style
     themeId = s.theme
+    loginArt = s.login_art
     pin = pinConfirm = ''
   }
 
@@ -157,6 +164,7 @@
           rest_minutes: rest,
           rest_style: restStyle,
           theme: themeId,
+          login_art: loginArt,
         }),
       )
       // What was previewed is now saved; keep showing it until the session says so too.
@@ -229,6 +237,15 @@
       <span class="unit">{themeMsg || 'a theme is a json file · export one to start from it'}</span>
       <input bind:this={fileInput} type="file" accept=".json,application/json" hidden onchange={importFile} />
     </div>
+    <label class="row">
+      <span>login art</span>
+      <select bind:value={loginArt}>
+        {#each Object.keys(loginHints) as art (art)}
+          <option value={art}>{art}</option>
+        {/each}
+      </select>
+      <span class="unit">{loginHints[loginArt]}</span>
+    </label>
 
     <h3>terminal <span>applies the next time dtvlt starts</span></h3>
 

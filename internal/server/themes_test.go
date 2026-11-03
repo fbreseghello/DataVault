@@ -56,6 +56,18 @@ func TestThemes(t *testing.T) {
 		t.Fatalf("the session should draw ember over souls: %+v", got)
 	}
 
+	gothic, _ := theme.LoginArt("gothic")
+	if code := call(t, s, c, http.MethodPut, "/api/settings", `{"pin_enabled":false,"keep_terminal":true,"auto_lock_minutes":5,"clipboard_clear_seconds":30,"login_art":"cursive"}`, nil, nil); code != http.StatusBadRequest {
+		t.Errorf("an unknown login art: %d", code)
+	}
+	if code := call(t, s, c, http.MethodPut, "/api/settings", `{"pin_enabled":false,"keep_terminal":true,"auto_lock_minutes":5,"clipboard_clear_seconds":30,"login_art":"gothic"}`, nil, nil); code != http.StatusOK {
+		t.Fatalf("choosing the gothic login: %d", code)
+	}
+	call(t, s, c, http.MethodGet, "/api/session", "", nil, &session)
+	if session.Theme.ID != "ember" || session.Theme.Login[0] != gothic[0] {
+		t.Fatalf("the gothic art should replace the theme's, keeping the theme: %q", session.Theme.Login[0])
+	}
+
 	var exported theme.Theme
 	call(t, s, c, http.MethodGet, "/api/themes/ember", "", nil, &exported)
 	if len(exported.Words) != len(theme.Words) || len(exported.Login) == 0 {

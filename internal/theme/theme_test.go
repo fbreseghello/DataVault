@@ -80,3 +80,18 @@ func TestStore(t *testing.T) {
 		t.Fatalf("after removing: %q", got.ID)
 	}
 }
+
+func TestLoginArts(t *testing.T) {
+	for _, name := range LoginArts[1:] {
+		lines, ok := LoginArt(name)
+		if !ok || len(lines) == 0 || strings.TrimSpace(lines[0]) == "" {
+			t.Errorf("%s: %v %q", name, ok, lines)
+		}
+	}
+	if _, ok := LoginArt(LoginFromTheme); ok {
+		t.Error("theme should leave the theme's art in place")
+	}
+	if _, ok := LoginArt("../builtin/souls"); ok {
+		t.Error("only the listed arts can be read")
+	}
+}

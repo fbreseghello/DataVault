@@ -31,6 +31,9 @@ type Config struct {
 	// Theme is the id of a built-in or imported theme. One that goes missing
 	// falls back to the default theme when drawn.
 	Theme string `toml:"theme"`
+	// LoginArt is the art above the login prompt: the theme's own, or one of
+	// theme.LoginArts whatever the theme.
+	LoginArt string `toml:"login_art"`
 }
 
 // Rest screen styles: one of the still images (the broken pillar or one of
@@ -51,7 +54,7 @@ var RestStyles = []string{RestPillar, RestSkullI, RestSkullII, RestRandom, RestC
 const MaxRestMinutes = 240
 
 func Default() Config {
-	return Config{KeepTerminal: true, AutoLockMinutes: 15, ClipboardClearSeconds: 20, CheckUpdates: true, RestMinutes: 15, RestStyle: RestPillar, Theme: theme.Default}
+	return Config{KeepTerminal: true, AutoLockMinutes: 15, ClipboardClearSeconds: 20, CheckUpdates: true, RestMinutes: 15, RestStyle: RestPillar, Theme: theme.Default, LoginArt: theme.LoginFromTheme}
 }
 
 func (c Config) Validate() error {
@@ -69,6 +72,9 @@ func (c Config) Validate() error {
 	}
 	if !theme.ValidID(c.Theme) {
 		return errors.New("theme must be 1 to 32 lowercase letters, digits or dashes")
+	}
+	if !slices.Contains(theme.LoginArts, c.LoginArt) {
+		return fmt.Errorf("login_art must be one of %s", strings.Join(theme.LoginArts, ", "))
 	}
 	if c.PinEnabled && c.PinHash == "" {
 		return errors.New("pin_enabled is set but no pin is configured")

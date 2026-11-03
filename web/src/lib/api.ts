@@ -88,6 +88,9 @@ export interface Theme {
 
 export type ThemeSummary = Pick<Theme, 'id' | 'name' | 'description' | 'builtin'>
 
+/** The art above the login prompt: the theme's own, or a fixed one whatever the theme. */
+export type LoginArt = 'theme' | 'poison' | 'gothic'
+
 /** What the rest screen shows: a still image, one of them at random, or the candle. */
 export type RestStyle = 'pillar' | 'skull-i' | 'skull-ii' | 'random' | 'candle'
 
@@ -286,6 +289,7 @@ export interface Settings {
   rest_minutes: number
   rest_style: RestStyle
   theme: string
+  login_art: LoginArt
   config_path: string
   vault_path: string
 }

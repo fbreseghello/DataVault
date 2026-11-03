@@ -23,6 +23,20 @@ embutidos no `dtvlt`. Escolha um em **settings → appearance → theme**: a tel
 hora, e **save** guarda a escolha (`theme` no `config.toml`). Sair sem salvar volta ao
 tema salvo.
 
+## Arte do login
+
+Em **settings → appearance → login art**, a arte do login pode seguir o tema ou ficar
+fixa, qualquer que seja o tema:
+
+| Opção | Arte |
+|---|---|
+| `theme` (padrão) | a arte do tema escolhido |
+| `poison` | "DataVault" na fonte Poison |
+| `gothic` | "DataVault" em letra gótica, a arte das versões antes da 0.15.2 |
+
+A escolha fica em `login_art` no `config.toml`. As duas artes fixas estão em
+[`internal/theme/login/`](../internal/theme/login/).
+
 ## Importar um tema
 
 Um tema é um arquivo `.json`. Em **settings → appearance**:

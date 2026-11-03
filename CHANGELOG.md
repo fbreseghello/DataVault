@@ -7,6 +7,12 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- Opção **login art** em settings → appearance: a arte do login segue o tema
+  (**theme**, o padrão) ou fica fixa em **poison** ou em **gothic**, a letra gótica das
+  versões anteriores, qualquer que seja o tema.
+
 ## [0.16.0] - 2026-11-03
 
 ### Adicionado

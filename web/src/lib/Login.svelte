@@ -11,6 +11,8 @@
   // The theme's art; its widest line sets how small it must draw to fit.
   const art = $derived(theme.current?.login ?? [])
   const cols = $derived(Math.max(1, ...art.map((line) => [...line].length)))
+  // Block letters stack without gaps; letters drawn in characters need air between lines.
+  const solid = $derived(art.some((line) => /[█▓▒░▄▀▌▐]/.test(line)))
 
   // One field at a time: the keyword first, then the password.
   let step = $state<'keyword' | 'password'>('keyword')
@@ -112,7 +114,7 @@
 <!-- Clicking anywhere returns focus to the hidden input, like a terminal. -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 <main onclick={() => input?.focus()}>
-  <pre class="art" style:--cols={cols} aria-hidden="true">{art.join('\n')}</pre>
+  <pre class="art" class:solid style:--cols={cols} aria-hidden="true">{art.join('\n')}</pre>
   <h1 class="sr-only">DataVault</h1>
 
   <div class="prompt" aria-hidden="true">
@@ -173,9 +175,12 @@
     color: var(--fg);
     /* Shrink the art to fit narrow windows. */
     font-size: min(14px, calc((100vw - 32px) / var(--cols) / 0.6));
-    /* Solid lines, so block letters stack without gaps. */
-    line-height: 1;
+    line-height: 1.12;
     user-select: none;
+  }
+
+  .art.solid {
+    line-height: 1;
   }
 
   .prompt {
