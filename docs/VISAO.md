@@ -353,6 +353,8 @@ Cada página deve sair numa versão MINOR própria.
 - Gerador de senhas e passphrases
 - Exportar e importar (incluindo de outros gerenciadores)
 - Animações da arte ASCII
+- Personagem que ganha XP e sobe de nível com o uso, no topo da barra lateral
+  (ver [PERSONAGEM.md](PERSONAGEM.md))
 
 ### Fora do escopo (por enquanto)
 
