@@ -9,8 +9,9 @@
 
 Um personagem em arte ASCII que acompanha quem usa o cofre. Ele ganha **experiência
 (XP)** com o que acontece no sistema (concluir tarefas no Siege, escrever no Unspoken,
-renovar uma chave no prazo) e sobe de **nível**. Com os níveis vêm títulos e peças
-novas para **personalizar** o boneco.
+renovar uma chave no prazo) e sobe de **nível**. Quem usa escolhe a **classe** dele, e
+com os níveis vêm títulos e peças novas para **personalizar** o boneco. Ele também
+aparece fora da página: na **tela de descanso** e no terminal, com o `dtvlt hollow`.
 
 Não é um jogo que pede atenção. É um diário de campanha silencioso: o personagem fica
 parado, como as outras artes do DataVault, e só registra o caminho percorrido.
@@ -194,10 +195,13 @@ Só ações que representam trabalho de verdade. Valores iniciais, para ajustar 
 | Grimoire | códigos de recuperação novos depois do aviso de "2 ou menos" | 15 | por entrada |
 | Crypt | arquivo guardado | 3 | 5 por dia |
 | Ledger | conta cancelada (**strike**) | 5 | 5 por dia |
-| — | abrir o cofre em dias seguidos | 2 × dias da sequência | máximo 20 por dia |
+| — | voltar ao cofre depois de 3 dias ou mais fora (**rested**) | os próximos 50 XP valem dobrado | 1 por volta |
 
 O que **não** dá XP: criar e apagar coisas em sequência, mover uma tarefa de volta e de
 novo para Conquered, copiar senhas, abrir páginas, tempo com o app aberto.
+
+**Sem sequência de dias.** Nada se perde por ficar longe; quem volta descansado ganha
+mais por um tempo. A ausência nunca é punida.
 
 ### Desfazer
 
@@ -246,6 +250,48 @@ Sem tela cheia nem animação. Quando o XP passa do limite:
   as outras mensagens de estado;
 - no terminal aberto, o log da sessão registra `17:24  level 8`.
 
+## Classe
+
+Quem usa **escolhe a classe** do personagem. Ela define a silhueta base, as peças
+iniciais e o atributo de afinidade (veja [Atributos](#atributos)). Cada tema dá nomes e
+peças próprias às classes; a chave interna é a do `souls`.
+
+| Chave | souls | arcane | dungeon | Afinidade | Silhueta |
+|---|---|---|---|---|---|
+| `knight` | knight | battlemage | warrior | vigor | ombros largos, elmo, espada |
+| `scribe` | scribe | scholar | bard | memory | encurvado, capuz, livro e pena |
+| `warden` | warden | enchanter | paladin | ward | escudo à frente, armadura fechada |
+| `thief` | thief | trickster | rogue | hoard | magro, capuz baixo, adagas |
+| `cleric` | cleric | oracle | priest | thrift | manto longo, lanterna ou cajado |
+
+- **A primeira vez** que a página abre, ela mostra as cinco classes lado a lado, em
+  ASCII, com o nome e uma linha de descrição. Setas escolhem, `Enter` confirma.
+- **Trocar depois** é livre e não custa XP nem nível: em `attire`, **class** abre a mesma
+  escolha. As peças que não servem na classe nova voltam para as iniciais dela; as
+  destravadas continuam destravadas.
+- O painel mostra a classe entre o nível e o título: `level 7 · knight · the unkindled`.
+- **Afinidade:** o atributo da classe ganha 10% a mais de pontos. É um empurrão, não
+  uma trava: um knight que só escreve notas ainda fica com memory alto.
+
+## Atributos
+
+Cada página alimenta um atributo. O XP é um só, mas cada ganho também soma pontos no
+atributo da página de onde veio, e o personagem acaba tendo o formato de como o cofre é
+usado.
+
+| Chave | souls | arcane | dungeon | Vem de |
+|---|---|---|---|---|
+| `vigor` | vigor | will | strength | Siege |
+| `memory` | memory | lore | wisdom | Unspoken |
+| `ward` | ward | warding | defense | Grimoire |
+| `hoard` | hoard | relics | loot | Crypt |
+| `thrift` | thrift | tithe | gold | Ledger |
+
+- No painel, abaixo da barra de XP, cada atributo é uma linha com uma barra curta:
+  `vigor   ######....  42`. A barra é relativa ao maior atributo.
+- Peças especiais de `attire` podem pedir um atributo mínimo além do nível
+  (`lv 10 · ward 30`).
+
 ## Personalizar
 
 O boneco é montado em **camadas de ASCII**, sobrepostas de baixo para cima. Um caractere
@@ -261,7 +307,9 @@ diferente de espaço numa camada cobre o que está embaixo.
 
 - Cada peça é uma grade de texto do tamanho do boneco (proposta: **20 × 12 células**),
   com espaço onde é transparente.
-- **Peças se destravam por nível**, nunca por compra nem por sorte. A lista em `attire`
+- A classe escolhe o `body` e as peças iniciais; as outras camadas são livres.
+- **Peças se destravam por nível**, por atributo ou por epitáfio (veja
+  [Epitáfios](#epitáfios)), nunca por compra nem por sorte. A lista em `attire`
   mostra todas; as que faltam aparecem desabilitadas, em `--muted`, com a dica do
   nível que as libera (`lv 10`), como as opções futuras em settings.
 - Cada tema traz o seu conjunto de peças, combinando com o clima: elmos e capas no
@@ -302,19 +350,115 @@ Rascunho do boneco base do `souls` (elmo, corpo, espada baixa):
 A arte final deve sair de um gerador, como a vela e o crânio da tela de descanso
 (`scripts/art/`), para as peças manterem o mesmo traço.
 
+## O cofre no corpo
+
+O boneco mostra a saúde do cofre. São camadas extras, por cima do `attire`, que
+aparecem e somem sozinhas; quem usa não escolhe nem remove, só resolve a causa.
+
+| Marca | Aparece quando | Some quando |
+|---|---|---|
+| **armadura gasta:** rachaduras e ferrugem (`:` e `.` no lugar de `#`) | há entradas vencidas no Grimoire ou uma entrada com 2 códigos de recuperação ou menos | tudo é renovado |
+| **peso nas costas:** o boneco fica encurvado | há tarefas em In Battle há mais de 3 dias | elas saem de In Battle |
+| **saco de moedas:** pendurado no cinto, maior com o gasto | sempre, proporcional ao gasto mensal do Ledger, em 3 tamanhos | contas recebem strike |
+
+- Não tiram XP nem nível. É uma auditoria de relance, não uma punição.
+- A dica do ícone na barra lateral diz a causa: `hollow · lv 7 · 2 keys rotting`.
+- As marcas seguem as regras da arte: paradas, em `--fg`, sem cor de destaque.
+
+## Epitáfios
+
+Marcos que acontecem uma vez só e ficam gravados numa lista, como inscrições numa
+lápide. Cada tema dá o seu nome à lista (`epitaphs` no `souls`, `chronicles` no
+`arcane`, `achievements` no `dungeon`).
+
+| Epitáfio | Quando |
+|---|---|
+| `first key renewed before it rotted` | a primeira renovação no prazo |
+| `wrote what was never said` | a primeira nota no Unspoken |
+| `a hundred orders conquered` | 100 tarefas em Conquered |
+| `thirty days at the vault` | 30 dias diferentes com o cofre aberto (não seguidos) |
+| `buried a year of dead words` | uma nota enterrada há mais de um ano |
+| `cut the ledger by half` | o gasto mensal cai à metade do maior já registrado |
+
+- Cada um dá XP uma vez e pode destravar uma peça que não sai por nível.
+- A lista mostra a data e o texto; os que faltam ficam ocultos, só com `???`, para não
+  virarem uma lista de tarefas.
+- Mesmo tom do resto: minúsculas, sem exclamação.
+
+## Ritmo
+
+- **A vela do dia:** ao lado do boneco, uma vela em ASCII, feita com a mesma arte da
+  vela da tela de descanso, mas parada. Ela vai derretendo conforme as tarefas do dia
+  saem de Orders e é trocada por uma nova à meia-noite. Não apaga por falta de uso.
+- **A crônica do ano:** no primeiro acesso de cada ano, a página oferece a crônica do
+  ano anterior, uma página de texto com o resumo: tarefas conquistadas, notas escritas,
+  chaves renovadas, quanto se cortou no Ledger, níveis e epitáfios. Só números e tipos
+  de ação, nunca títulos.
+
+## Tela de descanso
+
+Um estilo novo da tela de descanso, **`hollow`**, ao lado de `pillar`, `skull-i`,
+`skull-ii` e `candle`:
+
+- O personagem, com a classe, o `attire` e as marcas do cofre, no canto inferior
+  direito, olhando para a esquerda, como as outras artes.
+- Parado. Embaixo do boneco, em `--dim` e 11 px, só `lv 7 · the unkindled`.
+- O tamanho segue a regra da tela de descanso (`Rest.svelte`): cabe na altura pedida
+  sem passar de metade da largura.
+- Com o hollow desligado em settings, o estilo some da lista e, se estava em uso, a
+  tela volta para o padrão.
+- O cofre travado não tem acesso ao personagem; a tela de descanso só mostra o hollow
+  enquanto a sessão está aberta, e volta ao estilo padrão depois do lock.
+
 ## Dados
 
 - Uma coleção própria, `hollow`, dentro do payload criptografado do vault, como as
   tarefas e as notas. Nada fica fora do arquivo do cofre.
-- Guarda: as escolhas de `attire`, o último nível visto e a lista de **deeds** (XP,
-  tipo de ação, id da origem, data). O XP total e o nível são calculados a partir dos
-  deeds, então desfazer é só apagar o deed da origem.
+- Guarda: a classe, as escolhas de `attire`, o último nível visto, os epitáfios
+  (chave e data) e a lista de **deeds** (XP, atributo, tipo de ação, id da origem,
+  data). O XP total, o nível e os atributos são calculados a partir dos deeds, então
+  desfazer é só apagar o deed da origem.
+- As marcas do cofre não são guardadas: são calculadas na hora a partir do Grimoire,
+  do Siege e do Ledger.
 - Os deeds guardam o **id** da origem, nunca o título. Apagar a origem apaga o deed.
 - Deeds com mais de um ano podem ser compactados num deed só por mês, para o vault
   não crescer sem limite.
 - **Sem rede.** Nenhum ranking, nenhuma comparação, nada sai da máquina.
 
 ## Terminal
+
+### `dtvlt hollow`
+
+Um retrato do personagem no terminal, no estilo do `neofetch`: a arte à esquerda e a
+ficha à direita.
+
+```
+$ dtvlt hollow
+
+         .###.         hollow   level 7 · knight · the unkindled
+        :#####:        xp       [##########......]  340 / 500
+        ##-=-##
+        :#####:        vigor    ##########  58
+      .:#######:.      memory   #####.....  31
+     :##:#####:##:     ward     ####......  24
+     ## :#####: ##     hoard    #.........   6
+    /   :#####:  #     thrift   ##........  12
+        :##:##:  #
+        :##:##:        vault    142 entries · 2 keys rotting
+       .###:###.       siege    3 orders · 1 in battle · 4 conquered today
+                       since    12 Mar 2026 · 9 epitaphs
+```
+
+- Lê o personagem pela API de controle, como `dtvlt status`. Com o cofre travado, mostra
+  só a silhueta da classe e `vault locked · the hollow sleeps`, sem números.
+- Segue as regras do [terminal](ESTILO.md#terminal): rótulos esmaecidos em 8 colunas,
+  valores normais, o nome em negrito, dois espaços de indentação. Sem cores.
+- A arte é a mesma do navegador, com o `attire` e as marcas do cofre.
+- Com `NO_COLOR` ou saída redirecionada, sai texto puro, bom para colar num README.
+- No console é `hollow`.
+- **`--art`** imprime só o boneco; **`--card`** só a ficha.
+
+### Outros
 
 - `dtvlt status` ganha uma linha: `hollow   lv 7 · 340 / 500`.
 - O log da sessão registra ganhos e níveis com o mesmo tom dos outros eventos:
@@ -342,16 +486,29 @@ Quando for a hora, uma versão MINOR para cada passo:
 
 1. **Ícone e página vazia:** a chave `hollow` nos três temas, o botão no topo da barra
    e a placa "nothing here yet".
-2. **XP e níveis:** a coleção de deeds, os ganhos do Siege, a barra e o histórico.
-3. **As outras fontes de XP:** Unspoken, Grimoire, Crypt, Ledger e a sequência de dias.
-4. **Personalizar:** as camadas, as peças por tema e a tela `attire`.
-5. **Terminal:** `dtvlt status` e o log.
+2. **Classe e arte base:** a escolha de classe e a silhueta de cada uma nos três temas.
+3. **XP, níveis e atributos:** a coleção de deeds, os ganhos do Siege, a barra e o
+   histórico.
+4. **Tela de descanso e `dtvlt hollow`:** o boneco fora da página.
+5. **As outras fontes de XP:** Unspoken, Grimoire, Crypt, Ledger e o rested.
+6. **Personalizar:** as camadas, as peças por tema e a tela `attire`.
+7. **O cofre no corpo, epitáfios e ritmo:** as marcas, a lista de epitáfios, a vela e
+   a crônica.
+
+## Fora de questão
+
+- Moeda, loja, sorteio de peças: tudo vem de esforço.
+- Perder XP, nível ou peças por ficar longe do cofre.
+- Mostrar o título de entradas, notas ou tarefas no histórico, na ficha ou na crônica.
+- Qualquer coisa que dependa de rede.
 
 ## Em aberto
 
 - [ ] Os nomes do arcane (`familiar`) e do dungeon (`hero`) estão bons?
+- [ ] Os nomes das classes e dos atributos por tema.
 - [ ] Os valores de XP e a curva de níveis precisam de uso real para ajustar.
-- [ ] A sequência de dias pode virar pressão; vale manter?
-- [ ] Atributos (força, sabedoria...) ligados a cada página, ou só o nível basta?
-- [ ] Feitos únicos ("primeira chave renovada", "cem tarefas") como deeds especiais?
+- [ ] O boneco também aparece pequeno ao lado da arte do login (opcional, desligado
+      por padrão)? O login não tem acesso ao cofre, então seria só a silhueta da classe
+      guardada no `config.toml`.
+- [ ] Exportar o boneco como `.txt` pela página, além do `dtvlt hollow --art`.
 - [ ] Exportar o personagem junto com o tema, ou separado?
