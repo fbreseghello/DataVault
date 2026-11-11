@@ -7,7 +7,8 @@
 
 ## A ideia
 
-Um personagem em arte ASCII que acompanha quem usa o cofre. Ele ganha **experiência
+Um personagem em pixel art, com o Tibia e o Habbo como referências, que acompanha
+quem usa o cofre. Ele ganha **experiência
 (XP)** com o que acontece no sistema (concluir tarefas no Siege, escrever no Unspoken,
 renovar uma chave no prazo) e sobe de **nível**. Quem usa escolhe a **classe** dele, e
 com os níveis vêm títulos e peças novas para **personalizar** o boneco. Ele também
@@ -152,24 +153,23 @@ datavault / hollow
 ──────────────────────────────────────────────────────────────────
  lv 7 · the unkindled                      deeds · attire      ← barra
 ──────────────────────────────────────────────────────────────────
- today                          │
- +10  task conquered      14:20 │           .###.
- +5   note written        11:02 │          :#####:
- +15  key renewed         09:40 │          ##-=-##
-                                │          :#####:
- yesterday                      │        .:#######:.
- +10  task conquered      18:03 │       :##:#####:##:
- +10  task conquered      16:41 │       ## :#####: ##
- ...                            │          :##:##:
-                                │         .###:###.
-                                │
+ today                          │      ┌──────────────────┐
+ +10  task conquered      14:20 │      │  quarto e sprite │
+ +5   note written        11:02 │      │   32 × 32 a 4×   │
+ +15  key renewed         09:40 │      │     (128 px)     │
+                                │      │                  │
+ yesterday                      │      └──────────────────┘
+ +10  task conquered      18:03 │
+ +10  task conquered      16:41 │
+ ...                            │
                                 │      level 7 · the unkindled
                                 │   [##########......]  340 / 500
 ──────────────────────────────────────────────────────────────────
  lv 7 · 160 to next              0 open · a attire · d deeds · v1.x
 ```
 
-- **Painel:** o personagem no lugar do ícone da placa, o nível e o título embaixo, e a
+- **Painel:** o sprite em 4× no lugar do ícone da placa, com o quarto atrás, o nível e
+  o título embaixo, e a
   barra de XP em ASCII: `[`, `#` para o ganho, `.` para o que falta, `]`, e os
   números à direita.
 - **Coluna da esquerda (`deeds`):** o histórico de XP agrupado por dia, com o ganho, o
@@ -264,8 +264,8 @@ peças próprias às classes; a chave interna é a do `souls`.
 | `thief` | thief | trickster | rogue | hoard | magro, capuz baixo, adagas |
 | `cleric` | cleric | oracle | priest | thrift | manto longo, lanterna ou cajado |
 
-- **A primeira vez** que a página abre, ela mostra as cinco classes lado a lado, em
-  ASCII, com o nome e uma linha de descrição. Setas escolhem, `Enter` confirma.
+- **A primeira vez** que a página abre, ela mostra os cinco sprites lado a lado, com o
+  nome e uma linha de descrição. Setas escolhem, `Enter` confirma.
 - **Trocar depois** é livre e não custa XP nem nível: em `attire`, **class** abre a mesma
   escolha. As peças que não servem na classe nova voltam para as iniciais dela; as
   destravadas continuam destravadas.
@@ -292,21 +292,84 @@ usado.
 - Peças especiais de `attire` podem pedir um atributo mínimo além do nível
   (`lv 10 · ward 30`).
 
-## Personalizar
+## O sprite
 
-O boneco é montado em **camadas de ASCII**, sobrepostas de baixo para cima. Um caractere
-diferente de espaço numa camada cobre o que está embaixo.
+O boneco é **pixel art**, não ASCII. As referências são dois jogos, e só como
+referência: **nada é copiado** (nem sprites, nem proporções exatas, nem paletas, nem
+nomes de peças).
 
-| Camada | O que é | Exemplos (souls) |
+| Do **Tibia** vem | Do **Habbo** vem |
+|---|---|
+| o sprite compacto em visão 3/4, de lado e de cima ao mesmo tempo | o avatar montado em peças trocáveis, camada sobre camada |
+| o outfit por classe, com addons que se ganham com o tempo | o quarto isométrico com móveis (veja [O quarto](#o-quarto)) |
+| escolher a cor de cada parte do corpo | a tela de vestir, com o boneco mudando enquanto se escolhe |
+
+### Tamanho e vista
+
+- **32 × 32 pixels**, em visão 3/4, olhando para a esquerda e um pouco para baixo, para
+  dentro da tela. O boneco ocupa as linhas 2 a 30, com os pés na linha 30, para todas as
+  classes pisarem no mesmo chão.
+- Sempre em **múltiplos inteiros**: 4× na página (128 px), 3× ou 4× na tela de descanso,
+  1× ou 2× em miniaturas. Cada pixel da arte cai em pixels inteiros da tela.
+- Desenhado como os ícones: um caminho SVG por tom, com `shape-rendering: crispEdges`.
+
+### Cores: os tons do tema
+
+O sprite usa **só as cores do tema**, então continua monocromático e muda sozinho
+quando o tema muda.
+
+| Índice | Cor | Uso |
 |---|---|---|
-| `body` | silhueta base | magro, robusto, encurvado |
-| `head` | cabeça ou elmo | capuz, elmo fechado, coroa partida |
-| `cloak` | o que vai nas costas | capa rasgada, manto, nada |
-| `hand` | o que segura | espada, cajado, lanterna, livro |
-| `mark` | um detalhe pequeno | cicatriz, brasão, runa |
+| `.` | transparente | fundo |
+| `1` | `--line` | contorno e sombra mais funda |
+| `2` | `--dim` | sombra |
+| `3` | `--muted` | tom médio |
+| `4` | `--fg` | luz |
 
-- Cada peça é uma grade de texto do tamanho do boneco (proposta: **20 × 12 células**),
-  com espaço onde é transparente.
+- A **cor de destaque nunca entra no boneco.**
+- Isto estende a regra do [guia](ESTILO.md#ícones) de pixel art de 1 bit: os ícones
+  continuam com 1 bit; o sprite do personagem é a única arte em 4 tons. O guia deve
+  registrar isso quando a funcionalidade entrar no código.
+
+### Personalizar
+
+O boneco é montado em **camadas**, desenhadas de baixo para cima. Cada peça é uma grade
+de 32 × 32 com o mesmo formato, e um pixel não transparente cobre o de baixo.
+
+| Ordem | Camada | O que é | Exemplos (souls) |
+|---|---|---|---|
+| 1 | `back` | o que fica atrás do corpo | capa rasgada, manto, aljava |
+| 2 | `body` | o corpo da classe | vem da classe |
+| 3 | `legs` | pernas e pés | grevas, botas, pés enfaixados |
+| 4 | `torso` | o que veste no tronco | cota, gibão, túnica |
+| 5 | `head` | cabeça, cabelo ou elmo | capuz, elmo fechado, coroa partida |
+| 6 | `hand` | o que segura | espada, cajado, lanterna, livro |
+| 7 | `addon` | um detalhe que se ganha | ombreira, brasão, pena no elmo |
+
+**Cor por parte**, como no Tibia, mas dentro dos tons do tema. Algumas regiões das
+peças são marcadas com letras em vez de números, e quem usa escolhe o tom de cada uma:
+
+| Letra | Região | Escolha |
+|---|---|---|
+| `H` / `h` | cabeça | `fg`, `muted` ou `dim` |
+| `T` / `t` | tronco | idem |
+| `L` / `l` | pernas | idem |
+| `F` / `f` | pés | idem |
+
+Maiúscula é a luz da região, no tom escolhido; minúscula é a sombra, um tom abaixo.
+Escolher `dim` faz a sombra cair em `line`.
+
+Exemplo do formato (só algumas linhas de um elmo):
+
+```
+................................
+............111111..............
+..........11HHHHHH11............
+.........1HHHHHHHHHh1...........
+.........1HH11111HHh1...........
+.........1Hh1....1hh1...........
+```
+
 - A classe escolhe o `body` e as peças iniciais; as outras camadas são livres.
 - **Peças se destravam por nível**, por atributo ou por epitáfio (veja
   [Epitáfios](#epitáfios)), nunca por compra nem por sorte. A lista em `attire`
@@ -316,39 +379,28 @@ diferente de espaço numa camada cobre o que está embaixo.
   `souls`, chapéus e cajados no `arcane`, armaduras e tochas de 8 bits no `dungeon`. Ao
   trocar de tema, a escolha de cada camada vai para a peça de mesma posição no novo
   conjunto.
+- **Addons**, como no Tibia: cada classe tem dois, que se ganham por nível ou por
+  epitáfio e ficam na camada `addon`.
 - Temas importados podem trazer peças num campo novo, `attire`, com as mesmas regras
-  dos ícones: chaves conhecidas, tamanho fixo, nada de caracteres fora do ASCII.
+  dos ícones: chaves conhecidas, 32 linhas de 32 caracteres, só os índices e as letras
+  acima.
 
 ### Regras da arte
 
-As de [arte ASCII](ESTILO.md#arte-ascii), mais estas:
-
-- Só a rampa ` .:-=+*#%@` e os traços `/ \ | _ ( ) [ ] < >`. Sem blocos Unicode.
+- **Contorno de 1 pixel** em `1` em volta da silhueta toda, para o boneco se destacar
+  do fundo em qualquer tema.
+- **Luz de cima e da direita**, sempre do mesmo lado em todas as peças.
+- **Sem antisserrilhado** e sem pixels soltos. Vãos de 2 pixels, como nos ícones.
 - **Parado.** O personagem não pisca, não respira, não anda.
-- Olha para a esquerda. Peças com direção (espada, capa) são desenhadas assim; para
-  espelhar, use a regra do guia (`/`↔`\`, `(`↔`)` e o resto).
-- Em `--fg`, sem brilho. A cor de destaque nunca entra no boneco.
+- Peças com direção (espada, capa) são desenhadas olhando para a esquerda.
 - Toda combinação de peças precisa continuar legível: cada camada é testada sobre cada
-  `body`.
+  `body`, nos três temas e nas três escolhas de tom.
+- **Silhueta primeiro**, como nos ícones: se a classe não se reconhece só pelo
+  contorno em 1×, detalhe nenhum salva.
 
-Rascunho do boneco base do `souls` (elmo, corpo, espada baixa):
-
-```
-       .###.
-      :#####:
-      ##-=-##
-      :#####:
-    .:#######:.
-   :##:#####:##:
-   ## :#####: ##
-  /   :#####:  #
-      :##:##:  #
-      :##:##:
-     .###:###.
-```
-
-A arte final deve sair de um gerador, como a vela e o crânio da tela de descanso
-(`scripts/art/`), para as peças manterem o mesmo traço.
+As peças são desenhadas à mão num editor de pixel art (Aseprite, Piskel, LibreSprite)
+com uma paleta indexada de 5 cores, exportadas em PNG e convertidas na grade de texto
+por um script em `scripts/art/`, que também confere tamanho, índices e contorno.
 
 ## O cofre no corpo
 
@@ -357,13 +409,14 @@ aparecem e somem sozinhas; quem usa não escolhe nem remove, só resolve a causa
 
 | Marca | Aparece quando | Some quando |
 |---|---|---|
-| **armadura gasta:** rachaduras e ferrugem (`:` e `.` no lugar de `#`) | há entradas vencidas no Grimoire ou uma entrada com 2 códigos de recuperação ou menos | tudo é renovado |
+| **armadura gasta:** rachaduras e manchas de ferrugem, pixels de `fg` trocados por `dim` | há entradas vencidas no Grimoire ou uma entrada com 2 códigos de recuperação ou menos | tudo é renovado |
 | **peso nas costas:** o boneco fica encurvado | há tarefas em In Battle há mais de 3 dias | elas saem de In Battle |
 | **saco de moedas:** pendurado no cinto, maior com o gasto | sempre, proporcional ao gasto mensal do Ledger, em 3 tamanhos | contas recebem strike |
 
 - Não tiram XP nem nível. É uma auditoria de relance, não uma punição.
 - A dica do ícone na barra lateral diz a causa: `hollow · lv 7 · 2 keys rotting`.
-- As marcas seguem as regras da arte: paradas, em `--fg`, sem cor de destaque.
+- As marcas seguem as regras da arte: paradas, nos tons do tema, sem cor de destaque.
+  O peso nas costas troca o `body` por uma variante encurvada da classe.
 
 ## Epitáfios
 
@@ -387,8 +440,8 @@ lápide. Cada tema dá o seu nome à lista (`epitaphs` no `souls`, `chronicles` 
 
 ## Ritmo
 
-- **A vela do dia:** ao lado do boneco, uma vela em ASCII, feita com a mesma arte da
-  vela da tela de descanso, mas parada. Ela vai derretendo conforme as tarefas do dia
+- **A vela do dia:** ao lado do boneco, uma vela em pixel art, no mesmo formato do
+  sprite (16 × 32, tons do tema), parada. Ela vai derretendo conforme as tarefas do dia
   saem de Orders e é trocada por uma nova à meia-noite. Não apaga por falta de uso.
 - **A crônica do ano:** no primeiro acesso de cada ano, a página oferece a crônica do
   ano anterior, uma página de texto com o resumo: tarefas conquistadas, notas escritas,
@@ -400,15 +453,40 @@ lápide. Cada tema dá o seu nome à lista (`epitaphs` no `souls`, `chronicles` 
 Um estilo novo da tela de descanso, **`hollow`**, ao lado de `pillar`, `skull-i`,
 `skull-ii` e `candle`:
 
-- O personagem, com a classe, o `attire` e as marcas do cofre, no canto inferior
-  direito, olhando para a esquerda, como as outras artes.
-- Parado. Embaixo do boneco, em `--dim` e 11 px, só `lv 7 · the unkindled`.
-- O tamanho segue a regra da tela de descanso (`Rest.svelte`): cabe na altura pedida
-  sem passar de metade da largura.
+- O personagem, com a classe, o `attire` e as marcas do cofre, **dentro do quarto**
+  (veja abaixo), no canto inferior direito, olhando para a esquerda, como as outras
+  artes.
+- Parado. Embaixo do quarto, em `--dim` e 11 px, só `lv 7 · the unkindled`.
+- O tamanho é o maior múltiplo inteiro que cabe na altura pedida sem passar de metade
+  da largura, para os pixels continuarem inteiros.
 - Com o hollow desligado em settings, o estilo some da lista e, se estava em uso, a
   tela volta para o padrão.
 - O cofre travado não tem acesso ao personagem; a tela de descanso só mostra o hollow
   enquanto a sessão está aberta, e volta ao estilo padrão depois do lock.
+
+### O quarto
+
+A referência aqui é o Habbo: um **quarto isométrico pequeno**, onde o personagem fica.
+
+- Piso em losango com linhas de 2:1 (2 pixels para o lado, 1 para cima), de 4 × 4
+  ladrilhos, e duas paredes ao fundo. Tudo nos tons do tema, com o mesmo contorno do
+  sprite.
+- **Os móveis contam a história do cofre.** Cada atributo destrava móveis em alguns
+  patamares, e eles aparecem sozinhos no quarto:
+
+  | Atributo | Móveis (souls) |
+  |---|---|
+  | vigor | um suporte de armas, depois um boneco de treino |
+  | memory | uma pilha de livros, depois uma estante |
+  | ward | um cadeado na porta, depois um baú selado |
+  | hoard | uma caixa, depois um baú de relíquias |
+  | thrift | uma balança, depois um cofre de moedas |
+
+- Epitáfios destravam objetos únicos (uma lápide pequena, um estandarte), que quem usa
+  posiciona em `attire → room`, ladrilho a ladrilho, como no Habbo.
+- Cada tema traz o seu conjunto: pedra e velas no `souls`, estantes e cristais no
+  `arcane`, tochas e baús no `dungeon`.
+- O quarto também aparece, menor, atrás do boneco no painel da página.
 
 ## Dados
 
@@ -453,7 +531,11 @@ $ dtvlt hollow
   só a silhueta da classe e `vault locked · the hollow sleeps`, sem números.
 - Segue as regras do [terminal](ESTILO.md#terminal): rótulos esmaecidos em 8 colunas,
   valores normais, o nome em negrito, dois espaços de indentação. Sem cores.
-- A arte é a mesma do navegador, com o `attire` e as marcas do cofre.
+- A arte é o **mesmo sprite convertido em ASCII** na hora, com o `attire` e as marcas
+  do cofre: cada coluna de pixels vira um caractere e cada par de linhas vira uma linha
+  (a célula de 0,6 × 1 fica quase quadrada), e o tom vira um caractere da rampa do
+  guia (` `, `.`, `:`, `+`, `#`). Os 32 × 32 pixels viram 32 × 16 caracteres. O quarto
+  não aparece no terminal. O desenho acima é só um esboço da posição.
 - Com `NO_COLOR` ou saída redirecionada, sai texto puro, bom para colar num README.
 - No console é `hollow`.
 - **`--art`** imprime só o boneco; **`--card`** só a ficha.
@@ -486,17 +568,22 @@ Quando for a hora, uma versão MINOR para cada passo:
 
 1. **Ícone e página vazia:** a chave `hollow` nos três temas, o botão no topo da barra
    e a placa "nothing here yet".
-2. **Classe e arte base:** a escolha de classe e a silhueta de cada uma nos três temas.
+2. **Classe e sprite base:** o renderizador de sprites, o script de conversão, a
+   escolha de classe e o corpo de cada uma.
 3. **XP, níveis e atributos:** a coleção de deeds, os ganhos do Siege, a barra e o
    histórico.
 4. **Tela de descanso e `dtvlt hollow`:** o boneco fora da página.
 5. **As outras fontes de XP:** Unspoken, Grimoire, Crypt, Ledger e o rested.
-6. **Personalizar:** as camadas, as peças por tema e a tela `attire`.
+6. **Personalizar:** as camadas, as cores por parte, os addons, as peças por tema e a
+   tela `attire`.
 7. **O cofre no corpo, epitáfios e ritmo:** as marcas, a lista de epitáfios, a vela e
    a crônica.
+8. **O quarto:** o piso isométrico, os móveis por atributo e o posicionamento.
 
 ## Fora de questão
 
+- Copiar sprites, peças, móveis, paletas ou nomes do Tibia, do Habbo ou de qualquer
+  outro jogo. Eles são referência de jeito, não de arte.
 - Moeda, loja, sorteio de peças: tudo vem de esforço.
 - Perder XP, nível ou peças por ficar longe do cofre.
 - Mostrar o título de entradas, notas ou tarefas no histórico, na ficha ou na crônica.
@@ -507,7 +594,8 @@ Quando for a hora, uma versão MINOR para cada passo:
 - [ ] Os nomes do arcane (`familiar`) e do dungeon (`hero`) estão bons?
 - [ ] Os nomes das classes e dos atributos por tema.
 - [ ] Os valores de XP e a curva de níveis precisam de uso real para ajustar.
-- [ ] O boneco também aparece pequeno ao lado da arte do login (opcional, desligado
+- [ ] Um respiro de 2 quadros, bem lento e desligado com "reduzir movimento", como a
+      vela da tela de descanso? Hoje o boneco é parado.- [ ] O boneco também aparece pequeno ao lado da arte do login (opcional, desligado
       por padrão)? O login não tem acesso ao cofre, então seria só a silhueta da classe
       guardada no `config.toml`.
 - [ ] Exportar o boneco como `.txt` pela página, além do `dtvlt hollow --art`.
