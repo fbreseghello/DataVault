@@ -46,7 +46,7 @@ export interface SessionInfo {
 }
 
 /** The 16x16 pixel art slots a theme draws: one per page, the end button and the seal. */
-export type IconSlot = 'grimoire' | 'unspoken' | 'siege' | 'crypt' | 'ledger' | 'end' | 'seal'
+export type IconSlot = 'grimoire' | 'unspoken' | 'siege' | 'crypt' | 'ledger' | 'end' | 'seal' | 'hollow'
 
 /** The names a theme gives to the pages and their features. */
 export type WordKey =
@@ -69,6 +69,7 @@ export type WordKey =
   | 'kept'
   | 'strike'
   | 'end'
+  | 'hollow'
 
 /** A look DataVault can wear. See docs/TEMAS.md for the file format. */
 export interface Theme {

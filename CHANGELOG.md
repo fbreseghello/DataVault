@@ -7,6 +7,14 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- O ícone do **hollow** no topo da barra lateral, sozinho como a lápide no pé: o
+  personagem que vai evoluir com o uso do cofre (o plano está em `docs/PERSONAGEM.md`).
+  Por enquanto ele abre uma página vazia. Cada tema tem o seu ícone e o seu nome: elmo
+  no souls (**hollow**), coruja no arcane (**familiar**) e escudo no dungeon (**hero**).
+  Atalho `0`.
+
 ## [0.17.0] - 2026-11-03
 
 ### Adicionado

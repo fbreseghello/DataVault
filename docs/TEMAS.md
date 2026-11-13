@@ -108,6 +108,7 @@ O DataVault é escuro: mantenha `bg` perto do preto e `fg` claro.
 | `keep`, `kept` | guardar um arquivo no crypt, e o rótulo da data | bury, buried |
 | `strike` | apagar uma conta do ledger | strike |
 | `end` | o botão que encerra a sessão | end session |
+| `hollow` | o personagem no topo da barra lateral | hollow |
 
 ### Ícones
 
@@ -116,6 +117,7 @@ O DataVault é escuro: mantenha `bg` perto do preto e `fg` claro.
 | `grimoire`, `unspoken`, `siege`, `crypt`, `ledger` | barra lateral e a placa de cada página |
 | `end` | o botão de encerrar a sessão e a tela de sessão encerrada |
 | `seal` | entradas e notas protegidas pelo PIN |
+| `hollow` | o personagem, no topo da barra lateral e na placa da página dele |
 
 Desenhe como os do `souls`: silhueta legível em 32 px, vãos de 2 px, sem antisserrilhado.
 

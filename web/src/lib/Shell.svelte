@@ -2,6 +2,7 @@
   import type { SessionInfo } from './api'
   import Crypt from './Crypt.svelte'
   import Grimoire from './Grimoire.svelte'
+  import Hollow from './Hollow.svelte'
   import Icon from './Icon.svelte'
   import Ledger from './Ledger.svelte'
   import Settings from './Settings.svelte'
@@ -33,7 +34,8 @@
 
   let page = $state('grimoire')
   let settings = $state(false)
-  const current = $derived(pages.find((p) => p.id === page)!)
+  const current = $derived(page === 'hollow' ? word('hollow') : pages.find((p) => p.id === page)!.label)
+  const hollowSize = $derived(theme.current?.large_icons?.includes('hollow') ? 48 : 32)
 
   function go(id: string) {
     page = id
@@ -66,6 +68,11 @@
       return
     }
     if (isTyping(e.target) || e.ctrlKey || e.metaKey || e.altKey) return
+    if (e.key === '0') {
+      e.preventDefault()
+      go('hollow')
+      return
+    }
     const n = Number(e.key)
     if (n >= 1 && n <= pages.length) {
       e.preventDefault()
@@ -78,6 +85,17 @@
 
 <div class="shell">
   <aside>
+    <!-- The character sits apart at the top, as the tombstone does at the foot. -->
+    <button
+      class="page hollow"
+      class:active={!settings && page === 'hollow'}
+      onclick={() => go('hollow')}
+      aria-label={word('hollow')}
+      aria-current={!settings && page === 'hollow' ? 'page' : undefined}
+    >
+      <Icon name="hollow" size={hollowSize} />
+      <span class="tip" aria-hidden="true">{word('hollow')} <span class="key">0</span></span>
+    </button>
     <nav aria-label="pages">
       {#each pages as p, i (p.id)}
         <button
@@ -106,7 +124,7 @@
 
   <header>
     <span class="brand">datavault</span>
-    <span class="crumb">/ {settings ? 'settings' : current.label}</span>
+    <span class="crumb">/ {settings ? 'settings' : current}</span>
     <span class="spacer"></span>
     <span class="dim">session {info.id}</span>
     <button onclick={() => (settings = !settings)} class:on={settings}>settings</button>
@@ -129,6 +147,9 @@
     <div class="page-view" hidden={settings || page !== 'ledger'}>
       <Ledger active={!settings && page === 'ledger'} />
     </div>
+    <div class="page-view" hidden={settings || page !== 'hollow'}>
+      <Hollow />
+    </div>
     {#if settings}
       <div class="page-view scroll">
         <div class="padded">
@@ -146,7 +167,7 @@
     {#if !settings && page === 'siege'}<span>n new · arrows select · shift+arrows move · [ ] days ·</span>{/if}
     {#if !settings && page === 'crypt'}<span>n {word('keep')} · drop files here · esc close ·</span>{/if}
     {#if !settings && page === 'ledger'}<span>n new · esc close ·</span>{/if}
-    <span>1–{pages.length} pages · ctrl+shift+l rest</span>
+    <span>0 {word('hollow')} · 1–{pages.length} pages · ctrl+shift+l rest</span>
     <span class="version">{showVersion(info.version)}</span>
   </footer>
 </div>
@@ -211,7 +232,13 @@
   }
 
 
-  /* The tombstone sits apart at the foot of the sidebar; the pages stay centred. */
+  /* The character sits apart at the top of the sidebar and the tombstone at
+     its foot; the pages stay centred between them. */
+  .hollow {
+    position: absolute;
+    top: 16px;
+  }
+
   .end {
     position: absolute;
     bottom: 16px;

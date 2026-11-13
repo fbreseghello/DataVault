@@ -1,8 +1,9 @@
 # DataVault — Personagem
 
-> **Ideia registrada, ainda não implementada.** Este documento descreve um personagem
-> que evolui com o uso do DataVault. Nada aqui existe no código ainda; serve de
-> referência para quando a ideia for construída. A forma geral segue o
+> **Ideia registrada, quase toda ainda por fazer.** Este documento descreve um
+> personagem que evolui com o uso do DataVault. Por enquanto só existe o primeiro passo
+> da [ordem de construção](#ordem-de-construção): o ícone no topo da barra lateral e a
+> página vazia. O resto serve de referência para quando a ideia for construída. A forma geral segue o
 > [guia de estilo](ESTILO.md) e o formato de temas segue [TEMAS.md](TEMAS.md).
 
 ## A ideia
@@ -56,8 +57,8 @@ Um ícone novo, **sozinho no topo da barra**, espelhando a lápide que fica sozi
 ## Ícones por tema
 
 Cada tema traz o seu ícone na chave `hollow` de `icons` (16 × 16, 1 bit, `#` aceso).
-Os desenhos abaixo são a proposta inicial; antes de entrar no código, cada um precisa
-ser testado em 32 px ao lado dos vizinhos, como pede o [guia](ESTILO.md#ícones).
+Os três já estão nos temas embutidos e foram testados em 32 px ao lado dos vizinhos,
+como pede o [guia](ESTILO.md#ícones).
 
 ### souls: elmo
 
@@ -83,24 +84,26 @@ Elmo fechado de cavaleiro, visto de frente. A fenda dos olhos é um vão horizon
 ................
 ```
 
-### arcane: chapéu de mago
+### arcane: coruja
 
-O cone torto do chapéu, a faixa como um vão de 2 pixels e a aba larga embaixo.
+O `familiar` do mago: uma coruja vazada, com tufos nas orelhas, pousada num galho. É
+vazada como os outros ícones do `arcane`. (Um chapéu de mago foi tentado antes e, em
+32 px, parecia um barco à vela.)
 
 ```
 ................
-...........##...
-..........###...
-.........###....
-........####....
-.......#####....
-......#######...
-......#######...
-.....#########..
-.....#########..
-................
-................
-.##############.
+..##........##..
+..#.#......#.#..
+..#..######..#..
+..#..........#..
+..#..##..##..#..
+..#..##..##..#..
+..#..........#..
+..#....##....#..
+..#..........#..
+...#........#...
+....########....
+.....#....#.....
 ..############..
 ................
 ................
@@ -108,24 +111,25 @@ O cone torto do chapéu, a faixa como um vão de 2 pixels e a aba larga embaixo.
 
 ### dungeon: escudo
 
-Escudo de herói de 8 bits, com uma cruz gravada em vãos de 2 pixels.
+Escudo de herói de 8 bits, vazado como os outros ícones do `dungeon`, com uma cruz no
+meio.
 
 ```
 ................
 .##############.
-.######..######.
-.######..######.
-.######..######.
-.##..........##.
-.##..........##.
-.######..######.
-.######..######.
-..#####..#####..
-..#####..#####..
-...####..####...
-....###..###....
-.....##..##.....
-................
+.#............#.
+.#............#.
+.#.....##.....#.
+.#.....##.....#.
+.#..########..#.
+.#..########..#.
+.#.....##.....#.
+.#.....##.....#.
+..#....##....#..
+..#..........#..
+...#........#...
+....##....##....
+......####......
 ................
 ```
 
@@ -566,8 +570,8 @@ volta com `on`. A escolha fica em `hollow` no `config.toml`.
 
 Quando for a hora, uma versão MINOR para cada passo:
 
-1. **Ícone e página vazia:** a chave `hollow` nos três temas, o botão no topo da barra
-   e a placa "nothing here yet".
+1. **Ícone e página vazia** *(feito)*: a chave `hollow` nos três temas, o botão no
+   topo da barra e a placa "nothing here yet".
 2. **Classe e sprite base:** o renderizador de sprites, o script de conversão, a
    escolha de classe e o corpo de cada uma.
 3. **XP, níveis e atributos:** a coleção de deeds, os ganhos do Siege, a barra e o

@@ -63,7 +63,8 @@ O app é uma grade fixa: barra lateral, cabeçalho, conteúdo e rodapé.
 
 - **Barra lateral:** 64 px, só ícones, centralizados na vertical com 20 px entre eles.
   A página aberta ganha uma barra de 2 px na borda esquerda, como um cursor. A lápide
-  (encerrar sessão) fica sozinha no pé da barra, a 16 px do fundo. A borda da barra é
+  (encerrar sessão) fica sozinha no pé da barra, a 16 px do fundo, e o hollow (o
+  personagem) fica sozinho no topo, a 16 px do alto. A borda da barra é
   uma sombra interna de 1 px, para não roubar largura dos ícones.
 - **Cabeçalho:** `datavault / página` à esquerda; sessão, `settings` e `lock` à direita.
 - **Barra da página** (`.page-toolbar`): sempre 52 px de altura. Controles da página
@@ -92,6 +93,7 @@ crispEdges`.
 | saco de moedas cheio, amarrado na boca | `sack` | Ledger |
 | lápide com inscrição em degraus | `tomb` | encerrar sessão, tela "session ended" |
 | cadeado com buraco de chave | `seal` | itens selados |
+| elmo fechado, com fenda e respiro | `hollow` | o personagem, no topo da barra |
 
 Regras para desenhar um ícone novo:
 
@@ -209,6 +211,7 @@ três: `souls` (o padrão), `arcane` e `dungeon`. Outros podem ser importados co
 | Crypt | cruz | documentos e arquivos guardados |
 | Ledger | saco de moedas | assinaturas e gastos fixos; apagar é **strike** |
 | — | lápide | encerrar a sessão |
+| Hollow | elmo fechado | o personagem (veja [PERSONAGEM.md](PERSONAGEM.md)) |
 
 A escolha de tema fica em settings → appearance.
 

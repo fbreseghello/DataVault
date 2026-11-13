@@ -43,10 +43,13 @@ var Words = []string{
 	"strike",
 	// the sidebar button that ends the session
 	"end",
+	// the character at the top of the sidebar
+	"hollow",
 }
 
-// Icons are the 16x16 pixel art slots: one per page, the end button and the seal.
-var Icons = []string{"grimoire", "unspoken", "siege", "crypt", "ledger", "end", "seal"}
+// Icons are the 16x16 pixel art slots: one per page, the end button, the seal
+// and the character at the top of the sidebar.
+var Icons = []string{"grimoire", "unspoken", "siege", "crypt", "ledger", "end", "seal", "hollow"}
 
 // Limits for imported themes.
 const (
