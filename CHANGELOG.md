@@ -7,6 +7,12 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Alterado
+
+- O boneco do **cleric** ganhou detalhes, com a mesma silhueta: chama na lanterna, um
+  rosto na sombra do capuz, estola, cordão com nó e borla, uma dobra no manto e a barra
+  bordada.
+
 ## [0.22.0] - 2026-11-16
 
 ### Adicionado
