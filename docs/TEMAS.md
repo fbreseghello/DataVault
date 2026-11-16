@@ -64,7 +64,8 @@ então um tema pode trocar só as cores, ou só alguns nomes.
   "words": { "grimoire": "keys", "siege": "raids" },
   "icons": { "seal": ["................", "...16 linhas de 16 caracteres..."] },
   "large_icons": [],
-  "login": ["linha 1 da arte", "linha 2 da arte"]
+  "login": ["linha 1 da arte", "linha 2 da arte"],
+  "titles": ["the cold", "the kindled", "the burning"]
 }
 ```
 
@@ -78,6 +79,7 @@ então um tema pode trocar só as cores, ou só alguns nomes.
 | `icons` | 16 linhas de 16 caracteres: `#` aceso, `.` apagado. |
 | `large_icons` | ícones desenhados um passo maior na barra lateral, para arte que deixa mais vazio no quadro. |
 | `login` | até 24 linhas de até 160 caracteres. A arte encolhe para caber em janelas estreitas. |
+| `titles` | os títulos do hollow, um a cada cinco níveis, em ordem; o último vale daí em diante. Até 20, de uma linha, até 24 caracteres cada. |
 
 Chaves desconhecidas são recusadas, para que um erro de digitação não passe calado.
 
@@ -110,6 +112,8 @@ O DataVault é escuro: mantenha `bg` perto do preto e `fg` claro.
 | `strike` | apagar uma conta do ledger | strike |
 | `end` | o botão que encerra a sessão | end session |
 | `hollow` | o personagem no topo da barra lateral | hollow |
+| `xp`, `level`, `deeds` | a experiência do hollow, o nível e o histórico do que a rendeu | souls, level, deeds |
+| `vigor`, `memory`, `ward`, `hoard`, `thrift` | os atributos do hollow, um por página (siege, unspoken, grimoire, crypt, ledger) | os mesmos |
 
 ### Ícones
 

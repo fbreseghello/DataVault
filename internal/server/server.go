@@ -161,6 +161,8 @@ func (s *Server) routes() http.Handler {
 	api.HandleFunc("POST /api/bills", s.handleCreateBill)
 	api.HandleFunc("PUT /api/bills/{id}", s.handleUpdateBill)
 	api.HandleFunc("DELETE /api/bills/{id}", s.handleDeleteBill)
+	api.HandleFunc("GET /api/hollow", s.handleHollow)
+	api.HandleFunc("POST /api/hollow/seen", s.handleHollowSeen)
 	api.HandleFunc("GET /api/seal", s.handleSealStatus)
 	api.HandleFunc("PUT /api/seal", s.handleSetSealPIN)
 	api.HandleFunc("POST /api/events", s.handleEvent)

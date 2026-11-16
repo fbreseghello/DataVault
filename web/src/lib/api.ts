@@ -70,6 +70,14 @@ export type WordKey =
   | 'strike'
   | 'end'
   | 'hollow'
+  | 'xp'
+  | 'level'
+  | 'deeds'
+  | 'vigor'
+  | 'memory'
+  | 'ward'
+  | 'hoard'
+  | 'thrift'
 
 /** A look DataVault can wear. See docs/TEMAS.md for the file format. */
 export interface Theme {
@@ -85,6 +93,8 @@ export interface Theme {
   large_icons?: IconSlot[]
   /** The login art, one string per line. */
   login: string[]
+  /** The hollow's titles, one every five levels; the last is kept from then on. */
+  titles: string[]
 }
 
 export type ThemeSummary = Pick<Theme, 'id' | 'name' | 'description' | 'builtin'>
@@ -296,6 +306,36 @@ export type BillInput = Omit<Bill, 'id' | 'history' | 'created_at' | 'updated_at
 
 const billPath = (id: string) => '/api/bills/' + encodeURIComponent(id)
 
+/** An attribute of the hollow; each page feeds one. */
+export type Attr = 'vigor' | 'memory' | 'ward' | 'hoard' | 'thrift'
+
+export type DeedKind = 'task_conquered' | 'day_cleared'
+
+/** One gain of experience, tied to what earned it; never its title. */
+export interface Deed {
+  xp: number
+  attr: Attr
+  kind: DeedKind
+  source: string
+  /** The local date it was earned, YYYY-MM-DD. */
+  day: string
+  at: string
+}
+
+/** The character as it stands, worked out from its deeds. */
+export interface HollowState {
+  xp: number
+  level: number
+  /** XP gained inside the level, and what the level takes. */
+  into: number
+  need: number
+  /** The last level the page has shown; a higher one is news. */
+  seen_level: number
+  attrs: Record<Attr, number>
+  /** The latest deeds, newest first. */
+  deeds: Deed[]
+}
+
 export interface Settings {
   pin_enabled: boolean
   keep_terminal: boolean
@@ -349,6 +389,9 @@ export const api = {
   takeFile,
   renameFile: (id: string, title: string) => request<CryptFile>('PUT', '/api/files/' + encodeURIComponent(id), { title }),
   removeFile: (id: string) => request<void>('DELETE', '/api/files/' + encodeURIComponent(id)),
+  hollow: () => request<HollowState>('GET', '/api/hollow'),
+  /** Marks the current level as seen. */
+  hollowSeen: () => request<HollowState>('POST', '/api/hollow/seen'),
   bills: () => request<Bill[]>('GET', '/api/bills'),
   createBill: (b: BillInput) => request<Bill>('POST', '/api/bills', b),
   updateBill: (id: string, b: BillInput) => request<Bill>('PUT', billPath(id), b),

@@ -34,6 +34,8 @@ type payload struct {
 	Files []File `json:"files,omitempty"`
 	// Bills are the ledger: subscriptions and fixed expenses.
 	Bills []Bill `json:"bills,omitempty"`
+	// Hollow is the character that grows with the vault.
+	Hollow Hollow `json:"hollow"`
 	// SealPIN is the Argon2id hash of the PIN that opens sealed items.
 	SealPIN string `json:"seal_pin,omitempty"`
 }

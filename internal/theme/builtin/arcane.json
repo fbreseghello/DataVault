@@ -34,8 +34,17 @@
     "kept": "enshrined",
     "strike": "revoke",
     "end": "vanish",
-    "hollow": "familiar"
+    "hollow": "familiar",
+    "xp": "mana",
+    "level": "circle",
+    "deeds": "grimoire notes",
+    "vigor": "will",
+    "memory": "lore",
+    "ward": "warding",
+    "hoard": "relics",
+    "thrift": "tithe"
   },
+  "titles": ["apprentice", "adept", "magus", "archmage", "the unbound"],
   "icons": {
     "grimoire": [
       "................",

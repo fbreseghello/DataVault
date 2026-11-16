@@ -1,9 +1,10 @@
 # DataVault — Personagem
 
-> **Ideia registrada, quase toda ainda por fazer.** Este documento descreve um
-> personagem que evolui com o uso do DataVault. Por enquanto só existe o primeiro passo
-> da [ordem de construção](#ordem-de-construção): o ícone no topo da barra lateral e a
-> página vazia. O resto serve de referência para quando a ideia for construída. A forma geral segue o
+> **Em construção.** Este documento descreve um personagem que evolui com o uso do
+> DataVault. Já existem o ícone no topo da barra lateral e a experiência vinda do Siege,
+> com níveis, títulos, atributos e o histórico (veja a
+> [ordem de construção](#ordem-de-construção)). O resto serve de referência para quando
+> for construído. A forma geral segue o
 > [guia de estilo](ESTILO.md) e o formato de temas segue [TEMAS.md](TEMAS.md).
 
 ## A ideia
@@ -60,27 +61,27 @@ Cada tema traz o seu ícone na chave `hollow` de `icons` (16 × 16, 1 bit, `#` a
 Os três já estão nos temas embutidos e foram testados em 32 px ao lado dos vizinhos,
 como pede o [guia](ESTILO.md#ícones).
 
-### souls: elmo
+### souls: caveira encapuzada
 
-Elmo fechado de cavaleiro, visto de frente. A fenda dos olhos é um vão horizontal de
-2 pixels e a respiração, um vão vertical de 2 pixels.
+Uma caveira de órbitas vazias dentro de um capuz, vazada como o `end` e o `seal`. (Um
+elmo fechado foi o primeiro desenho e, em 32 px, ficou pesado demais.)
 
 ```
 ................
 .....######.....
-...##########...
-..############..
-..############..
-.##############.
-.##############.
+...##......##...
+..#..######..#..
+.#..########..#.
+.#.##########.#.
+#..#...##...#..#
+#..#...##...#..#
+#..###.##.###..#
+#...###..###...#
+#....######....#
+.#...#.##.#...#.
+.#....####....#.
+..#..........#..
 .##..........##.
-.##..........##.
-.##############.
-.######..######.
-.######..######.
-.######..######.
-..#####..#####..
-...####..####...
 ................
 ```
 
@@ -133,7 +134,7 @@ meio.
 ................
 ```
 
-Um tema importado que não defina `hollow` herda o elmo do `souls`, como acontece com
+Um tema importado que não defina `hollow` herda a caveira do `souls`, como acontece com
 qualquer ícone que falte.
 
 ## Nomes por tema
@@ -572,10 +573,12 @@ Quando for a hora, uma versão MINOR para cada passo:
 
 1. **Ícone e página vazia** *(feito)*: a chave `hollow` nos três temas, o botão no
    topo da barra e a placa "nothing here yet".
-2. **Classe e sprite base:** o renderizador de sprites, o script de conversão, a
+2. **XP, níveis e atributos** *(feito)*: a coleção de deeds, os ganhos do Siege, a
+   barra, os atributos, o histórico, os títulos por tema, o ícone em destaque num nível
+   novo e o log da sessão. Veio antes do sprite, que era o passo 2 do plano original;
+   até o sprite chegar, a página mostra o ícone do tema no lugar do boneco.
+3. **Classe e sprite base:** o renderizador de sprites, o script de conversão, a
    escolha de classe e o corpo de cada uma.
-3. **XP, níveis e atributos:** a coleção de deeds, os ganhos do Siege, a barra e o
-   histórico.
 4. **Tela de descanso e `dtvlt hollow`:** o boneco fora da página.
 5. **As outras fontes de XP:** Unspoken, Grimoire, Crypt, Ledger e o rested.
 6. **Personalizar:** as camadas, as cores por parte, os addons, as peças por tema e a

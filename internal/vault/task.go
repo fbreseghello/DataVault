@@ -114,11 +114,20 @@ func (v *Vault) AddTask(in TaskInput) (Task, error) {
 	}
 	next := v.data
 	next.Tasks = append(slices.Clone(v.data.Tasks), t)
+	next.Hollow.Deeds = siegeDeeds(v.data.Hollow.Deeds, next.Tasks, []string{t.Day}, conqueredNow(Task{}, t))
 	if err := v.save(next); err != nil {
 		return Task{}, err
 	}
 	v.data = next
 	return t, nil
+}
+
+// conqueredNow is the id of a task that has just gone into Conquered, or "".
+func conqueredNow(before, after Task) string {
+	if after.Column == Conquered && before.Column != Conquered {
+		return after.ID
+	}
+	return ""
 }
 
 // UpdateTask edits the title and note; moving goes through MoveTask.
@@ -127,7 +136,7 @@ func (v *Vault) UpdateTask(id, title, note string) (Task, error) {
 	if title == "" {
 		return Task{}, fmt.Errorf("%w: title is required", ErrInvalidItem)
 	}
-	return v.changeTasks(id, func(tasks []Task, i int) []Task {
+	return v.changeTasks(id, false, func(tasks []Task, i int) []Task {
 		tasks[i].Title = title
 		tasks[i].Note = note
 		tasks[i].UpdatedAt = time.Now().UTC()
@@ -140,7 +149,7 @@ func (v *Vault) MoveTask(id string, column Column, index int) (Task, error) {
 	if !column.valid() {
 		return Task{}, fmt.Errorf("%w: unknown column %q", ErrInvalidItem, column)
 	}
-	return v.changeTasks(id, func(tasks []Task, i int) []Task {
+	return v.changeTasks(id, true, func(tasks []Task, i int) []Task {
 		moving := tasks[i]
 		// The column as it will be, without the moving task, in order.
 		var col []int
@@ -167,7 +176,7 @@ func (v *Vault) MoveTask(id string, column Column, index int) (Task, error) {
 }
 
 func (v *Vault) DeleteTask(id string) error {
-	_, err := v.changeTasks(id, func(tasks []Task, i int) []Task {
+	_, err := v.changeTasks(id, true, func(tasks []Task, i int) []Task {
 		gone := tasks[i]
 		tasks = slices.Delete(tasks, i, i+1)
 		renumber(tasks, gone.Day, gone.Column)
@@ -240,6 +249,9 @@ func (v *Vault) CarryPending(day string) (int, error) {
 	for k := range from {
 		renumber(next.Tasks, k[0], Column(k[1]))
 	}
+	// unfinished work lands on day, which is no longer cleared; the days it
+	// left are not looked at, so carrying work away never clears them
+	next.Hollow.Deeds = siegeDeeds(v.data.Hollow.Deeds, next.Tasks, []string{day}, "")
 	if err := v.save(next); err != nil {
 		return 0, err
 	}
@@ -247,7 +259,9 @@ func (v *Vault) CarryPending(day string) (int, error) {
 	return len(moved), nil
 }
 
-func (v *Vault) changeTasks(id string, change func(tasks []Task, i int) []Task) (Task, error) {
+// changeTasks applies change to the task with id and saves. With deeds set, the
+// hollow's deeds follow the change on the task's day.
+func (v *Vault) changeTasks(id string, deeds bool, change func(tasks []Task, i int) []Task) (Task, error) {
 	v.mu.Lock()
 	defer v.mu.Unlock()
 	if v.dek == nil {
@@ -257,16 +271,21 @@ func (v *Vault) changeTasks(id string, change func(tasks []Task, i int) []Task) 
 	if i < 0 {
 		return Task{}, ErrNotFound
 	}
+	before := v.data.Tasks[i]
 	next := v.data
 	next.Tasks = change(slices.Clone(v.data.Tasks), i)
+	after := Task{}
+	if j := slices.IndexFunc(next.Tasks, func(t Task) bool { return t.ID == id }); j >= 0 {
+		after = next.Tasks[j]
+	}
+	if deeds {
+		next.Hollow.Deeds = siegeDeeds(v.data.Hollow.Deeds, next.Tasks, []string{before.Day}, conqueredNow(before, after))
+	}
 	if err := v.save(next); err != nil {
 		return Task{}, err
 	}
 	v.data = next
-	if j := slices.IndexFunc(next.Tasks, func(t Task) bool { return t.ID == id }); j >= 0 {
-		return next.Tasks[j], nil
-	}
-	return Task{}, nil
+	return after, nil
 }
 
 func (v *Vault) columnLen(day string, c Column) int { return columnLen(v.data.Tasks, day, c) }

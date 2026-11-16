@@ -7,6 +7,22 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- O **hollow** ganha experiência com o **siege**: 10 por tarefa em **Conquered** (até
+  20 por dia) e 25 por dia fechado sem nada em Orders nem In Battle. Tirar a tarefa de
+  Conquered, ou apagá-la, devolve o que ela rendeu; **Fallen** não dá nem tira, e
+  trazer tarefas de dias anteriores nunca fecha um dia sozinho.
+- A página do hollow mostra o nível, o título, a barra de experiência, os cinco
+  atributos e o histórico (**deeds**) por dia, só com o tipo de ação, nunca o título da
+  tarefa. O boneco em pixel art vem numa próxima versão; por enquanto o ícone do tema
+  fica no lugar dele.
+- Um nível novo deixa o ícone do hollow na cor de destaque até a página ser aberta e
+  aparece uma vez no rodapé. A dica do ícone mostra o nível, e o log da sessão no
+  terminal registra os ganhos (`+10 souls  task conquered`) e os níveis.
+- Nos temas, os nomes `xp`, `level`, `deeds` e os dos atributos, e a lista `titles`,
+  um título a cada cinco níveis (veja `docs/TEMAS.md`).
+
 ## [0.20.0] - 2026-11-16
 
 ### Adicionado

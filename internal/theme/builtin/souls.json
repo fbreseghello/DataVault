@@ -34,8 +34,17 @@
     "kept": "buried",
     "strike": "strike",
     "end": "end session",
-    "hollow": "hollow"
+    "hollow": "hollow",
+    "xp": "souls",
+    "level": "level",
+    "deeds": "deeds",
+    "vigor": "vigor",
+    "memory": "memory",
+    "ward": "ward",
+    "hoard": "hoard",
+    "thrift": "thrift"
   },
+  "titles": ["the nameless", "the unkindled", "the wayfarer", "the warden", "the undying"],
   "icons": {
     "grimoire": [
       "................",

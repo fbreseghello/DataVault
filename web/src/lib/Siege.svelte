@@ -1,6 +1,7 @@
 <script lang="ts">
   import { tick, untrack } from 'svelte'
   import { api, ApiError, type Board, type Column, type Task } from './api'
+  import { refreshHollow } from './character.svelte'
   import { hasTag, parseTitle, tagText, type Tag } from './tags'
   import { word } from './theme.svelte'
 
@@ -88,13 +89,15 @@
     error = e instanceof Error ? e.message : String(e)
   }
 
-  async function load() {
+  // with earned: the board changed, and the hollow may have earned or lost a deed
+  async function load(earned = false) {
     try {
       board = await api.board(day)
       error = ''
     } catch (e) {
       fail(e)
     }
+    if (earned) void refreshHollow()
   }
 
   $effect(() => {
@@ -139,7 +142,7 @@
     try {
       const t = await api.createTask(title, day, note)
       selected = t.id
-      await load()
+      await load(true)
     } catch (err) {
       newTitle = title
       newNote = note
@@ -166,7 +169,7 @@
   async function move(id: string, c: Column, index: number) {
     try {
       await api.moveTask(id, c, fullIndex(c, index, id))
-      await load()
+      await load(true)
     } catch (e) {
       fail(e)
     }
@@ -204,7 +207,7 @@
       await api.deleteTask(id)
       confirmDelete = null
       selected = null
-      await load()
+      await load(true)
     } catch (e) {
       fail(e)
     }
@@ -213,7 +216,7 @@
   async function carry() {
     try {
       await api.carryTasks(day)
-      await load()
+      await load(true)
     } catch (e) {
       fail(e)
     }

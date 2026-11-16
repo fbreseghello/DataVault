@@ -44,8 +44,12 @@ var Words = []string{
 	"strike",
 	// the sidebar button that ends the session
 	"end",
-	// the character at the top of the sidebar
-	"hollow",
+	// the character at the top of the sidebar, its experience, its level and
+	// the history of what earned it
+	"hollow", "xp", "level", "deeds",
+	// the character's attributes, one per page: siege, unspoken, grimoire,
+	// crypt and ledger
+	"vigor", "memory", "ward", "hoard", "thrift",
 }
 
 // Icons are the 16x16 pixel art slots: one per page, the end button, the seal
@@ -56,6 +60,7 @@ var Icons = []string{"grimoire", "unspoken", "siege", "crypt", "ledger", "end", 
 const (
 	IconSize      = 16
 	maxWord       = 24
+	maxTitles     = 20
 	maxName       = 32
 	maxDesc       = 160
 	maxLoginLines = 24
@@ -77,6 +82,9 @@ type Theme struct {
 	LargeIcons []string `json:"large_icons,omitempty"`
 	// Login is the art above the login prompt, one string per line.
 	Login []string `json:"login"`
+	// Titles are what the hollow is called as it grows: one every five levels,
+	// in order, the last one kept from then on.
+	Titles []string `json:"titles,omitempty"`
 }
 
 // Summary is what the theme picker lists.
@@ -204,6 +212,14 @@ func (t Theme) validate() error {
 			return fmt.Errorf("large_icons: unknown icon %q", k)
 		}
 	}
+	if len(t.Titles) > maxTitles {
+		return fmt.Errorf("titles must be at most %d", maxTitles)
+	}
+	for i, title := range t.Titles {
+		if w := strings.TrimSpace(title); w == "" || utf8.RuneCountInString(w) > maxWord || strings.ContainsAny(w, "\r\n\t") {
+			return fmt.Errorf("title %d must be one line of 1 to %d characters", i+1, maxWord)
+		}
+	}
 	if len(t.Login) > maxLoginLines {
 		return fmt.Errorf("login art must have at most %d lines", maxLoginLines)
 	}
@@ -247,6 +263,9 @@ func (t Theme) complete() error {
 	if len(t.Login) == 0 {
 		return errors.New("missing login art")
 	}
+	if len(t.Titles) == 0 {
+		return errors.New("missing titles")
+	}
 	return nil
 }
 
@@ -269,6 +288,9 @@ func (t Theme) Resolved() Theme {
 	}
 	if len(t.Login) == 0 {
 		out.Login = base.Login
+	}
+	if len(t.Titles) == 0 {
+		out.Titles = base.Titles
 	}
 	return out
 }

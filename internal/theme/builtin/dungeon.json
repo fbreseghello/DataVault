@@ -34,8 +34,17 @@
     "kept": "stashed",
     "strike": "drop",
     "end": "save & quit",
-    "hollow": "hero"
+    "hollow": "hero",
+    "xp": "xp",
+    "level": "level",
+    "deeds": "quest journal",
+    "vigor": "strength",
+    "memory": "wisdom",
+    "ward": "defense",
+    "hoard": "loot",
+    "thrift": "gold"
   },
+  "titles": ["peasant", "squire", "knight", "champion", "legend"],
   "icons": {
     "grimoire": [
       "................",

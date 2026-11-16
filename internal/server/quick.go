@@ -29,7 +29,11 @@ func (s *Server) WriteTask(title, note, day string) (vault.Task, error) {
 	if err != nil {
 		return vault.Task{}, err
 	}
-	t, err := v.AddTask(vault.TaskInput{Title: title, Note: note, Day: day})
+	var t vault.Task
+	err = s.tracked(v, func() (err error) {
+		t, err = v.AddTask(vault.TaskInput{Title: title, Note: note, Day: day})
+		return err
+	})
 	if err == nil {
 		s.opts.Session.Log("ordered " + printable(t.Title))
 	}

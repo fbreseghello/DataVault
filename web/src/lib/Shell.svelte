@@ -3,6 +3,8 @@
   import Crypt from './Crypt.svelte'
   import Grimoire from './Grimoire.svelte'
   import Hollow from './Hollow.svelte'
+  import { titleFor } from './character'
+  import { hollow, refreshHollow, unseen } from './character.svelte'
   import Icon from './Icon.svelte'
   import Ledger from './Ledger.svelte'
   import Settings from './Settings.svelte'
@@ -31,6 +33,12 @@
       size: theme.current?.large_icons?.includes(id) ? 48 : 32,
     })),
   )
+
+  // the character's level, for the sidebar tip and the news of a new one
+  $effect(() => {
+    void refreshHollow()
+  })
+  const hollowTip = $derived(hollow.state ? `${word('hollow')} · lv ${hollow.state.level}` : word('hollow'))
 
   let page = $state('grimoire')
   let settings = $state(false)
@@ -89,12 +97,13 @@
     <button
       class="page hollow"
       class:active={!settings && page === 'hollow'}
+      class:news={unseen() && !(!settings && page === 'hollow')}
       onclick={() => go('hollow')}
-      aria-label={word('hollow')}
+      aria-label={hollowTip}
       aria-current={!settings && page === 'hollow' ? 'page' : undefined}
     >
       <Icon name="hollow" size={hollowSize} />
-      <span class="tip" aria-hidden="true">{word('hollow')} <span class="key">0</span></span>
+      <span class="tip" aria-hidden="true">{hollowTip} <span class="key">0</span></span>
     </button>
     <nav aria-label="pages">
       {#each pages as p, i (p.id)}
@@ -148,7 +157,7 @@
       <Ledger active={!settings && page === 'ledger'} />
     </div>
     <div class="page-view" hidden={settings || page !== 'hollow'}>
-      <Hollow />
+      <Hollow active={!settings && page === 'hollow'} />
     </div>
     {#if settings}
       <div class="page-view scroll">
@@ -161,6 +170,11 @@
 
   <footer>
     <span>auto-lock {info.auto_lock_minutes}m · clipboard {info.clipboard_clear_seconds}s</span>
+    {#if hollow.news}
+      <span class="news" role="status">
+        {word('level')} {hollow.news} · {titleFor(hollow.news, theme.current?.titles ?? [])}
+      </span>
+    {/if}
     <span class="spacer"></span>
     {#if !settings && page === 'grimoire'}<span>n new · g {word('forge')} · / search · esc close ·</span>{/if}
     {#if !settings && page === 'unspoken'}<span>n new · esc close · saves as you write ·</span>{/if}
@@ -245,6 +259,12 @@
   }
 
   .end.armed {
+    color: var(--accent);
+  }
+
+  /* a level the page has not shown yet: a change of state, so the accent */
+  .hollow.news,
+  .news {
     color: var(--accent);
   }
 

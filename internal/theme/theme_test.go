@@ -32,6 +32,8 @@ func TestParseRejects(t *testing.T) {
 		"icon chars":    `{"id":"x","name":"x","icons":{"seal":` + strings.Replace(icon, ".", "x", 1) + `}}`,
 		"large unknown": `{"id":"x","name":"x","large_icons":["moon"]}`,
 		"built-in id":   `{"id":"souls","name":"souls"}`,
+		"empty title":   `{"id":"x","name":"x","titles":["the first"," "]}`,
+		"long title":    `{"id":"x","name":"x","titles":["` + strings.Repeat("a", maxWord+1) + `"]}`,
 	} {
 		if _, err := Parse([]byte(body)); err == nil {
 			t.Errorf("%s: accepted", name)

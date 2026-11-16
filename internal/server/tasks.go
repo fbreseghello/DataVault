@@ -43,7 +43,11 @@ func (s *Server) handleCreateTask(w http.ResponseWriter, r *http.Request) {
 		writeVaultError(w, err)
 		return
 	}
-	t, err := v.AddTask(in)
+	var t vault.Task
+	err = s.tracked(v, func() (err error) {
+		t, err = v.AddTask(in)
+		return err
+	})
 	if err != nil {
 		writeVaultError(w, err)
 		return
@@ -85,7 +89,11 @@ func (s *Server) handleMoveTask(w http.ResponseWriter, r *http.Request) {
 		writeVaultError(w, err)
 		return
 	}
-	t, err := v.MoveTask(r.PathValue("id"), req.Column, req.Index)
+	var t vault.Task
+	err = s.tracked(v, func() (err error) {
+		t, err = v.MoveTask(r.PathValue("id"), req.Column, req.Index)
+		return err
+	})
 	if err != nil {
 		writeVaultError(w, err)
 		return
@@ -99,7 +107,7 @@ func (s *Server) handleDeleteTask(w http.ResponseWriter, r *http.Request) {
 		writeVaultError(w, err)
 		return
 	}
-	if err := v.DeleteTask(r.PathValue("id")); err != nil {
+	if err := s.tracked(v, func() error { return v.DeleteTask(r.PathValue("id")) }); err != nil {
 		writeVaultError(w, err)
 		return
 	}
@@ -119,7 +127,11 @@ func (s *Server) handleCarryTasks(w http.ResponseWriter, r *http.Request) {
 		writeVaultError(w, err)
 		return
 	}
-	n, err := v.CarryPending(req.Day)
+	var n int
+	err = s.tracked(v, func() (err error) {
+		n, err = v.CarryPending(req.Day)
+		return err
+	})
 	if err != nil {
 		writeVaultError(w, err)
 		return
