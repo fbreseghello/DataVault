@@ -7,6 +7,18 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Alterado
+
+- O histórico (**deeds**) da página do hollow mostra só os 8 ganhos mais recentes: os
+  4 primeiros inteiros e os outros 4 sumindo aos poucos. Ele desce para o pé da
+  coluna, menor e mais apagado, para a leitura vir primeiro.
+
+### Corrigido
+
+- O bônus de **dia fechado** vale um por dia, como o plano dizia. Antes, concluir
+  tarefas em quadros de dias anteriores fechava cada um desses dias e rendia +25 por
+  dia, várias vezes no mesmo dia.
+
 ## [0.24.0] - 2026-11-16
 
 ### Adicionado

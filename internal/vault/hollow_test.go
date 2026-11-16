@@ -220,3 +220,25 @@ func TestCompanionsMatchThePage(t *testing.T) {
 		t.Fatalf("the page has %v\nthe vault has %v", page, Companions)
 	}
 }
+
+func TestOneClearedDayADay(t *testing.T) {
+	at(t, "2026-11-16")
+	v, _ := newVault(t)
+	// clearing three old boards today earns the cleared day once
+	for _, day := range []string{"2026-11-13", "2026-11-14", "2026-11-15"} {
+		task, _ := v.AddTask(TaskInput{Title: "t", Day: day})
+		if _, err := v.MoveTask(task.ID, Conquered, 0); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if s := xp(t, v); s.XP != 3*taskXP+dayClearedXP {
+		t.Fatalf("three old days: %d", s.XP)
+	}
+	// tomorrow there is a new one to earn
+	at(t, "2026-11-17")
+	task, _ := v.AddTask(TaskInput{Title: "t", Day: "2026-11-17"})
+	_, _ = v.MoveTask(task.ID, Conquered, 0)
+	if s := xp(t, v); s.XP != 4*taskXP+2*dayClearedXP {
+		t.Fatalf("next day: %d", s.XP)
+	}
+}

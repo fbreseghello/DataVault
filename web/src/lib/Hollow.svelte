@@ -16,9 +16,14 @@
   // the page asks for a companion: pick a category's card, then one of its own.
   let { active }: { active: boolean } = $props()
 
+  // how strongly each of the latest deeds is drawn, newest first
+  const FADE = [1, 1, 1, 1, 0.7, 0.45, 0.25, 0.1]
+
   const s = $derived(hollow.state)
   const title = $derived(s ? titleFor(s.level, theme.current?.titles ?? []) : '')
-  const days = $derived(s ? byDay(s.deeds) : [])
+  // the latest deeds: four in full, then four fading out, and no more
+  const shown = $derived(s ? s.deeds.slice(0, FADE.length) : [])
+  const days = $derived(byDay(shown))
   const top = $derived(s ? Math.max(...ATTRS.map((a) => s.attrs[a] ?? 0)) : 0)
 
   // ---- choosing: a category face down, then a companion face up ---------------
@@ -216,11 +221,13 @@
           {/each}
         </div>
 
+        <!-- the latest deeds sit at the foot, quiet: the reading comes first -->
+        <div class="deeds">
         <p class="group first">{word('deeds')}</p>
         {#each days as g (g.day)}
           <p class="group">{dayLabel(g.day)}</p>
           {#each g.deeds as d (d.source)}
-            <div class="deed">
+            <div class="deed" style:opacity={FADE[shown.indexOf(d)]}>
               <span class="gain">+{d.xp}</span>
               <span class="kind">{kindName(d.kind)}</span>
               <span class="dim">{time(d.at)}</span>
@@ -229,6 +236,7 @@
         {:else}
           <p class="empty">nothing yet · conquer a task in the {word('siege')}</p>
         {/each}
+        </div>
       </section>
     </div>
   {/if}
@@ -265,6 +273,15 @@
     overflow-y: auto;
     min-height: 0;
     font-variant-numeric: tabular-nums;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* pushed to the foot of the column, smaller and dimmer than the reading */
+  .deeds {
+    margin-top: auto;
+    padding-top: 32px;
+    font-size: 11px;
   }
 
   .reading p {
@@ -304,20 +321,21 @@
   }
 
   .group.first {
-    margin-top: 32px !important;
-    color: var(--muted);
+    margin-top: 0 !important;
+    color: var(--dim);
   }
 
   .deed {
     display: grid;
     grid-template-columns: 4ch 1fr auto;
     gap: 10px;
-    padding: 3px 0;
+    padding: 2px 0;
     max-width: 420px;
+    color: var(--muted);
   }
 
   .gain {
-    color: var(--muted);
+    color: var(--dim);
   }
 
   .empty {

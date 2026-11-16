@@ -229,7 +229,9 @@ func siegeDeeds(deeds []Deed, tasks []Task, days []string, conquered string) []D
 			out = append(out, Deed{XP: taskXP, Attr: Vigor, Kind: TaskConquered, Source: t.ID, Day: today, At: now.UTC()})
 		}
 	}
-	if day := "day:" + t.Day; t.Day <= today && !has(day) && cleared(tasks, t.Day) {
+	// one cleared day a day: clearing old boards one after another earns once
+	clearedToday := slices.ContainsFunc(out, func(d Deed) bool { return d.Kind == DayCleared && d.Day == today })
+	if day := "day:" + t.Day; t.Day <= today && !clearedToday && !has(day) && cleared(tasks, t.Day) {
 		out = append(out, Deed{XP: dayClearedXP, Attr: Vigor, Kind: DayCleared, Source: day, Day: today, At: now.UTC()})
 	}
 	return out
