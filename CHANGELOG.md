@@ -7,6 +7,13 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Corrigido
+
+- Um tema importado não pode mais trazer caracteres de controle (como sequências de
+  escape de terminal) nos nomes, nos títulos nem na arte do login. O log da sessão
+  também limpa o nome do XP antes de escrevê-lo, para um tema não conseguir mexer no
+  terminal aberto.
+
 ## [0.21.0] - 2026-11-16
 
 ### Adicionado

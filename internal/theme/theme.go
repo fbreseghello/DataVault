@@ -17,6 +17,7 @@ import (
 	"slices"
 	"sort"
 	"strings"
+	"unicode"
 	"unicode/utf8"
 )
 
@@ -195,7 +196,7 @@ func (t Theme) validate() error {
 		if !slices.Contains(Words, k) {
 			return fmt.Errorf("unknown word %q (known: %s)", k, strings.Join(Words, ", "))
 		}
-		if w := strings.TrimSpace(v); w == "" || utf8.RuneCountInString(w) > maxWord || strings.ContainsAny(w, "\r\n\t") {
+		if w := strings.TrimSpace(v); w == "" || utf8.RuneCountInString(w) > maxWord || hasControl(w) {
 			return fmt.Errorf("word %s must be one line of 1 to %d characters", k, maxWord)
 		}
 	}
@@ -216,7 +217,7 @@ func (t Theme) validate() error {
 		return fmt.Errorf("titles must be at most %d", maxTitles)
 	}
 	for i, title := range t.Titles {
-		if w := strings.TrimSpace(title); w == "" || utf8.RuneCountInString(w) > maxWord || strings.ContainsAny(w, "\r\n\t") {
+		if w := strings.TrimSpace(title); w == "" || utf8.RuneCountInString(w) > maxWord || hasControl(w) {
 			return fmt.Errorf("title %d must be one line of 1 to %d characters", i+1, maxWord)
 		}
 	}
@@ -224,11 +225,17 @@ func (t Theme) validate() error {
 		return fmt.Errorf("login art must have at most %d lines", maxLoginLines)
 	}
 	for i, line := range t.Login {
-		if utf8.RuneCountInString(line) > maxLoginCols || strings.ContainsAny(line, "\r\n\t") {
+		if utf8.RuneCountInString(line) > maxLoginCols || hasControl(line) {
 			return fmt.Errorf("login art line %d must be one line of at most %d characters", i+1, maxLoginCols)
 		}
 	}
 	return nil
+}
+
+// hasControl reports whether s holds a control character: a line break, a tab
+// or an escape that a terminal would act on if the text reached the log.
+func hasControl(s string) bool {
+	return strings.ContainsFunc(s, unicode.IsControl)
 }
 
 func validIcon(rows []string) error {

@@ -56,7 +56,8 @@ func (s *Server) tracked(v *vault.Vault, change func() error) error {
 	if err != nil {
 		return nil
 	}
-	xp := s.activeTheme().Words["xp"]
+	// an imported theme names the XP; the log never prints its control characters
+	xp := printable(s.activeTheme().Words["xp"])
 	sources := func(ds []vault.Deed) []string {
 		out := make([]string, len(ds))
 		for i, d := range ds {

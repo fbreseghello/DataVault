@@ -34,6 +34,9 @@ func TestParseRejects(t *testing.T) {
 		"built-in id":   `{"id":"souls","name":"souls"}`,
 		"empty title":   `{"id":"x","name":"x","titles":["the first"," "]}`,
 		"long title":    `{"id":"x","name":"x","titles":["` + strings.Repeat("a", maxWord+1) + `"]}`,
+		"escape word":   `{"id":"x","name":"x","words":{"xp":"\u001b[31msouls"}}`,
+		"escape title":  `{"id":"x","name":"x","titles":["\u001b]0;x\u0007"]}`,
+		"escape login":  `{"id":"x","name":"x","login":["\u001b[2J"]}`,
 	} {
 		if _, err := Parse([]byte(body)); err == nil {
 			t.Errorf("%s: accepted", name)
