@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-11-16
+
 ### Adicionado
 
 - **Fim** nas contas do **ledger**: a data em que a conta acaba, como um plano anual
@@ -441,7 +443,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.18.1...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.19.0...HEAD
+[0.19.0]: https://github.com/fbreseghello/DataVault/compare/v0.18.1...v0.19.0
 [0.18.1]: https://github.com/fbreseghello/DataVault/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/fbreseghello/DataVault/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/fbreseghello/DataVault/compare/v0.16.0...v0.17.0
