@@ -7,6 +7,17 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Alterado
+
+- A página do **hollow** mostra o boneco grande à esquerda, no maior tamanho que cabe
+  (sempre em múltiplos inteiros, com os pixels nítidos), e à direita o status: nível,
+  classe, título, a barra de XP, os atributos e o histórico. Na escolha de classe os
+  bonecos também ficaram maiores.
+- O **cleric** foi redesenhado em 64 × 64, o dobro da resolução, com muito mais
+  detalhe: lanterna com armação e chama, rosto com nariz e olho na sombra do capuz,
+  broche, estola com um sol bordado, cordão torcido com borla, dobras no manto e
+  amarração no cajado. As outras classes seguem em 32 × 32 até serem redesenhadas.
+
 ## [0.22.1] - 2026-11-16
 
 ### Alterado

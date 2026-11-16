@@ -18,6 +18,11 @@
   let error = $state('')
   const choosing = $derived(!!hollow.state && (picking || !hollow.state.class))
 
+  // the art pane's size: the sprite takes the largest whole scale that fits in it
+  let stageW = $state(0)
+  let stageH = $state(0)
+  const artBox = $derived(Math.max(128, Math.min(stageW, stageH) - 64))
+
   const s = $derived(hollow.state)
   const title = $derived(s ? titleFor(s.level, theme.current?.titles ?? []) : '')
   const days = $derived(s ? byDay(s.deeds) : [])
@@ -100,7 +105,7 @@
             onclick={() => (pick === i ? choose(c.id) : (pick = i))}
             ondblclick={() => choose(c.id)}
           >
-            <Sprite name={c.id} scale={3} />
+            <Sprite name={c.id} box={160} />
             <span class="cname">{word(c.id)}</span>
             <span class="look">{c.look}</span>
             <span class="lean">leans to {word(c.attr)}</span>
@@ -112,7 +117,35 @@
     </div>
   {:else}
   <div class="body">
-    <nav aria-label={word('deeds')}>
+    <!-- the character on the left, as large as the pane allows in whole steps -->
+    <div class="stage" bind:clientWidth={stageW} bind:clientHeight={stageH}>
+      {#if s?.class}<Sprite name={s.class} box={artBox} />{/if}
+    </div>
+
+    <!-- what it is on the right: level, experience, attributes, then the deeds -->
+    <section class="status">
+      {#if s}
+        <p class="name">
+          {word('level')} {s.level}
+          {#if s.class}<span class="dim">· {word(s.class)}</span>{/if}
+          <span class="dim">· {title}</span>
+        </p>
+        <p class="xp">
+          <span class="dim label">{word('xp')}</span>
+          <span>[{bar(s.into, s.need)}]</span>
+          <span class="nums">{s.into} / {s.need}</span>
+        </p>
+        <div class="attrs">
+          {#each ATTRS as a (a)}
+            <p>
+              <span class="dim label">{word(a)}</span>
+              <span class="meter">{bar(s.attrs[a] ?? 0, top, 16)}</span>
+              <span class="nums">{s.attrs[a] ?? 0}</span>
+            </p>
+          {/each}
+        </div>
+      {/if}
+
       <p class="group first">{word('deeds')}</p>
       {#each days as g (g.day)}
         <p class="group">{dayLabel(g.day)}</p>
@@ -126,33 +159,6 @@
       {:else}
         <p class="empty">nothing yet · conquer a task in the {word('siege')}</p>
       {/each}
-    </nav>
-
-    <section>
-      {#if s}
-        <div class="sheet">
-          {#if s.class}<span class="figure"><Sprite name={s.class} scale={4} /></span>{/if}
-          <p class="name">
-            {word('level')} {s.level}
-            {#if s.class}<span class="dim">· {word(s.class)}</span>{/if}
-            <span class="dim">· {title}</span>
-          </p>
-          <p class="xp">
-            <span class="dim">{word('xp')}</span>
-            [{bar(s.into, s.need)}]
-            <span class="nums">{s.into} / {s.need}</span>
-          </p>
-          <div class="attrs">
-            {#each ATTRS as a (a)}
-              <p>
-                <span class="dim label">{word(a)}</span>
-                <span class="meter">{bar(s.attrs[a] ?? 0, top, 10)}</span>
-                <span class="nums">{s.attrs[a] ?? 0}</span>
-              </p>
-            {/each}
-          </div>
-        </div>
-      {/if}
     </section>
   </div>
   {/if}
@@ -172,25 +178,55 @@
 
   .body {
     display: grid;
-    grid-template-columns: minmax(240px, 360px) 1fr;
+    grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
     min-height: 0;
   }
 
-  nav {
+  .stage {
+    display: grid;
+    place-items: center;
+    min-height: 0;
+    overflow: hidden;
     border-right: 1px solid var(--line);
-    padding: 8px 0;
+  }
+
+  .status {
+    padding: 32px;
     overflow-y: auto;
+    min-height: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .name {
+    margin: 0 0 16px;
+    font-weight: 700;
+  }
+
+  .xp,
+  .attrs p {
+    margin: 2px 0;
+    display: grid;
+    grid-template-columns: 10ch auto 1fr;
+    gap: 12px;
+    white-space: pre;
+  }
+
+  .attrs {
+    margin: 12px 0 8px;
+  }
+
+  .nums {
+    color: var(--muted);
   }
 
   .group {
     margin: 16px 0 4px;
-    padding: 0 24px;
     color: var(--dim);
     font-size: 11px;
   }
 
   .group.first {
-    margin-top: 4px;
+    margin-top: 32px;
     color: var(--muted);
   }
 
@@ -198,8 +234,8 @@
     display: grid;
     grid-template-columns: 4ch 1fr auto;
     gap: 10px;
-    padding: 3px 24px;
-    font-variant-numeric: tabular-nums;
+    padding: 3px 0;
+    max-width: 420px;
   }
 
   .gain {
@@ -208,26 +244,6 @@
 
   .empty {
     color: var(--dim);
-    padding: 0 24px;
-  }
-
-  section {
-    position: relative;
-    padding: 32px;
-    overflow-y: auto;
-    min-height: 0;
-  }
-
-  .sheet {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .figure {
-    margin-bottom: 16px;
   }
 
   .choose {
@@ -253,7 +269,7 @@
   }
 
   .class {
-    width: 150px;
+    width: 190px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -333,8 +349,10 @@
   @media (max-width: 720px) {
     .body {
       grid-template-columns: 1fr;
+      grid-template-rows: 50vh auto;
+      overflow-y: auto;
     }
-    nav {
+    .stage {
       border-right: 0;
       border-bottom: 1px solid var(--line);
     }

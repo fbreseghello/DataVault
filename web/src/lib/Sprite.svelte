@@ -3,19 +3,23 @@
   import { spritePaths } from './character'
   import sprites from './sprites.json'
 
-  // The hollow in pixel art: a 32x32 grid in the theme's four tones, one SVG
-  // path per tone, drawn at a whole multiple so every art pixel lands on whole
-  // screen pixels (docs/PERSONAGEM.md, "O sprite").
-  let { name, scale = 4 }: { name: HollowClass; scale?: number } = $props()
+  // The hollow in pixel art: a square grid (64x64, or 32x32 for the ones not yet
+  // redrawn) in the theme's four tones, one SVG path per tone. It is drawn at the
+  // largest whole multiple that fits in box pixels, so every art pixel lands on
+  // whole screen pixels (docs/PERSONAGEM.md, "O sprite").
+  let { name, box }: { name: HollowClass; box: number } = $props()
 
-  const paths = $derived(spritePaths((sprites as Record<HollowClass, string[]>)[name]))
+  const rows = $derived((sprites as Record<HollowClass, string[]>)[name])
+  const n = $derived(rows.length)
+  const scale = $derived(Math.max(1, Math.floor(box / n)))
+  const paths = $derived(spritePaths(rows))
 </script>
 
 <svg
   class="sprite"
-  width={32 * scale}
-  height={32 * scale}
-  viewBox="0 0 32 32"
+  width={n * scale}
+  height={n * scale}
+  viewBox="0 0 {n} {n}"
   shape-rendering="crispEdges"
   aria-hidden="true"
 >

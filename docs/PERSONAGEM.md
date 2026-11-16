@@ -152,36 +152,34 @@ Novas chaves em `words`, com as mesmas regras (uma linha, até 24 caracteres):
 
 ## A página
 
-Segue o mesmo quadro das outras: barra da página no topo, coluna da esquerda e painel.
+O boneco grande à esquerda e o status à direita.
 
 ```
 datavault / hollow
 ──────────────────────────────────────────────────────────────────
- lv 7 · the unkindled                      deeds · attire      ← barra
+ lv 7 · the unkindled                     340 souls to next · class
 ──────────────────────────────────────────────────────────────────
- today                          │      ┌──────────────────┐
- +10  task conquered      14:20 │      │  quarto e sprite │
- +5   note written        11:02 │      │   32 × 32 a 4×   │
- +15  key renewed         09:40 │      │     (128 px)     │
-                                │      │                  │
- yesterday                      │      └──────────────────┘
- +10  task conquered      18:03 │
- +10  task conquered      16:41 │
- ...                            │
-                                │      level 7 · the unkindled
-                                │   [##########......]  340 / 500
+                                 │ level 7 · cleric · the unkindled
+        ┌──────────────────┐     │ souls   [##########......]  340 / 500
+        │                  │     │
+        │  sprite 64 × 64  │     │ vigor   ################  58
+        │  no maior múlti- │     │ memory  ########........  31
+        │  plo que couber  │     │ ...
+        │                  │     │
+        └──────────────────┘     │ deeds
+                                 │ today
+                                 │ +10  task conquered      14:20
+                                 │ +25  day cleared         14:20
 ──────────────────────────────────────────────────────────────────
- lv 7 · 160 to next              0 open · a attire · d deeds · v1.x
 ```
 
-- **Painel:** o sprite em 4× no lugar do ícone da placa, com o quarto atrás, o nível e
-  o título embaixo, e a
-  barra de XP em ASCII: `[`, `#` para o ganho, `.` para o que falta, `]`, e os
-  números à direita.
-- **Coluna da esquerda (`deeds`):** o histórico de XP agrupado por dia, com o ganho, o
-  motivo e a hora. Nunca mostra o título de notas, entradas ou tarefas, só o tipo de
-  ação, como o log da sessão no terminal.
-- **`attire`:** troca a coluna da esquerda pela lista de peças (veja
+- **À esquerda:** o sprite no maior múltiplo inteiro que cabe no painel, com o quarto
+  atrás quando ele existir.
+- **À direita:** o nível, a classe e o título; a barra de XP em ASCII (`[`, `#` para o
+  ganho, `.` para o que falta, `]`, e os números); os atributos; e embaixo o histórico
+  (`deeds`) agrupado por dia, com o ganho, o motivo e a hora. Nunca mostra o título de
+  notas, entradas ou tarefas, só o tipo de ação, como o log da sessão no terminal.
+- **`attire`:** troca o histórico pela lista de peças (veja
   [Personalizar](#personalizar)); escolher uma peça mostra o boneco já com ela.
 - O personagem olha para a esquerda, para dentro da tela, como as artes da tela de
   descanso.
@@ -312,11 +310,15 @@ nomes de peças).
 
 ### Tamanho e vista
 
-- **32 × 32 pixels**, em visão 3/4, olhando para a esquerda e um pouco para baixo, para
-  dentro da tela. O boneco ocupa as linhas 2 a 30, com os pés na linha 30, para todas as
-  classes pisarem no mesmo chão.
-- Sempre em **múltiplos inteiros**: 4× na página (128 px), 3× ou 4× na tela de descanso,
-  1× ou 2× em miniaturas. Cada pixel da arte cai em pixels inteiros da tela.
+- **64 × 64 pixels**, em visão 3/4, olhando para a esquerda e um pouco para baixo, para
+  dentro da tela, com os pés perto do pé da grade, para todas as classes pisarem no
+  mesmo chão. (As classes começaram em 32 × 32 e estão sendo redesenhadas em 64, uma
+  por vez, a partir do cleric; enquanto isso as duas convivem, e cada uma é desenhada
+  no maior múltiplo que cabe.)
+- Sempre em **múltiplos inteiros**: o maior que cabe na página, 2× na escolha de classe,
+  o que couber na tela de descanso. Cada pixel da arte cai em pixels inteiros da tela.
+- Um desenho novo pode partir do de 32 ampliado com o **Scale2x**, que suaviza as
+  diagonais, e ganha os detalhes por cima, já em 64.
 - Desenhado como os ícones: um caminho SVG por tom, com `shape-rendering: crispEdges`.
 
 ### Cores: os tons do tema
@@ -340,7 +342,7 @@ quando o tema muda.
 ### Personalizar
 
 O boneco é montado em **camadas**, desenhadas de baixo para cima. Cada peça é uma grade
-de 32 × 32 com o mesmo formato, e um pixel não transparente cobre o de baixo.
+de 64 × 64 com o mesmo formato, e um pixel não transparente cobre o de baixo.
 
 | Ordem | Camada | O que é | Exemplos (souls) |
 |---|---|---|---|
@@ -540,7 +542,7 @@ $ dtvlt hollow
 - A arte é o **mesmo sprite convertido em ASCII** na hora, com o `attire` e as marcas
   do cofre: cada coluna de pixels vira um caractere e cada par de linhas vira uma linha
   (a célula de 0,6 × 1 fica quase quadrada), e o tom vira um caractere da rampa do
-  guia (` `, `.`, `:`, `+`, `#`). Os 32 × 32 pixels viram 32 × 16 caracteres. O quarto
+  guia (` `, `.`, `:`, `+`, `#`). Os 64 × 64 pixels são reduzidos à metade antes, e viram 32 × 16 caracteres. O quarto
   não aparece no terminal. O desenho acima é só um esboço da posição.
 - Com `NO_COLOR` ou saída redirecionada, sai texto puro, bom para colar num README.
 - No console é `hollow`.

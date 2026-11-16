@@ -114,7 +114,7 @@ Regras para desenhar um ícone novo:
 ### O sprite do hollow
 
 O boneco do hollow é **a única arte em 4 tons**; os ícones continuam com 1 bit. Cada
-classe é uma grade de 32 × 32 em
+classe é uma grade de 64 × 64 (32 × 32 nas que ainda não foram redesenhadas) em
 [`web/src/lib/sprites.json`](../web/src/lib/sprites.json), desenhada pelo
 `Sprite.svelte` com um caminho SVG por tom:
 
@@ -128,8 +128,8 @@ classe é uma grade de 32 × 32 em
 
 - Só os tons do tema, então o boneco muda sozinho com ele. **Nunca a cor de destaque.**
 - Contorno de 1 pixel em `1` em volta da silhueta toda; luz de cima e da direita.
-- Olha para a esquerda, os pés na linha 30, para todas as classes pisarem no mesmo chão.
-- Sempre em múltiplos inteiros: 4× na página, 3× na escolha de classe.
+- Olha para a esquerda, os pés no pé da grade, para todas as classes pisarem no mesmo chão.
+- Sempre em múltiplos inteiros: o maior que cabe na página, 160 px na escolha de classe.
 - As outras regras estão em [PERSONAGEM.md](PERSONAGEM.md#o-sprite).
 - **Silhueta primeiro.** Teste no tamanho real (32 px) antes de detalhar; se não se
   reconhece ali, detalhe nenhum salva.
