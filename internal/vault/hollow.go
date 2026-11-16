@@ -24,14 +24,16 @@ const (
 // Attributes in the order the page lists them.
 var Attributes = []string{Vigor, Memory, Ward, Hoard, Thrift}
 
-// Classes are the shapes the hollow can take, each with the attribute it leans
-// to: that one gains a tenth more points. The theme names them; the key stays.
-var Classes = map[string]string{
-	"knight": Vigor,
-	"scribe": Memory,
-	"warden": Ward,
-	"thief":  Hoard,
-	"cleric": Thrift,
+// Companions are what the hollow can be, each in its category
+// (docs/PERSONAGEM.md, "O companheiro"). Any theme can choose any of them.
+var Companions = map[string]string{
+	"hermit": "wanderers", "mercenary": "wanderers", "sorcerer": "wanderers", "witch": "wanderers", "necromancer": "wanderers",
+	"dog": "animals", "cat": "animals", "raven": "animals", "bat": "animals", "owl": "animals", "wolf": "animals", "serpent": "animals",
+	"reaper": "shinigami", "gaunt": "shinigami", "masked": "shinigami",
+	"imp": "demons", "brute": "demons", "fiend": "demons", "hellhound": "demons",
+	"samurai": "bushi", "ronin": "bushi", "shinobi": "bushi", "komuso": "bushi", "sohei": "bushi",
+	"pixie": "fae", "wisp": "fae", "dryad": "fae", "moth": "fae", "changeling": "fae",
+	"goblin": "denizens", "skeleton": "denizens", "slime": "denizens", "mimic": "denizens", "golem": "denizens",
 }
 
 // DeedKind is what was done to earn a deed. The page names it; the deed never
@@ -66,18 +68,19 @@ type Deed struct {
 
 // Hollow is the character's part of the vault.
 type Hollow struct {
-	// Class is the shape the user chose; empty until the page first asks.
-	Class string `json:"class,omitempty"`
-	Deeds []Deed `json:"deeds,omitempty"`
+	// Companion is what the user chose; empty until the page first asks. (The
+	// pixel art classes of 0.22 were kept as "class", which is no longer read.)
+	Companion string `json:"companion,omitempty"`
+	Deeds     []Deed `json:"deeds,omitempty"`
 	// SeenLevel is the last level the user has seen; a higher one is news.
 	SeenLevel int `json:"seen_level,omitempty"`
 }
 
 // HollowState is the character as the page draws it.
 type HollowState struct {
-	Class string `json:"class"`
-	XP    int    `json:"xp"`
-	Level int    `json:"level"`
+	Companion string `json:"companion"`
+	XP        int    `json:"xp"`
+	Level     int    `json:"level"`
 	// Into is the XP gained inside the current level; Need is what the level takes.
 	Into      int            `json:"into"`
 	Need      int            `json:"need"`
@@ -111,16 +114,13 @@ func LevelFor(xp int) (level, into, need int) {
 }
 
 func (h Hollow) state() HollowState {
-	s := HollowState{Class: h.Class, SeenLevel: h.SeenLevel, Attrs: map[string]int{}}
+	s := HollowState{Companion: h.Companion, SeenLevel: h.SeenLevel, Attrs: map[string]int{}}
 	for _, a := range Attributes {
 		s.Attrs[a] = 0
 	}
 	for _, d := range h.Deeds {
 		s.XP += d.XP
 		s.Attrs[d.Attr] += d.XP
-	}
-	if a, ok := Classes[h.Class]; ok {
-		s.Attrs[a] += s.Attrs[a] / 10
 	}
 	s.Level, s.Into, s.Need = LevelFor(s.XP)
 	n := min(len(h.Deeds), maxDeedsShown)
@@ -141,11 +141,11 @@ func (v *Vault) Hollow() (HollowState, error) {
 	return v.data.Hollow.state(), nil
 }
 
-// SetClass gives the hollow its shape. Changing it later is free: it costs no
-// XP and no level.
-func (v *Vault) SetClass(class string) (HollowState, error) {
-	if _, ok := Classes[class]; !ok {
-		return HollowState{}, fmt.Errorf("%w: unknown class %q", ErrInvalidItem, class)
+// SetCompanion gives the hollow its companion. Changing it later is free: it
+// costs no XP and no level.
+func (v *Vault) SetCompanion(companion string) (HollowState, error) {
+	if _, ok := Companions[companion]; !ok {
+		return HollowState{}, fmt.Errorf("%w: unknown companion %q", ErrInvalidItem, companion)
 	}
 	v.mu.Lock()
 	defer v.mu.Unlock()
@@ -153,7 +153,7 @@ func (v *Vault) SetClass(class string) (HollowState, error) {
 		return HollowState{}, ErrLocked
 	}
 	next := v.data
-	next.Hollow.Class = class
+	next.Hollow.Companion = companion
 	if err := v.save(next); err != nil {
 		return HollowState{}, err
 	}

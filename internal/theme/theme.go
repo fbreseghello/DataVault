@@ -51,9 +51,12 @@ var Words = []string{
 	// the character's attributes, one per page: siege, unspoken, grimoire,
 	// crypt and ledger
 	"vigor", "memory", "ward", "hoard", "thrift",
-	// the hollow's classes
-	"knight", "scribe", "warden", "thief", "cleric",
 }
+
+// retiredWords were names a theme could give and no longer can: the hollow's
+// pixel art classes of 0.22. A theme exported back then still carries them, so
+// they are dropped on import instead of refused.
+var retiredWords = []string{"knight", "scribe", "warden", "thief", "cleric"}
 
 // Icons are the 16x16 pixel art slots: one per page, the end button, the seal
 // and the character at the top of the sidebar.
@@ -169,6 +172,9 @@ func parse(data []byte) (Theme, error) {
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(&t); err != nil {
 		return Theme{}, fmt.Errorf("not a theme file: %w", err)
+	}
+	for _, k := range retiredWords {
+		delete(t.Words, k)
 	}
 	if err := t.validate(); err != nil {
 		return Theme{}, err

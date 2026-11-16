@@ -26,10 +26,10 @@ func (s *Server) handleHollow(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, h)
 }
 
-// handleHollowClass gives the hollow the class the user picked.
-func (s *Server) handleHollowClass(w http.ResponseWriter, r *http.Request) {
+// handleHollowCompanion gives the hollow the companion the user picked.
+func (s *Server) handleHollowCompanion(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		Class string `json:"class"`
+		Companion string `json:"companion"`
 	}
 	if !readJSON(w, r, &req) {
 		return
@@ -39,7 +39,7 @@ func (s *Server) handleHollowClass(w http.ResponseWriter, r *http.Request) {
 		writeVaultError(w, err)
 		return
 	}
-	h, err := v.SetClass(req.Class)
+	h, err := v.SetCompanion(req.Companion)
 	if err != nil {
 		writeVaultError(w, err)
 		return

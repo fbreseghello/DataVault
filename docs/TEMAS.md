@@ -119,7 +119,6 @@ O DataVault é escuro: mantenha `bg` perto do preto e `fg` claro.
 | `hollow` | o personagem no topo da barra lateral | hollow |
 | `xp`, `level`, `deeds` | a experiência do hollow, o nível e o histórico do que a rendeu | souls, level, deeds |
 | `vigor`, `memory`, `ward`, `hoard`, `thrift` | os atributos do hollow, um por página (siege, unspoken, grimoire, crypt, ledger) | os mesmos |
-| `knight`, `scribe`, `warden`, `thief`, `cleric` | as classes do hollow | os mesmos |
 
 ### Ícones
 

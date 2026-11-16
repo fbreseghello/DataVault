@@ -42,12 +42,7 @@
     "memory": "lore",
     "ward": "warding",
     "hoard": "relics",
-    "thrift": "tithe",
-    "knight": "battlemage",
-    "scribe": "scholar",
-    "warden": "enchanter",
-    "thief": "trickster",
-    "cleric": "oracle"
+    "thrift": "tithe"
   },
   "titles": ["apprentice", "adept", "magus", "archmage", "the unbound"],
   "icons": {

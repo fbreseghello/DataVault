@@ -181,6 +181,7 @@
     {#if !settings && page === 'siege'}<span>n new · arrows select · shift+arrows move · [ ] days ·</span>{/if}
     {#if !settings && page === 'crypt'}<span>n {word('keep')} · drop files here · esc close ·</span>{/if}
     {#if !settings && page === 'ledger'}<span>n new · esc close ·</span>{/if}
+    {#if !settings && page === 'hollow'}<span>c companion · arrows choose · enter turns ·</span>{/if}
     <span>0 {word('hollow')} · 1–{pages.length} pages · ctrl+shift+l rest</span>
     <span class="version">{showVersion(info.version)}</span>
   </footer>

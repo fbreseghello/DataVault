@@ -2,7 +2,8 @@
 
 > **Em construção.** Este documento descreve um companheiro que evolui com o uso do
 > DataVault. Já existem o ícone no topo da barra lateral e a experiência vinda do Siege,
-> com níveis, títulos, atributos e o histórico (veja a
+> com níveis, títulos, atributos e o histórico, e a carta do companheiro na página, com
+> uma imagem provisória até as ilustrações chegarem (veja a
 > [ordem de construção](#ordem-de-construção)). A versão 0.22 trouxe classes em pixel art;
 > elas saem quando os companheiros descritos aqui entrarem. A forma geral segue o
 > [guia de estilo](ESTILO.md) e o formato de temas segue [TEMAS.md](TEMAS.md). Os prompts
@@ -667,7 +668,7 @@ Uma versão MINOR para cada passo:
 4. **As ilustrações:** gerar no Midjourney a primeira leva, um companheiro de cada
    categoria (`hermit`, `raven`, `reaper`, `imp`, `ronin`, `pixie`, `goblin`), e o script de conversão para tons
    de cinza e WebP.
-5. **A carta na página:** a moldura com o numeral e o nome, a moldura como barra de XP,
+5. **A carta na página** *(feito, com imagem provisória)*: a moldura com o numeral e o nome, a moldura como barra de XP,
    a imagem nos tons do tema, a leitura à direita, a escolha tirando uma carta (com os
    selos de categoria) e a troca livre. As classes saem.
 6. **Os outros companheiros:** o resto das categorias, com as próprias de cada tema

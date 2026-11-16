@@ -1,32 +1,74 @@
 <script lang="ts">
   import { untrack } from 'svelte'
-  import { api, type HollowClass } from './api'
-  import { ATTRS, bar, byDay, CLASSES, kindName, titleFor } from './character'
+  import { api } from './api'
+  import Card from './Card.svelte'
+  import CardBack from './CardBack.svelte'
+  import { ATTRS, bar, byDay, kindName, titleFor } from './character'
   import { hollow, refreshHollow, seeHollow } from './character.svelte'
+  import { categoryOf, ordered, roman, type Category } from './companions'
   import { showDate } from './renew'
-  import Sprite from './Sprite.svelte'
+  import ToneFilter from './ToneFilter.svelte'
   import { theme, word } from './theme.svelte'
 
-  // The character that grows with the vault (docs/PERSONAGEM.md). On the left,
-  // the deeds that earned its experience, by day; on the right, the character,
-  // its level and its attributes. The first time, the page asks for a class.
+  // The companion that grows with the vault (docs/PERSONAGEM.md). The page is a
+  // tarot card: on the left the card, whose frame is the experience bar, the
+  // level its numeral; on the right the reading, in plain text. The first time,
+  // the page asks for a companion: pick a category's card, then one of its own.
   let { active }: { active: boolean } = $props()
-
-  // picking a class: the first time, or from the class button
-  let picking = $state(false)
-  let pick = $state(0)
-  let error = $state('')
-  const choosing = $derived(!!hollow.state && (picking || !hollow.state.class))
-
-  // the art pane's size: the sprite takes the largest whole scale that fits in it
-  let stageW = $state(0)
-  let stageH = $state(0)
-  const artBox = $derived(Math.max(128, Math.min(stageW, stageH) - 64))
 
   const s = $derived(hollow.state)
   const title = $derived(s ? titleFor(s.level, theme.current?.titles ?? []) : '')
   const days = $derived(s ? byDay(s.deeds) : [])
   const top = $derived(s ? Math.max(...ATTRS.map((a) => s.attrs[a] ?? 0)) : 0)
+
+  // ---- choosing: a category face down, then a companion face up ---------------
+
+  let picking = $state(false)
+  let category = $state<Category | null>(null)
+  let pick = $state(0)
+  let error = $state('')
+  const choosing = $derived(!!s && (picking || !s.companion))
+  const categories = $derived(ordered())
+  // what the arrows move through: the categories, or the open category's companions
+  const row = $derived(category ? category.companions.length : categories.length)
+
+  function startPicking() {
+    const current = s?.companion ? categoryOf(s.companion) : undefined
+    category = null
+    pick = Math.max(0, categories.findIndex((c) => c === current))
+    error = ''
+    picking = true
+  }
+
+  function openCategory(c: Category) {
+    category = c
+    pick = Math.max(0, c.companions.findIndex((x) => x.id === s?.companion))
+  }
+
+  async function choose(id: string) {
+    try {
+      hollow.state = await api.setHollowCompanion(id)
+      picking = false
+      category = null
+      error = ''
+    } catch (e) {
+      error = e instanceof Error ? e.message : String(e)
+    }
+  }
+
+  function confirm() {
+    if (category) void choose(category.companions[pick].id)
+    else openCategory(categories[pick])
+  }
+
+  // ---- sizes: the card takes the largest 2:3 that fits its pane ----------------
+
+  let stageW = $state(0)
+  let stageH = $state(0)
+  const cardW = $derived(Math.max(160, Math.floor(Math.min((stageW - 64) / 1, (stageH - 96) / 1.5))))
+  let chooseW = $state(0)
+  // the choice deals its cards in one row when it can
+  const dealW = $derived(Math.max(110, Math.min(170, Math.floor((chooseW - 48 - 16 * (row - 1)) / Math.max(row, 1)))))
 
   $effect(() => {
     if (!active) return
@@ -49,90 +91,119 @@
     return new Date(at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
   }
 
-  function startPicking() {
-    pick = Math.max(0, CLASSES.findIndex((c) => c.id === hollow.state?.class))
-    error = ''
-    picking = true
-  }
-
-  async function choose(id: HollowClass) {
-    try {
-      hollow.state = await api.setHollowClass(id)
-      picking = false
-      error = ''
-    } catch (e) {
-      error = e instanceof Error ? e.message : String(e)
-    }
+  function isTyping(t: EventTarget | null) {
+    return t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement
   }
 
   function onkeydown(e: KeyboardEvent) {
-    if (!active || !choosing || e.ctrlKey || e.metaKey || e.altKey) return
+    if (!active || e.ctrlKey || e.metaKey || e.altKey || isTyping(e.target)) return
+    if (!choosing) {
+      if (e.key === 'c' && s) {
+        e.preventDefault()
+        startPicking()
+      }
+      return
+    }
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
       e.preventDefault()
-      pick = (pick + (e.key === 'ArrowRight' ? 1 : CLASSES.length - 1)) % CLASSES.length
+      pick = (pick + (e.key === 'ArrowRight' ? 1 : row - 1)) % row
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      void choose(CLASSES[pick].id)
-    } else if (e.key === 'Escape' && hollow.state?.class) {
-      picking = false
+      confirm()
+    } else if (e.key === 'Escape') {
+      if (category) {
+        pick = Math.max(0, categories.indexOf(category))
+        category = null
+      } else if (s?.companion) picking = false
     }
   }
 </script>
 
 <svelte:window {onkeydown} />
+<ToneFilter />
 
 <div class="hollow">
   <div class="toolbar page-toolbar">
     {#if s}
-      <span>lv {s.level}</span>
+      <span>{roman(s.level)}</span>
       <span class="dim">· {title}</span>
     {/if}
     <span class="spacer"></span>
-    {#if s}<span class="count">{s.need - s.into} {word('xp')} to next</span>{/if}
-    {#if s?.class && !choosing}<button onclick={startPicking} title="change the class · free, costs no {word('xp')}">class</button>{/if}
+    {#if s && !choosing}
+      <span class="count">{s.need - s.into} {word('xp')} to next</span>
+      <button onclick={startPicking} title="choose another companion · c · it costs nothing">companion</button>
+    {/if}
   </div>
 
   {#if choosing}
-    <div class="choose">
-      <p class="ask">{s?.class ? 'choose another class · it costs nothing' : `choose what your ${word('hollow')} becomes`}</p>
-      <div class="classes" role="radiogroup" aria-label="class">
-        {#each CLASSES as c, i (c.id)}
-          <button
-            class="class"
-            class:on={pick === i}
-            role="radio"
-            aria-checked={pick === i}
-            onclick={() => (pick === i ? choose(c.id) : (pick = i))}
-            ondblclick={() => choose(c.id)}
-          >
-            <Sprite name={c.id} box={160} />
-            <span class="cname">{word(c.id)}</span>
-            <span class="look">{c.look}</span>
-            <span class="lean">leans to {word(c.attr)}</span>
-          </button>
-        {/each}
+    <div class="choose" bind:clientWidth={chooseW}>
+      <p class="ask">
+        {#if category}
+          {category.id} · choose one
+        {:else if s?.companion}
+          draw another card · it costs nothing
+        {:else}
+          draw a card · what will walk with you
+        {/if}
+      </p>
+      <div class="deal" role="radiogroup" aria-label={category ? 'companion' : 'category'}>
+        {#if category}
+          {#each category.companions as c, i (c.id)}
+            <button
+              class="pick"
+              class:on={pick === i}
+              role="radio"
+              aria-checked={pick === i}
+              aria-label={c.id}
+              onclick={() => (pick === i ? choose(c.id) : (pick = i))}
+              ondblclick={() => choose(c.id)}
+            >
+              <Card companion={c.id} width={dealW} />
+              <span class="look">{c.look}</span>
+            </button>
+          {/each}
+        {:else}
+          {#each categories as c, i (c.id)}
+            <button
+              class="pick"
+              class:on={pick === i}
+              role="radio"
+              aria-checked={pick === i}
+              aria-label={c.id}
+              onclick={() => (pick === i ? openCategory(c) : (pick = i))}
+              ondblclick={() => openCategory(c)}
+            >
+              <CardBack seal={c.seal} label={c.id} width={dealW} />
+              <span class="look">{c.companions.length} · {c.sealName}</span>
+            </button>
+          {/each}
+        {/if}
       </div>
       {#if error}<p class="error" role="alert">{error}</p>{/if}
-      <p class="hint">arrows choose · enter confirms{s?.class ? ' · esc keeps the current one' : ''} · it can be changed later</p>
+      <p class="hint">
+        arrows choose · enter {category ? 'turns the card' : 'opens the category'}{category
+          ? ' · esc back'
+          : s?.companion
+            ? ' · esc keeps yours'
+            : ''}
+      </p>
     </div>
-  {:else}
-  <div class="body">
-    <!-- the character on the left, as large as the pane allows in whole steps -->
-    <div class="stage" bind:clientWidth={stageW} bind:clientHeight={stageH}>
-      {#if s?.class}<Sprite name={s.class} box={artBox} />{/if}
-    </div>
+  {:else if s}
+    <div class="body">
+      <!-- the card on the left, as large as the pane allows -->
+      <div class="stage" bind:clientWidth={stageW} bind:clientHeight={stageH}>
+        {#if stageW}
+          <Card companion={s.companion} level={s.level} progress={s.need ? s.into / s.need : 0} width={cardW} />
+        {/if}
+      </div>
 
-    <!-- what it is on the right: level, experience, attributes, then the deeds -->
-    <section class="status">
-      {#if s}
-        <p class="name">
-          {word('level')} {s.level}
-          {#if s.class}<span class="dim">· {word(s.class)}</span>{/if}
-          <span class="dim">· {title}</span>
-        </p>
+      <!-- the reading on the right: plain text, like notes on a spread -->
+      <section class="reading">
+        <p class="name">{roman(s.level)} · the {s.companion}</p>
+        <p class="dim">{title}</p>
+
         <p class="xp">
           <span class="dim label">{word('xp')}</span>
-          <span>[{bar(s.into, s.need)}]</span>
           <span class="nums">{s.into} / {s.need}</span>
         </p>
         <div class="attrs">
@@ -144,23 +215,22 @@
             </p>
           {/each}
         </div>
-      {/if}
 
-      <p class="group first">{word('deeds')}</p>
-      {#each days as g (g.day)}
-        <p class="group">{dayLabel(g.day)}</p>
-        {#each g.deeds as d (d.source)}
-          <div class="deed">
-            <span class="gain">+{d.xp}</span>
-            <span class="kind">{kindName(d.kind)}</span>
-            <span class="dim">{time(d.at)}</span>
-          </div>
+        <p class="group first">{word('deeds')}</p>
+        {#each days as g (g.day)}
+          <p class="group">{dayLabel(g.day)}</p>
+          {#each g.deeds as d (d.source)}
+            <div class="deed">
+              <span class="gain">+{d.xp}</span>
+              <span class="kind">{kindName(d.kind)}</span>
+              <span class="dim">{time(d.at)}</span>
+            </div>
+          {/each}
+        {:else}
+          <p class="empty">nothing yet · conquer a task in the {word('siege')}</p>
         {/each}
-      {:else}
-        <p class="empty">nothing yet · conquer a task in the {word('siege')}</p>
-      {/each}
-    </section>
-  </div>
+      </section>
+    </div>
   {/if}
 </div>
 
@@ -190,16 +260,20 @@
     border-right: 1px solid var(--line);
   }
 
-  .status {
+  .reading {
     padding: 32px;
     overflow-y: auto;
     min-height: 0;
     font-variant-numeric: tabular-nums;
   }
 
+  .reading p {
+    margin: 0;
+  }
+
   .name {
-    margin: 0 0 16px;
     font-weight: 700;
+    letter-spacing: 0.04em;
   }
 
   .xp,
@@ -211,6 +285,10 @@
     white-space: pre;
   }
 
+  .xp {
+    margin-top: 24px !important;
+  }
+
   .attrs {
     margin: 12px 0 8px;
   }
@@ -220,13 +298,13 @@
   }
 
   .group {
-    margin: 16px 0 4px;
+    margin: 16px 0 4px !important;
     color: var(--dim);
     font-size: 11px;
   }
 
   .group.first {
-    margin-top: 32px;
+    margin-top: 32px !important;
     color: var(--muted);
   }
 
@@ -253,7 +331,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 24px;
+    gap: 28px;
   }
 
   .ask {
@@ -261,47 +339,47 @@
     color: var(--muted);
   }
 
-  .classes {
+  .deal {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 16px;
   }
 
-  .class {
-    width: 190px;
+  .pick {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    padding: 16px 8px;
-    border: 1px solid transparent;
+    gap: 14px;
+    padding: 0;
+    opacity: 0.55;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .pick:hover {
+    opacity: 0.8;
+  }
+
+  /* the card under the cursor is lifted out of the spread */
+  .pick.on {
+    opacity: 1;
+    transform: translateY(-8px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pick {
+      transition: none;
+    }
+  }
+
+  .look {
+    max-width: 170px;
+    font-size: 11px;
     color: var(--dim);
     text-align: center;
   }
 
-  .class:hover {
-    color: var(--muted);
-  }
-
-  .class.on {
-    border-color: var(--line);
-    background: var(--raise);
-    color: var(--fg);
-  }
-
-  .cname {
-    font-weight: 700;
-    margin-top: 8px;
-  }
-
-  .look,
-  .lean {
-    font-size: 11px;
-    color: var(--dim);
-  }
-
-  .class.on .look {
+  .pick.on .look {
     color: var(--muted);
   }
 
@@ -316,40 +394,10 @@
     margin: 0;
   }
 
-  .name {
-    margin: 0;
-    font-weight: 700;
-  }
-
-  .xp {
-    margin: 0;
-    white-space: pre;
-  }
-
-  .nums {
-    color: var(--muted);
-  }
-
-  .attrs {
-    margin-top: 20px;
-  }
-
-  .attrs p {
-    margin: 2px 0;
-    display: grid;
-    grid-template-columns: 10ch 10ch 5ch;
-    gap: 12px;
-    white-space: pre;
-  }
-
-  .attrs .nums {
-    text-align: right;
-  }
-
   @media (max-width: 720px) {
     .body {
       grid-template-columns: 1fr;
-      grid-template-rows: 50vh auto;
+      grid-template-rows: 70vh auto;
       overflow-y: auto;
     }
     .stage {

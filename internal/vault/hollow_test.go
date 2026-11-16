@@ -1,6 +1,13 @@
 package vault
 
 import (
+	"errors"
+	"maps"
+	"os"
+	"path/filepath"
+	"regexp"
+	"slices"
+	"strings"
 	"testing"
 	"time"
 )
@@ -146,29 +153,70 @@ func TestCarryNeverClears(t *testing.T) {
 	}
 }
 
-func TestClass(t *testing.T) {
+func TestCompanion(t *testing.T) {
 	at(t, "2026-11-16")
-	v, _ := newVault(t)
-	if s := xp(t, v); s.Class != "" {
-		t.Fatalf("class before choosing: %q", s.Class)
+	v, path := newVault(t)
+	if s := xp(t, v); s.Companion != "" {
+		t.Fatalf("companion before choosing: %q", s.Companion)
 	}
-	if _, err := v.SetClass("bard"); err == nil {
-		t.Fatal("unknown class accepted")
+	for _, bad := range []string{"knight", "Hermit", ""} {
+		if _, err := v.SetCompanion(bad); !errors.Is(err, ErrInvalidItem) {
+			t.Fatalf("%q accepted: %v", bad, err)
+		}
 	}
 	for range 3 {
 		task, _ := v.AddTask(TaskInput{Title: "t", Day: "2026-11-16", Column: Fallen})
 		_, _ = v.MoveTask(task.ID, Conquered, 0)
 	}
-	// 3 tasks and the cleared day: 55 vigor, and a knight leans to vigor
-	s, err := v.SetClass("knight")
+	// 3 tasks and the cleared day; a companion leans to nothing
+	s, err := v.SetCompanion("hermit")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if s.Class != "knight" || s.XP != 55 || s.Attrs[Vigor] != 60 {
-		t.Fatalf("knight: %+v", s)
+	if s.Companion != "hermit" || s.XP != 55 || s.Attrs[Vigor] != 55 {
+		t.Fatalf("hermit: %+v", s)
 	}
-	// changing class is free and moves the lean
-	if s, _ := v.SetClass("scribe"); s.XP != 55 || s.Attrs[Vigor] != 55 {
-		t.Fatalf("scribe: %+v", s)
+	// changing is free, and kept with the vault
+	if _, err := v.SetCompanion("raven"); err != nil {
+		t.Fatal(err)
+	}
+	v.Lock()
+	v, err = Open(path, []byte("keyword"), []byte("password"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if s := xp(t, v); s.Companion != "raven" || s.XP != 55 {
+		t.Fatalf("after reopen: %+v", s)
+	}
+}
+
+func TestCompanionsHaveKnownCategories(t *testing.T) {
+	known := []string{"wanderers", "animals", "shinigami", "demons", "bushi", "fae", "denizens"}
+	for k, c := range Companions {
+		if !slices.Contains(known, c) {
+			t.Errorf("%s: unknown category %q", k, c)
+		}
+	}
+}
+
+// The page's catalog (web/src/lib/companions.ts) and the vault must name the
+// same companions in the same categories, or a choice would be refused.
+func TestCompanionsMatchThePage(t *testing.T) {
+	src, err := os.ReadFile(filepath.Join("..", "..", "web", "src", "lib", "companions.ts"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	page := map[string]string{}
+	category := ""
+	for _, line := range strings.Split(string(src), "\n") {
+		if m := regexp.MustCompile(`^\s*id: '(\w+)',$`).FindStringSubmatch(line); m != nil {
+			category = m[1]
+		}
+		if m := regexp.MustCompile(`\{ id: '(\w+)', look:`).FindStringSubmatch(line); m != nil {
+			page[m[1]] = category
+		}
+	}
+	if !maps.Equal(page, Companions) {
+		t.Fatalf("the page has %v\nthe vault has %v", page, Companions)
 	}
 }

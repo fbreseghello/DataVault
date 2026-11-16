@@ -111,29 +111,24 @@ Regras para desenhar um ícone novo:
 - **Fendas e vãos com 2 pixels.** Um vão de 1 pixel some no tamanho pequeno, e duas
   partes que se tocam só pela quina parecem uma peça só.
 
-### O sprite do hollow
+### A carta do hollow
 
-O boneco do hollow é **a única arte em 4 tons**; os ícones continuam com 1 bit. Cada
-classe é uma grade de 64 × 64 (32 × 32 nas que ainda não foram redesenhadas) em
-[`web/src/lib/sprites.json`](../web/src/lib/sprites.json), desenhada pelo
-`Sprite.svelte` com um caminho SVG por tom:
+O companheiro do hollow é **a única ilustração do app** (veja
+[PERSONAGEM.md](PERSONAGEM.md#a-página-a-carta)). Os ícones continuam em pixel art de
+1 bit; a carta é outra coisa:
 
-| Índice | Cor | Uso |
-|---|---|---|
-| `.` | transparente | fundo |
-| `1` | `--line` | contorno e sombra mais funda |
-| `2` | `--dim` | sombra |
-| `3` | `--muted` | tom médio |
-| `4` | `--fg` | luz |
-
-- Só os tons do tema, então o boneco muda sozinho com ele. **Nunca a cor de destaque.**
-- Contorno de 1 pixel em `1` em volta da silhueta toda; luz de cima e da direita.
-- Olha para a esquerda, os pés no pé da grade, para todas as classes pisarem no mesmo chão.
-- Sempre em múltiplos inteiros: o maior que cabe na página, 160 px na escolha de classe.
-- As outras regras estão em [PERSONAGEM.md](PERSONAGEM.md#o-sprite).
-- **Silhueta primeiro.** Teste no tamanho real (32 px) antes de detalhar; se não se
-  reconhece ali, detalhe nenhum salva.
-- Um comentário de uma linha acima da grade diz o que o ícone é.
+- **A ilustração** é guardada em tons de cinza e pintada na hora pelo
+  `ToneFilter.svelte`: o preto vira `--bg`, o branco vira `--fg`, e os cinzas passam por
+  `--line`, `--dim` e `--muted`. Muda sozinha com o tema; **nunca a cor de destaque**.
+- **A moldura** é uma linha de 1 px desenhada pelo `Card.svelte`: firme em `--fg` no que
+  o nível já tem, pontilhada em `--line` no que falta. É a barra de XP; não há outra.
+- **O numeral** (o nível, em algarismos romanos) e **o nome** (`THE HERMIT`) ficam sobre
+  a moldura, no topo e no pé, com fundo `--bg` cortando a linha.
+- **O verso** (`CardBack.svelte`) é o ícone `hollow` do tema repetido em `--line`, com o
+  selo da categoria em `--muted` no meio. Os selos são ícones de 16 × 16 em 1 bit, com as
+  mesmas regras dos outros.
+- **Movimento:** só a carta girando quando inverte, e a carta escolhida subindo um pouco;
+  os dois somem com "reduzir movimento".
 
 ## Controles
 

@@ -100,3 +100,13 @@ func TestLoginArts(t *testing.T) {
 		t.Error("only the listed arts can be read")
 	}
 }
+
+func TestRetiredWordsAreDropped(t *testing.T) {
+	th, err := Parse([]byte(`{"id":"old","name":"old","words":{"knight":"warrior","siege":"war"}}`))
+	if err != nil {
+		t.Fatalf("a theme exported with the 0.22 classes should still import: %v", err)
+	}
+	if _, ok := th.Words["knight"]; ok || th.Words["siege"] != "war" {
+		t.Fatalf("words: %v", th.Words)
+	}
+}

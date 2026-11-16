@@ -7,6 +7,28 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- O **hollow** vira um **companheiro** e a página vira **uma carta de tarot**. Na
+  primeira vez, você tira uma carta: sete categorias viradas para baixo (wanderers,
+  animals, shinigami, demons, bushi, fae e denizens), cada uma com o seu selo, e depois
+  um dos companheiros dela, entre 34. A tecla `c` (ou **companion**) troca depois, sem
+  custar nada.
+- A carta mostra o nível em algarismos romanos no topo e o nome no pé, e **a moldura é
+  a barra de XP**: ela vai sendo traçada conforme o nível enche. À direita fica a
+  leitura: os números do XP, os atributos e o histórico.
+- A ilustração aparece nos tons do tema, e o verso das cartas usa o ícone do tema, então
+  cada tema tem o seu baralho. Até as ilustrações chegarem, todos os companheiros usam
+  uma imagem provisória.
+- Um documento de estilo para cada tema em `docs/temas/`, com a categoria própria de
+  cada um.
+
+### Removido
+
+- As cinco classes em pixel art (knight, scribe, warden, thief e cleric) e a afinidade
+  de classe. Quem tinha escolhido uma escolhe um companheiro na próxima vez que abrir a
+  página. Temas exportados com os nomes das classes continuam importando.
+
 ## [0.23.0] - 2026-11-16
 
 ### Alterado
