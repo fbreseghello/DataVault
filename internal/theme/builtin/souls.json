@@ -42,7 +42,12 @@
     "memory": "memory",
     "ward": "ward",
     "hoard": "hoard",
-    "thrift": "thrift"
+    "thrift": "thrift",
+    "knight": "knight",
+    "scribe": "scribe",
+    "warden": "warden",
+    "thief": "thief",
+    "cleric": "cleric"
   },
   "titles": ["the nameless", "the unkindled", "the wayfarer", "the warden", "the undying"],
   "icons": {

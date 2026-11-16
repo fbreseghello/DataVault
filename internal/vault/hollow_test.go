@@ -145,3 +145,30 @@ func TestCarryNeverClears(t *testing.T) {
 		t.Fatalf("after reopen: %+v", s)
 	}
 }
+
+func TestClass(t *testing.T) {
+	at(t, "2026-11-16")
+	v, _ := newVault(t)
+	if s := xp(t, v); s.Class != "" {
+		t.Fatalf("class before choosing: %q", s.Class)
+	}
+	if _, err := v.SetClass("bard"); err == nil {
+		t.Fatal("unknown class accepted")
+	}
+	for range 3 {
+		task, _ := v.AddTask(TaskInput{Title: "t", Day: "2026-11-16", Column: Fallen})
+		_, _ = v.MoveTask(task.ID, Conquered, 0)
+	}
+	// 3 tasks and the cleared day: 55 vigor, and a knight leans to vigor
+	s, err := v.SetClass("knight")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if s.Class != "knight" || s.XP != 55 || s.Attrs[Vigor] != 60 {
+		t.Fatalf("knight: %+v", s)
+	}
+	// changing class is free and moves the lean
+	if s, _ := v.SetClass("scribe"); s.XP != 55 || s.Attrs[Vigor] != 55 {
+		t.Fatalf("scribe: %+v", s)
+	}
+}

@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"fmt"
 	"math"
 	"slices"
 	"time"
@@ -22,6 +23,16 @@ const (
 
 // Attributes in the order the page lists them.
 var Attributes = []string{Vigor, Memory, Ward, Hoard, Thrift}
+
+// Classes are the shapes the hollow can take, each with the attribute it leans
+// to: that one gains a tenth more points. The theme names them; the key stays.
+var Classes = map[string]string{
+	"knight": Vigor,
+	"scribe": Memory,
+	"warden": Ward,
+	"thief":  Hoard,
+	"cleric": Thrift,
+}
 
 // DeedKind is what was done to earn a deed. The page names it; the deed never
 // keeps the title of what it came from.
@@ -55,6 +66,8 @@ type Deed struct {
 
 // Hollow is the character's part of the vault.
 type Hollow struct {
+	// Class is the shape the user chose; empty until the page first asks.
+	Class string `json:"class,omitempty"`
 	Deeds []Deed `json:"deeds,omitempty"`
 	// SeenLevel is the last level the user has seen; a higher one is news.
 	SeenLevel int `json:"seen_level,omitempty"`
@@ -62,8 +75,9 @@ type Hollow struct {
 
 // HollowState is the character as the page draws it.
 type HollowState struct {
-	XP    int `json:"xp"`
-	Level int `json:"level"`
+	Class string `json:"class"`
+	XP    int    `json:"xp"`
+	Level int    `json:"level"`
 	// Into is the XP gained inside the current level; Need is what the level takes.
 	Into      int            `json:"into"`
 	Need      int            `json:"need"`
@@ -97,13 +111,16 @@ func LevelFor(xp int) (level, into, need int) {
 }
 
 func (h Hollow) state() HollowState {
-	s := HollowState{SeenLevel: h.SeenLevel, Attrs: map[string]int{}}
+	s := HollowState{Class: h.Class, SeenLevel: h.SeenLevel, Attrs: map[string]int{}}
 	for _, a := range Attributes {
 		s.Attrs[a] = 0
 	}
 	for _, d := range h.Deeds {
 		s.XP += d.XP
 		s.Attrs[d.Attr] += d.XP
+	}
+	if a, ok := Classes[h.Class]; ok {
+		s.Attrs[a] += s.Attrs[a] / 10
 	}
 	s.Level, s.Into, s.Need = LevelFor(s.XP)
 	n := min(len(h.Deeds), maxDeedsShown)
@@ -122,6 +139,26 @@ func (v *Vault) Hollow() (HollowState, error) {
 		return HollowState{}, ErrLocked
 	}
 	return v.data.Hollow.state(), nil
+}
+
+// SetClass gives the hollow its shape. Changing it later is free: it costs no
+// XP and no level.
+func (v *Vault) SetClass(class string) (HollowState, error) {
+	if _, ok := Classes[class]; !ok {
+		return HollowState{}, fmt.Errorf("%w: unknown class %q", ErrInvalidItem, class)
+	}
+	v.mu.Lock()
+	defer v.mu.Unlock()
+	if v.dek == nil {
+		return HollowState{}, ErrLocked
+	}
+	next := v.data
+	next.Hollow.Class = class
+	if err := v.save(next); err != nil {
+		return HollowState{}, err
+	}
+	v.data = next
+	return next.Hollow.state(), nil
 }
 
 // SeeLevel marks the current level as seen, once the page shows it.

@@ -1,8 +1,9 @@
 # DataVault — Personagem
 
 > **Em construção.** Este documento descreve um personagem que evolui com o uso do
-> DataVault. Já existem o ícone no topo da barra lateral e a experiência vinda do Siege,
-> com níveis, títulos, atributos e o histórico (veja a
+> DataVault. Já existem o ícone no topo da barra lateral, a experiência vinda do Siege,
+> com níveis, títulos, atributos e o histórico, e a escolha de classe com o boneco de
+> cada uma (veja a
 > [ordem de construção](#ordem-de-construção)). O resto serve de referência para quando
 > for construído. A forma geral segue o
 > [guia de estilo](ESTILO.md) e o formato de temas segue [TEMAS.md](TEMAS.md).
@@ -577,8 +578,11 @@ Quando for a hora, uma versão MINOR para cada passo:
    barra, os atributos, o histórico, os títulos por tema, o ícone em destaque num nível
    novo e o log da sessão. Veio antes do sprite, que era o passo 2 do plano original;
    até o sprite chegar, a página mostra o ícone do tema no lugar do boneco.
-3. **Classe e sprite base:** o renderizador de sprites, o script de conversão, a
-   escolha de classe e o corpo de cada uma.
+3. **Classe e sprite base** *(feito)*: o renderizador de sprites, a escolha de classe,
+   a afinidade e o corpo de cada uma. Os cinco corpos foram desenhados direto na grade
+   de texto; o script que converte PNG de um editor de pixel art fica para o passo 6,
+   quando as peças de `attire` precisarem dele. Até lá, trocar de classe é pelo botão
+   **class** da página.
 4. **Tela de descanso e `dtvlt hollow`:** o boneco fora da página.
 5. **As outras fontes de XP:** Unspoken, Grimoire, Crypt, Ledger e o rested.
 6. **Personalizar:** as camadas, as cores por parte, os addons, as peças por tema e a

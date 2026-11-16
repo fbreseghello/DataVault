@@ -7,6 +7,18 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- O **hollow** ganha corpo: na primeira vez que a página abre, ela pede a classe entre
+  cinco (**knight**, **scribe**, **warden**, **thief** e **cleric**), cada uma com o
+  seu boneco em pixel art de 32 × 32 nos tons do tema. Setas escolhem e `Enter`
+  confirma. O boneco aparece em 4× no lugar do ícone, e o botão **class** troca a
+  classe depois, sem custar XP nem nível.
+- Cada classe tem um atributo de afinidade, que ganha 10% a mais de pontos.
+- Nos temas, os nomes das classes (`knight`, `scribe`, `warden`, `thief`, `cleric`):
+  battlemage, scholar, enchanter, trickster e oracle no arcane; warrior, bard,
+  paladin, rogue e priest no dungeon.
+
 ## [0.21.1] - 2026-11-16
 
 ### Corrigido

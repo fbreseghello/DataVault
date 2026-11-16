@@ -1,16 +1,22 @@
 <script lang="ts">
   import { untrack } from 'svelte'
-  import { ATTRS, bar, byDay, kindName, titleFor } from './character'
+  import { api, type HollowClass } from './api'
+  import { ATTRS, bar, byDay, CLASSES, kindName, titleFor } from './character'
   import { hollow, refreshHollow, seeHollow } from './character.svelte'
-  import Icon from './Icon.svelte'
   import { showDate } from './renew'
+  import Sprite from './Sprite.svelte'
   import { theme, word } from './theme.svelte'
 
   // The character that grows with the vault (docs/PERSONAGEM.md). On the left,
   // the deeds that earned its experience, by day; on the right, the character,
-  // its level and its attributes. The sprite comes in a later version; until
-  // then the theme's icon stands in for it.
+  // its level and its attributes. The first time, the page asks for a class.
   let { active }: { active: boolean } = $props()
+
+  // picking a class: the first time, or from the class button
+  let picking = $state(false)
+  let pick = $state(0)
+  let error = $state('')
+  const choosing = $derived(!!hollow.state && (picking || !hollow.state.class))
 
   const s = $derived(hollow.state)
   const title = $derived(s ? titleFor(s.level, theme.current?.titles ?? []) : '')
@@ -37,7 +43,38 @@
   function time(at: string): string {
     return new Date(at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
   }
+
+  function startPicking() {
+    pick = Math.max(0, CLASSES.findIndex((c) => c.id === hollow.state?.class))
+    error = ''
+    picking = true
+  }
+
+  async function choose(id: HollowClass) {
+    try {
+      hollow.state = await api.setHollowClass(id)
+      picking = false
+      error = ''
+    } catch (e) {
+      error = e instanceof Error ? e.message : String(e)
+    }
+  }
+
+  function onkeydown(e: KeyboardEvent) {
+    if (!active || !choosing || e.ctrlKey || e.metaKey || e.altKey) return
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault()
+      pick = (pick + (e.key === 'ArrowRight' ? 1 : CLASSES.length - 1)) % CLASSES.length
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      void choose(CLASSES[pick].id)
+    } else if (e.key === 'Escape' && hollow.state?.class) {
+      picking = false
+    }
+  }
 </script>
+
+<svelte:window {onkeydown} />
 
 <div class="hollow">
   <div class="toolbar page-toolbar">
@@ -47,8 +84,33 @@
     {/if}
     <span class="spacer"></span>
     {#if s}<span class="count">{s.need - s.into} {word('xp')} to next</span>{/if}
+    {#if s?.class && !choosing}<button onclick={startPicking} title="change the class · free, costs no {word('xp')}">class</button>{/if}
   </div>
 
+  {#if choosing}
+    <div class="choose">
+      <p class="ask">{s?.class ? 'choose another class · it costs nothing' : `choose what your ${word('hollow')} becomes`}</p>
+      <div class="classes" role="radiogroup" aria-label="class">
+        {#each CLASSES as c, i (c.id)}
+          <button
+            class="class"
+            class:on={pick === i}
+            role="radio"
+            aria-checked={pick === i}
+            onclick={() => (pick === i ? choose(c.id) : (pick = i))}
+            ondblclick={() => choose(c.id)}
+          >
+            <Sprite name={c.id} scale={3} />
+            <span class="cname">{word(c.id)}</span>
+            <span class="look">{c.look}</span>
+            <span class="lean">leans to {word(c.attr)}</span>
+          </button>
+        {/each}
+      </div>
+      {#if error}<p class="error" role="alert">{error}</p>{/if}
+      <p class="hint">arrows choose · enter confirms{s?.class ? ' · esc keeps the current one' : ''} · it can be changed later</p>
+    </div>
+  {:else}
   <div class="body">
     <nav aria-label={word('deeds')}>
       <p class="group first">{word('deeds')}</p>
@@ -69,8 +131,12 @@
     <section>
       {#if s}
         <div class="sheet">
-          <span class="figure"><Icon name="hollow" size={128} /></span>
-          <p class="name">{word('level')} {s.level} <span class="dim">· {title}</span></p>
+          {#if s.class}<span class="figure"><Sprite name={s.class} scale={4} /></span>{/if}
+          <p class="name">
+            {word('level')} {s.level}
+            {#if s.class}<span class="dim">· {word(s.class)}</span>{/if}
+            <span class="dim">· {title}</span>
+          </p>
           <p class="xp">
             <span class="dim">{word('xp')}</span>
             [{bar(s.into, s.need)}]
@@ -89,6 +155,7 @@
       {/if}
     </section>
   </div>
+  {/if}
 </div>
 
 <style>
@@ -160,8 +227,77 @@
   }
 
   .figure {
-    color: var(--muted);
     margin-bottom: 16px;
+  }
+
+  .choose {
+    padding: 32px 24px;
+    overflow-y: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .ask {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .classes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .class {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 8px;
+    border: 1px solid transparent;
+    color: var(--dim);
+    text-align: center;
+  }
+
+  .class:hover {
+    color: var(--muted);
+  }
+
+  .class.on {
+    border-color: var(--line);
+    background: var(--raise);
+    color: var(--fg);
+  }
+
+  .cname {
+    font-weight: 700;
+    margin-top: 8px;
+  }
+
+  .look,
+  .lean {
+    font-size: 11px;
+    color: var(--dim);
+  }
+
+  .class.on .look {
+    color: var(--muted);
+  }
+
+  .hint {
+    margin: 0;
+    font-size: 11px;
+    color: var(--dim);
+  }
+
+  .error {
+    color: var(--accent);
+    margin: 0;
   }
 
   .name {

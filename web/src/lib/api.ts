@@ -78,6 +78,11 @@ export type WordKey =
   | 'ward'
   | 'hoard'
   | 'thrift'
+  | 'knight'
+  | 'scribe'
+  | 'warden'
+  | 'thief'
+  | 'cleric'
 
 /** A look DataVault can wear. See docs/TEMAS.md for the file format. */
 export interface Theme {
@@ -323,7 +328,11 @@ export interface Deed {
 }
 
 /** The character as it stands, worked out from its deeds. */
+export type HollowClass = 'knight' | 'scribe' | 'warden' | 'thief' | 'cleric'
+
 export interface HollowState {
+  /** Empty until the user picks one. */
+  class: HollowClass | ''
   xp: number
   level: number
   /** XP gained inside the level, and what the level takes. */
@@ -392,6 +401,7 @@ export const api = {
   hollow: () => request<HollowState>('GET', '/api/hollow'),
   /** Marks the current level as seen. */
   hollowSeen: () => request<HollowState>('POST', '/api/hollow/seen'),
+  setHollowClass: (c: HollowClass) => request<HollowState>('PUT', '/api/hollow/class', { class: c }),
   bills: () => request<Bill[]>('GET', '/api/bills'),
   createBill: (b: BillInput) => request<Bill>('POST', '/api/bills', b),
   updateBill: (id: string, b: BillInput) => request<Bill>('PUT', billPath(id), b),

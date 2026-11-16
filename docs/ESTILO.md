@@ -98,7 +98,7 @@ crispEdges`.
 | saco de moedas cheio, amarrado na boca | `sack` | Ledger |
 | lápide com inscrição em degraus | `tomb` | encerrar sessão, tela "session ended" |
 | cadeado com buraco de chave | `seal` | itens selados |
-| elmo fechado, com fenda e respiro | `hollow` | o personagem, no topo da barra |
+| caveira encapuzada, de órbitas vazias | `hollow` | o personagem, no topo da barra |
 
 Regras para desenhar um ícone novo:
 
@@ -110,6 +110,27 @@ Regras para desenhar um ícone novo:
   ativo `--fg`. Nunca pinte um ícone com a cor de destaque, exceto num estado armado.
 - **Fendas e vãos com 2 pixels.** Um vão de 1 pixel some no tamanho pequeno, e duas
   partes que se tocam só pela quina parecem uma peça só.
+
+### O sprite do hollow
+
+O boneco do hollow é **a única arte em 4 tons**; os ícones continuam com 1 bit. Cada
+classe é uma grade de 32 × 32 em
+[`web/src/lib/sprites.json`](../web/src/lib/sprites.json), desenhada pelo
+`Sprite.svelte` com um caminho SVG por tom:
+
+| Índice | Cor | Uso |
+|---|---|---|
+| `.` | transparente | fundo |
+| `1` | `--line` | contorno e sombra mais funda |
+| `2` | `--dim` | sombra |
+| `3` | `--muted` | tom médio |
+| `4` | `--fg` | luz |
+
+- Só os tons do tema, então o boneco muda sozinho com ele. **Nunca a cor de destaque.**
+- Contorno de 1 pixel em `1` em volta da silhueta toda; luz de cima e da direita.
+- Olha para a esquerda, os pés na linha 30, para todas as classes pisarem no mesmo chão.
+- Sempre em múltiplos inteiros: 4× na página, 3× na escolha de classe.
+- As outras regras estão em [PERSONAGEM.md](PERSONAGEM.md#o-sprite).
 - **Silhueta primeiro.** Teste no tamanho real (32 px) antes de detalhar; se não se
   reconhece ali, detalhe nenhum salva.
 - Um comentário de uma linha acima da grade diz o que o ícone é.

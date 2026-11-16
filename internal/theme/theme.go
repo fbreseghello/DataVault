@@ -51,6 +51,8 @@ var Words = []string{
 	// the character's attributes, one per page: siege, unspoken, grimoire,
 	// crypt and ledger
 	"vigor", "memory", "ward", "hoard", "thrift",
+	// the hollow's classes
+	"knight", "scribe", "warden", "thief", "cleric",
 }
 
 // Icons are the 16x16 pixel art slots: one per page, the end button, the seal

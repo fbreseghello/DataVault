@@ -39,3 +39,23 @@ describe('byDay and kindName', () => {
     expect(kindName('day_cleared')).toBe('day cleared')
   })
 })
+
+describe('spritePaths', () => {
+  it('draws each run of a tone as one rectangle', async () => {
+    const { spritePaths } = await import('./character')
+    expect(spritePaths(['.11.', '2.22'])).toEqual([
+      { tone: 1, d: 'M1 0h2v1h-2z' },
+      { tone: 2, d: 'M0 1h1v1h-1zM2 1h2v1h-2z' },
+    ])
+  })
+
+  it('has every class drawn on a 32x32 grid of tones', async () => {
+    const sprites = (await import('./sprites.json')).default as Record<string, string[]>
+    const { CLASSES } = await import('./character')
+    for (const c of CLASSES) {
+      const rows = sprites[c.id]
+      expect(rows).toHaveLength(32)
+      for (const r of rows) expect(r).toMatch(/^[.1-4]{32}$/)
+    }
+  })
+})

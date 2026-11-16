@@ -42,7 +42,12 @@
     "memory": "wisdom",
     "ward": "defense",
     "hoard": "loot",
-    "thrift": "gold"
+    "thrift": "gold",
+    "knight": "warrior",
+    "scribe": "bard",
+    "warden": "paladin",
+    "thief": "rogue",
+    "cleric": "priest"
   },
   "titles": ["peasant", "squire", "knight", "champion", "legend"],
   "icons": {

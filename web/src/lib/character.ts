@@ -32,3 +32,32 @@ export function byDay(deeds: Deed[]): { day: string; deeds: Deed[] }[] {
   }
   return out
 }
+
+/** A sprite's grid as SVG paths, one per tone (1 to 4), each run of a row one rectangle. */
+export function spritePaths(rows: string[]): { tone: number; d: string }[] {
+  const by = new Map<number, string[]>()
+  rows.forEach((row, y) => {
+    let x = 0
+    while (x < row.length) {
+      const ch = row[x]
+      let end = x
+      while (end < row.length && row[end] === ch) end++
+      const tone = Number(ch)
+      if (tone >= 1 && tone <= 4) {
+        if (!by.has(tone)) by.set(tone, [])
+        by.get(tone)!.push(`M${x} ${y}h${end - x}v1h${x - end}z`)
+      }
+      x = end
+    }
+  })
+  return [...by].sort((a, b) => a[0] - b[0]).map(([tone, parts]) => ({ tone, d: parts.join('') }))
+}
+
+/** What each class looks like and leans to, for the first choice. */
+export const CLASSES: { id: 'knight' | 'scribe' | 'warden' | 'thief' | 'cleric'; attr: Attr; look: string }[] = [
+  { id: 'knight', attr: 'vigor', look: 'broad shoulders, a closed helm, a sword' },
+  { id: 'scribe', attr: 'memory', look: 'hunched under a hood, a book and a quill' },
+  { id: 'warden', attr: 'ward', look: 'a great shield held in front, closed armor' },
+  { id: 'thief', attr: 'hoard', look: 'thin, a low hood, a dagger in each hand' },
+  { id: 'cleric', attr: 'thrift', look: 'a long robe, a lantern on a staff' },
+]
