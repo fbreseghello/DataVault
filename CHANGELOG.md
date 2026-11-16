@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.18.1] - 2026-11-16
+
 ### Alterado
 
 - O ícone do **hollow** no souls agora é uma caveira encapuzada, de órbitas vazias, no
@@ -431,7 +433,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.18.0...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.18.1...HEAD
+[0.18.1]: https://github.com/fbreseghello/DataVault/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/fbreseghello/DataVault/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/fbreseghello/DataVault/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/fbreseghello/DataVault/compare/v0.15.2...v0.16.0
