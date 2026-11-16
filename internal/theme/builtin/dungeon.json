@@ -9,7 +9,10 @@
     "dim": "#5c5349",
     "muted": "#968b7b",
     "fg": "#ebe3d5",
-    "accent": "#e07b39"
+    "accent": "#e07b39",
+    "red": "#d14b3c",
+    "blue": "#5f9fd6",
+    "green": "#8fbf4f"
   },
   "words": {
     "grimoire": "keyring",

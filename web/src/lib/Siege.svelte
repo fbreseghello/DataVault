@@ -536,15 +536,15 @@
   }
 
   .tag.red {
-    --tag: #d9655b;
+    --tag: var(--red);
   }
 
   .tag.blue {
-    --tag: #6a9fd8;
+    --tag: var(--blue);
   }
 
   .tag.green {
-    --tag: #7fb36a;
+    --tag: var(--green);
   }
 
   .conquered .tag,

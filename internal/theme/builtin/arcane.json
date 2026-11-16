@@ -9,7 +9,10 @@
     "dim": "#544d6e",
     "muted": "#8b85a6",
     "fg": "#e3dff2",
-    "accent": "#7fc8e0"
+    "accent": "#7fc8e0",
+    "red": "#e0707f",
+    "blue": "#8a9cf0",
+    "green": "#7fd6a8"
   },
   "words": {
     "grimoire": "spellbook",

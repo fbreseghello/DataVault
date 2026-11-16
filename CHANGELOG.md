@@ -25,6 +25,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
   `dtvlt` antes do título. A tag termina nos primeiros dois espaços (com um só, o título
   inteiro vira tag). `(r)`, `(b)` ou `(g)` no fim da tag a deixa vermelha, azul ou
   verde, como em `!dtvlt(r)`; sem cor, ela usa a cor de destaque do tema.
+- Cores `red`, `blue` e `green` nos temas, só para as tags do siege. Cada tema embutido
+  tem os seus tons, e um tema importado pode trocá-los (veja `docs/TEMAS.md`).
 
 ### Alterado
 

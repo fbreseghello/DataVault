@@ -9,7 +9,10 @@
     "dim": "#555555",
     "muted": "#8a8a8a",
     "fg": "#e4e4e4",
-    "accent": "#c8a96a"
+    "accent": "#c8a96a",
+    "red": "#c9564b",
+    "blue": "#6f93c4",
+    "green": "#7fa66a"
   },
   "words": {
     "grimoire": "grimoire",

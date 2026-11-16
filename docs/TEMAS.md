@@ -92,6 +92,7 @@ Chaves desconhecidas são recusadas, para que um erro de digitação não passe 
 | `muted` | botões de texto, valores secundários |
 | `fg` | texto principal e item ativo |
 | `accent` | **só mudança de estado** |
+| `red`, `blue`, `green` | só as tags coloridas do siege: `!tag(r)`, `!tag(b)`, `!tag(g)` |
 
 O DataVault é escuro: mantenha `bg` perto do preto e `fg` claro.
 

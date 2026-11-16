@@ -33,6 +33,7 @@ fora delas. Os valores abaixo são os do `souls`; cada tema define os seus.
 | `--muted` | `#8a8a8a` | botões de texto, valores secundários, hover |
 | `--fg` | `#e4e4e4` | texto principal, valores, item ativo |
 | `--accent` | `#c8a96a` | **só mudança de estado** (ver abaixo) |
+| `--red`, `--blue`, `--green` | `#c9564b`, `#6f93c4`, `#7fa66a` | **só as tags coloridas do siege** |
 
 **A cor de destaque (âmbar) nunca é decoração.** Ela aparece só quando algo mudou ou
 pede atenção:
@@ -41,6 +42,10 @@ pede atenção:
 - chaves ligadas (`on`) na tela settings;
 - itens selados e o cadeado aberto;
 - ações destrutivas armadas: a lápide antes do segundo clique, o "delete" do Siege.
+
+**Vermelho, azul e verde são do usuário, não da interface.** Só pintam as tags que ele
+mesmo colore no título de uma tarefa (`!tag(r)`). Uma tag sem cor usa a de destaque. A
+interface nunca usa essas três cores para nada.
 
 A hierarquia vem dos cinzas: `--dim` → `--muted` → `--fg`. Um elemento sobe de tom no
 hover e fica em `--fg` quando está ativo.

@@ -25,7 +25,8 @@ import (
 const Default = "souls"
 
 // Colors are the CSS variables a theme sets, in the order the style guide lists them.
-var Colors = []string{"bg", "raise", "line", "dim", "muted", "fg", "accent"}
+// red, blue and green are only for the tags a user colors in the siege.
+var Colors = []string{"bg", "raise", "line", "dim", "muted", "fg", "accent", "red", "blue", "green"}
 
 // Words are the names a theme gives to the pages and their features.
 var Words = []string{

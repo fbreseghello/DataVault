@@ -290,7 +290,7 @@ O plano de batalha do dia. **Um quadro por dia**, com quatro colunas:
   `!` até os primeiros **dois espaços**: `!dtvlt  corrigir o login` é a tag `dtvlt`
   e o título `corrigir o login`, mas `!dtvlt corrigir o login`, com um espaço só, é
   tudo tag. Uma letra entre parênteses no fim escolhe a cor: `(r)` vermelho, `(b)` azul,
-  `(g)` verde; sem ela, a tag usa a cor de destaque do tema. Várias seguidas:
+  `(g)` verde, nos tons do tema; sem ela, a tag usa a cor de destaque. Várias seguidas:
   `!dtvlt(r)  !web  corrigir o login`.
 - **Dias:** o quadro abre no dia de hoje. Dá para navegar para os dias anteriores
   (histórico) e voltar para hoje. Um dia novo começa vazio e oferece trazer o que
