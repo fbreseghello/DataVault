@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-11-16
+
 ### Alterado
 
 - A página do **hollow** mostra o boneco grande à esquerda, no maior tamanho que cabe
@@ -541,7 +543,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.22.1...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.23.0...HEAD
+[0.23.0]: https://github.com/fbreseghello/DataVault/compare/v0.22.1...v0.23.0
 [0.22.1]: https://github.com/fbreseghello/DataVault/compare/v0.22.0...v0.22.1
 [0.22.0]: https://github.com/fbreseghello/DataVault/compare/v0.21.1...v0.22.0
 [0.21.1]: https://github.com/fbreseghello/DataVault/compare/v0.21.0...v0.21.1
