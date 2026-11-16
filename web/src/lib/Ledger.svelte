@@ -1,13 +1,28 @@
 <script lang="ts">
   import { untrack } from 'svelte'
   import { api, ApiError, type Bill, type BillInput, type Cycle } from './api'
-  import { amountText, CYCLES, money, nextCharge, parseAmount, perMonth, SOON_DAYS, todayISO, totals } from './ledger'
+  import {
+    amountText,
+    CYCLES,
+    ended,
+    ENDING_DAYS,
+    lastCharge,
+    money,
+    nextCharge,
+    paidSoFar,
+    parseAmount,
+    perMonth,
+    SOON_DAYS,
+    todayISO,
+    totals,
+  } from './ledger'
   import { daysUntil, longDue, showDate } from './renew'
   import Placard from './Placard.svelte'
   import { word } from './theme.svelte'
 
   // The ledger: subscriptions and fixed expenses. The list runs in the order the
-  // bills come due; the toolbar adds up what they cost a month and a year.
+  // bills come due, with the ones that have ended at the bottom; the toolbar adds
+  // up what the running ones cost a month and a year.
   let { active }: { active: boolean } = $props()
 
   let bills = $state<Bill[]>([])
@@ -22,18 +37,32 @@
   let currency = $state('BRL')
   let cycle = $state<Cycle>('monthly')
   let since = $state('')
+  let until = $state('')
   let method = $state('')
   let note = $state('')
+
+  type Row = Bill & { next: string | null; over: boolean }
 
   let today = $state(todayISO())
   const ordered = $derived(
     bills
-      .map((b) => ({ ...b, next: nextCharge(b, today) }))
-      .sort((a, b) => a.next.localeCompare(b.next) || a.name.localeCompare(b.name)),
+      .map((b): Row => ({ ...b, next: nextCharge(b, today), over: ended(b, today) }))
+      .sort((a, b) => {
+        if (a.over !== b.over) return a.over ? 1 : -1
+        // ended bills: the latest to end first; running ones: the next to charge (or end) first
+        if (a.over) return (b.until ?? '').localeCompare(a.until ?? '') || a.name.localeCompare(b.name)
+        return (a.next ?? a.until ?? '').localeCompare(b.next ?? b.until ?? '') || a.name.localeCompare(b.name)
+      }),
   )
+  const running = $derived(ordered.filter((b) => !b.over))
+  const past = $derived(ordered.filter((b) => b.over))
   const selected = $derived(ordered.find((b) => b.id === selectedId) ?? null)
-  const sums = $derived(totals(bills))
-  const soon = $derived(ordered.filter((b) => daysUntil(b.next) <= SOON_DAYS).length)
+  const sums = $derived(totals(bills, today))
+  const soon = $derived(running.filter((b) => b.next && daysUntil(b.next) <= SOON_DAYS).length)
+  const ending = $derived(running.filter((b) => endingSoon(b)).length)
+  const paid = $derived(selected ? paidSoFar(selected, today) : null)
+  // the last charge the form's end leaves, as it is picked
+  const draftLast = $derived(until && until > since ? lastCharge({ since, cycle, until }) : null)
   // what the form would cost a month, as it is typed
   const draftCents = $derived(parseAmount(amount))
 
@@ -71,6 +100,7 @@
     currency = b?.currency ?? usualCurrency()
     cycle = b?.cycle ?? 'monthly'
     since = b?.since ?? todayISO()
+    until = b?.until ?? ''
     method = b?.method ?? ''
     note = b?.note ?? ''
   }
@@ -88,7 +118,11 @@
       error = 'the amount is not a number'
       return
     }
-    const input: BillInput = { name, amount: cents, currency, cycle, since, method, note }
+    if (until && until <= since) {
+      error = 'the end must come after the first charge'
+      return
+    }
+    const input: BillInput = { name, amount: cents, currency, cycle, since, until, method, note }
     busy = true
     error = ''
     try {
@@ -121,12 +155,27 @@
     return CYCLES.find((x) => x.cycle === c)?.short ?? c
   }
 
-  function shortNext(next: string): string {
-    const n = daysUntil(next)
+  function endingSoon(b: Bill): boolean {
+    return !!b.until && !ended(b, today) && daysUntil(b.until) <= ENDING_DAYS
+  }
+
+  function shortDay(day: string): string {
+    return showDate(day).replace(/ \d{4}$/, '')
+  }
+
+  // the list's right column: when it charges next, or when it ends or ended
+  function shortNext(b: Row): string {
+    if (b.over) return `ended ${shortDay(b.until!)}`
+    if (!b.next) return `ends ${shortDay(b.until!)}`
+    const n = daysUntil(b.next)
     if (n === 0) return 'today'
     if (n === 1) return 'tomorrow'
     if (n <= SOON_DAYS) return `in ${n}d`
-    return showDate(next).replace(/ \d{4}$/, '')
+    return shortDay(b.next)
+  }
+
+  function flagged(b: Row): boolean {
+    return (!!b.next && daysUntil(b.next) <= SOON_DAYS) || endingSoon(b)
   }
 
   function isTyping(t: EventTarget | null) {
@@ -160,21 +209,32 @@
     </span>
     <span class="spacer"></span>
     {#if soon}<span class="count due">{soon} due this week</span>{/if}
-    <span class="count">{bills.length} {bills.length === 1 ? 'bill' : 'bills'}</span>
+    {#if ending}<span class="count due">{ending} ending soon</span>{/if}
+    <span class="count">{running.length} {running.length === 1 ? 'bill' : 'bills'}</span>
     <button class="new" onclick={() => open(null)}>+ new</button>
   </div>
 
   <div class="body">
     <nav aria-label="bills">
-      {#each ordered as b (b.id)}
+      {#each running as b (b.id)}
         <button class="bill" class:active={selectedId === b.id} onclick={() => open(b)}>
           <span class="name">{b.name}</span>
           <span class="amount">{money(b.amount, b.currency)}<span class="dim">/{per(b.cycle)}</span></span>
-          <span class="next" class:due={daysUntil(b.next) <= SOON_DAYS}>{shortNext(b.next)}</span>
+          <span class="next" class:due={flagged(b)}>{shortNext(b)}</span>
         </button>
       {:else}
-        <p class="empty">nothing owed yet · press n to write the first bill</p>
+        <p class="empty">{past.length ? 'nothing running' : 'nothing owed yet · press n to write the first bill'}</p>
       {/each}
+      {#if past.length}
+        <p class="group">ended</p>
+        {#each past as b (b.id)}
+          <button class="bill over" class:active={selectedId === b.id} onclick={() => open(b)}>
+            <span class="name">{b.name}</span>
+            <span class="amount">{money(b.amount, b.currency)}<span class="dim">/{per(b.cycle)}</span></span>
+            <span class="next">{shortNext(b)}</span>
+          </button>
+        {/each}
+      {/if}
     </nav>
 
     <section>
@@ -182,8 +242,12 @@
         <form class="page" onsubmit={save}>
           <h2>
             {selected ? selected.name : 'new bill'}
-            {#if selected}
+            {#if selected?.over}
+              <span class="dim">ended {showDate(selected.until!)}</span>
+            {:else if selected?.next}
               <span class="dim">next {showDate(selected.next)} · {longDue(selected.next)}</span>
+            {:else if selected?.until}
+              <span class="dim">no more charges · ends {longDue(selected.until)}</span>
             {/if}
           </h2>
 
@@ -217,6 +281,19 @@
             <span class="unit">the rest follow</span>
           </label>
           <label class="row">
+            <span>ends</span>
+            <input type="date" bind:value={until} min={since} />
+            <span class="unit">
+              {#if draftLast}
+                last charge {showDate(draftLast)}
+              {:else if until}
+                no charge before it
+              {:else}
+                empty if it runs on
+              {/if}
+            </span>
+          </label>
+          <label class="row">
             <span>paid with</span>
             <input type="text" bind:value={method} spellcheck="false" autocomplete="off" placeholder="card or account" />
             <span></span>
@@ -238,7 +315,13 @@
               </button>
             {/if}
           </div>
-          <p class="meta">kept encrypted in the vault · {word('strike')} a bill once it is cancelled</p>
+          {#if selected && paid?.count}
+            <p class="meta">
+              paid so far · {money(paid.cents, selected.currency)} in {paid.count}
+              {paid.count === 1 ? 'charge' : 'charges'} since {showDate(selected.since)}
+            </p>
+          {/if}
+          <p class="meta">kept encrypted in the vault · set an end when it is cancelled, {word('strike')} it to forget it</p>
         </form>
       {:else}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
@@ -331,6 +414,18 @@
   .empty {
     color: var(--dim);
     padding: 0 24px;
+  }
+
+  .group {
+    margin: 16px 0 4px;
+    padding: 0 24px;
+    color: var(--dim);
+    font-size: 11px;
+  }
+
+  .bill.over .name,
+  .bill.over .amount {
+    color: var(--dim);
   }
 
   section {

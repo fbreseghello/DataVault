@@ -6,6 +6,9 @@ import type { Bill, Cycle } from './api'
 /** Bills due within this many days are flagged in the list. */
 export const SOON_DAYS = 7
 
+/** Bills ending within this many days are flagged too, in time to renew or cancel. */
+export const ENDING_DAYS = 30
+
 export const CYCLES: { cycle: Cycle; label: string; short: string }[] = [
   { cycle: 'monthly', label: 'month', short: 'mo' },
   { cycle: 'yearly', label: 'year', short: 'yr' },
@@ -34,29 +37,67 @@ function clamped(y: number, m: number, day: number): string {
   return iso(y, m, Math.min(day, last))
 }
 
-/** The first charge on or after today (or after the first charge, if that is still ahead). */
-export function nextCharge(b: Pick<Bill, 'since' | 'cycle'>, today = todayISO()): string {
-  if (b.since >= today) return b.since
+/** The k-th charge (0 is the first), on the cycle from the first charge. */
+export function chargeAt(b: Pick<Bill, 'since' | 'cycle'>, k: number): string {
   const [y, m, d] = ymd(b.since)
   if (b.cycle === 'weekly') {
-    const start = Date.UTC(y, m - 1, d)
-    const [ty, tm, td] = ymd(today)
-    const weeks = Math.ceil((Date.UTC(ty, tm - 1, td) - start) / (7 * 86_400_000))
-    const next = new Date(start + weeks * 7 * 86_400_000)
-    return iso(next.getUTCFullYear(), next.getUTCMonth() + 1, next.getUTCDate())
+    const t = new Date(Date.UTC(y, m - 1, d) + k * 7 * 86_400_000)
+    return iso(t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate())
   }
-  const [ty, tm] = ymd(today)
-  if (b.cycle === 'yearly') {
-    for (let year = ty; ; year++) {
-      const c = clamped(year, m, d)
-      if (c >= today) return c
-    }
-  }
-  for (let k = 0; ; k++) {
-    const month = tm - 1 + k
-    const c = clamped(ty + Math.floor(month / 12), (month % 12) + 1, d)
-    if (c >= today) return c
-  }
+  if (b.cycle === 'yearly') return clamped(y + k, m, d)
+  const month = m - 1 + k
+  return clamped(y + Math.floor(month / 12), (month % 12) + 1, d)
+}
+
+// the index of the first charge on or after day, found by estimate and then a step either way
+function indexFrom(b: Pick<Bill, 'since' | 'cycle'>, day: string): number {
+  if (day <= b.since) return 0
+  const [y, m, d] = ymd(b.since)
+  const [ty, tm, td] = ymd(day)
+  let k =
+    b.cycle === 'weekly'
+      ? Math.floor((Date.UTC(ty, tm - 1, td) - Date.UTC(y, m - 1, d)) / (7 * 86_400_000))
+      : b.cycle === 'yearly'
+        ? ty - y
+        : (ty - y) * 12 + (tm - m)
+  k = Math.max(0, k - 1)
+  while (chargeAt(b, k) < day) k++
+  return k
+}
+
+/** True once the bill's end has come: it charges no more. */
+export function ended(b: Pick<Bill, 'until'>, today = todayISO()): boolean {
+  return !!b.until && b.until <= today
+}
+
+/**
+ * The first charge on or after today (or the first charge, if that is still
+ * ahead). Null when the bill ends before it.
+ */
+export function nextCharge(b: Pick<Bill, 'since' | 'cycle' | 'until'>, today = todayISO()): string | null {
+  const c = chargeAt(b, indexFrom(b, today))
+  return b.until && c >= b.until ? null : c
+}
+
+/** The last charge before the end, or null when the bill has no end. */
+export function lastCharge(b: Pick<Bill, 'since' | 'cycle' | 'until'>): string | null {
+  if (!b.until) return null
+  return chargeAt(b, indexFrom(b, b.until) - 1)
+}
+
+/** How many charges have fallen so far, today's included, and what they add up to. */
+export function paidSoFar(b: Pick<Bill, 'since' | 'cycle' | 'until' | 'amount'>, today = todayISO()): { count: number; cents: number } {
+  if (b.since > today) return { count: 0, cents: 0 }
+  const tomorrow = addDay(today)
+  const stop = b.until && b.until < tomorrow ? b.until : tomorrow
+  const count = indexFrom(b, stop)
+  return { count, cents: count * b.amount }
+}
+
+function addDay(day: string): string {
+  const [y, m, d] = ymd(day)
+  const t = new Date(Date.UTC(y, m - 1, d + 1))
+  return iso(t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate())
 }
 
 /** What a bill costs a month, in cents. */
@@ -66,10 +107,10 @@ export function perMonth(b: Pick<Bill, 'amount' | 'cycle'>): number {
   return b.amount
 }
 
-/** Monthly totals by currency, largest first. */
-export function totals(bills: Bill[]): { currency: string; month: number }[] {
+/** Monthly totals by currency of the bills still running, largest first. */
+export function totals(bills: Bill[], today = todayISO()): { currency: string; month: number }[] {
   const by = new Map<string, number>()
-  for (const b of bills) by.set(b.currency, (by.get(b.currency) ?? 0) + perMonth(b))
+  for (const b of bills) if (!ended(b, today)) by.set(b.currency, (by.get(b.currency) ?? 0) + perMonth(b))
   return [...by].map(([currency, month]) => ({ currency, month })).sort((a, b) => b.month - a.month)
 }
 

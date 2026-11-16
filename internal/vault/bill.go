@@ -32,6 +32,7 @@ const MaxAmount = 1_000_000_000_000_00
 // Bill is a ledger entry: a subscription or fixed expense that comes due again
 // and again. Amount is in cents of Currency. Since is the first charge, as the
 // user's local date (YYYY-MM-DD); the next ones follow from it and the cycle.
+// Until, when set, is the day it ends: no charge falls on it or after it.
 type Bill struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`
@@ -39,6 +40,7 @@ type Bill struct {
 	Currency  string    `json:"currency"`
 	Cycle     Cycle     `json:"cycle"`
 	Since     string    `json:"since"`
+	Until     string    `json:"until,omitempty"`
 	Method    string    `json:"method"`
 	Note      string    `json:"note"`
 	CreatedAt time.Time `json:"created_at"`
@@ -52,6 +54,7 @@ type BillInput struct {
 	Currency string `json:"currency"`
 	Cycle    Cycle  `json:"cycle"`
 	Since    string `json:"since"`
+	Until    string `json:"until,omitempty"`
 	Method   string `json:"method"`
 	Note     string `json:"note"`
 }
@@ -77,6 +80,15 @@ func (in *BillInput) normalize() error {
 	}
 	if _, err := time.Parse(time.DateOnly, in.Since); err != nil {
 		return fmt.Errorf("%w: first charge must be a date (YYYY-MM-DD)", ErrInvalidItem)
+	}
+	in.Until = strings.TrimSpace(in.Until)
+	if in.Until != "" {
+		if _, err := time.Parse(time.DateOnly, in.Until); err != nil {
+			return fmt.Errorf("%w: end must be a date (YYYY-MM-DD)", ErrInvalidItem)
+		}
+		if in.Until <= in.Since {
+			return fmt.Errorf("%w: end must come after the first charge", ErrInvalidItem)
+		}
 	}
 	return nil
 }
@@ -167,6 +179,7 @@ func (b *Bill) set(in BillInput, now time.Time) {
 	b.Currency = in.Currency
 	b.Cycle = in.Cycle
 	b.Since = in.Since
+	b.Until = in.Until
 	b.Method = in.Method
 	b.Note = in.Note
 	b.UpdatedAt = now

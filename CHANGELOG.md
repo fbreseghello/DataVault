@@ -7,6 +7,14 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- **Fim** nas contas do **ledger**: a data em que a conta acaba, como um plano anual
+  que não vai ser renovado. Nenhuma cobrança cai nela nem depois, e o formulário mostra
+  qual fica sendo a última. O que acaba em até 30 dias fica destacado (**ending soon**),
+  e o que já acabou desce para o grupo **ended**, fora dos totais.
+- **Pago até hoje** em cada conta do ledger: quanto ela já levou e em quantas cobranças.
+
 ## [0.18.1] - 2026-11-16
 
 ### Alterado

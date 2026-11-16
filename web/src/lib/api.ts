@@ -270,6 +270,8 @@ export interface Bill {
   cycle: Cycle
   /** The first charge, YYYY-MM-DD; the next follow from it and the cycle. */
   since: string
+  /** The day it ends, YYYY-MM-DD: no charge on it or after. Empty when it runs on. */
+  until?: string
   /** The card or account it is paid with. */
   method: string
   note: string

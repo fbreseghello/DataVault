@@ -18,6 +18,7 @@ func TestBills(t *testing.T) {
 	b, _ := v.AddBill(BillInput{Name: "Domain", Amount: 6000, Currency: "USD", Cycle: Yearly, Since: "2025-03-02"})
 
 	in.Amount = 6490
+	in.Until = "2027-01-31"
 	if _, err := v.UpdateBill(a.ID, in); err != nil {
 		t.Fatal(err)
 	}
@@ -34,7 +35,7 @@ func TestBills(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(bills) != 1 || bills[0].Amount != 6490 || bills[0].Method != "visa" {
+	if len(bills) != 1 || bills[0].Amount != 6490 || bills[0].Method != "visa" || bills[0].Until != "2027-01-31" {
 		t.Fatalf("after reopen: %+v", bills)
 	}
 	if _, err := v.DeleteBill(b.ID); !errors.Is(err, ErrNotFound) {
@@ -50,6 +51,8 @@ func TestBillValidation(t *testing.T) {
 		{Name: "x", Currency: "R$", Since: "2026-01-01"},
 		{Name: "x", Currency: "BRL", Cycle: "daily", Since: "2026-01-01"},
 		{Name: "x", Currency: "BRL", Since: "01/02/2026"},
+		{Name: "x", Currency: "BRL", Since: "2026-01-01", Until: "2026-13-01"},
+		{Name: "x", Currency: "BRL", Since: "2026-01-01", Until: "2026-01-01"},
 	} {
 		if _, err := v.AddBill(in); !errors.Is(err, ErrInvalidItem) {
 			t.Fatalf("%+v: got %v", in, err)

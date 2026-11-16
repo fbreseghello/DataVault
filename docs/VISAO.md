@@ -318,15 +318,22 @@ O livro-razão das assinaturas e gastos fixos: streaming, servidores, domínios,
 academia. Mostra quanto vai embora todo mês e o que cobra nos próximos dias.
 
 - **Conta:** nome, valor, moeda (código de três letras, como BRL ou USD), ciclo
-  (mensal, anual ou semanal), data da primeira cobrança, cartão ou conta usada e
-  uma nota.
+  (mensal, anual ou semanal), data da primeira cobrança, data do fim (opcional),
+  cartão ou conta usada e uma nota.
+- **Fim:** o dia em que a conta acaba, como um plano anual que não vai ser renovado.
+  Nenhuma cobrança cai nele nem depois; o formulário mostra qual fica sendo a última.
+  O que acaba em até 30 dias fica destacado, a tempo de renovar ou cancelar, e o que
+  já acabou desce para o grupo **ended**, fora dos totais, sem se perder.
 - **Próxima cobrança:** calculada na página a partir da primeira cobrança e do
   ciclo, no calendário do navegador. Num mês sem o dia (31 em fevereiro) a cobrança
   cai no último dia.
 - **Lista:** em ordem de cobrança; o que vence em até 7 dias fica destacado.
-- **Totais:** no topo, por mês e por ano, separados por moeda. Contas anuais
+- **Totais:** no topo, por mês e por ano, separados por moeda, só das contas que
+  continuam correndo. Contas anuais
   contam 1/12 por mês, e semanais 52/12.
-- **Strike:** apaga a conta (com confirmação), para quando ela for cancelada.
+- **Pago até hoje:** quanto a conta já levou, somando as cobranças desde a primeira.
+- **Strike:** apaga a conta (com confirmação), para esquecê-la de vez; para uma conta
+  cancelada, basta dar um fim.
 - **Dados:** uma coleção dentro do payload criptografado do vault; o valor é
   guardado em centavos.
 - **Depois:** as cobranças no calendário, quando ele existir.
