@@ -1,6 +1,7 @@
 <script lang="ts">
   import { tick, untrack } from 'svelte'
   import { api, ApiError, type Board, type Column, type Task } from './api'
+  import { parseTitle } from './tags'
   import { word } from './theme.svelte'
 
   // Siege: the day's battle plan. One board per day, four columns. Tasks move
@@ -43,6 +44,7 @@
   let editNote = $state('')
   let adding = $state(false)
   let newTitle = $state('')
+  let newNote = $state('')
   let confirmDelete = $state<string | null>(null)
   let dragId = $state<string | null>(null)
   let drop = $state<{ column: Column; index: number } | null>(null)
@@ -83,7 +85,7 @@
   function reset() {
     selected = editing = confirmDelete = null
     adding = false
-    newTitle = ''
+    newTitle = newNote = ''
   }
 
   async function go(d: string) {
@@ -102,16 +104,34 @@
     e.preventDefault()
     const title = newTitle.trim()
     if (!title) return
+    const note = newNote
     // Clear right away so the next order can be typed while this one saves.
-    newTitle = ''
+    newTitle = newNote = ''
+    addField?.focus()
     try {
-      const t = await api.createTask(title, day)
+      const t = await api.createTask(title, day, note)
       selected = t.id
       await load()
     } catch (err) {
       newTitle = title
+      newNote = note
       fail(err)
     }
+  }
+
+  // Ctrl+Enter in the note adds the order; Enter alone starts a new line.
+  function noteKey(e: KeyboardEvent) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault()
+      ;(e.currentTarget as HTMLTextAreaElement).form?.requestSubmit()
+    }
+  }
+
+  // The form folds away when focus leaves it with nothing typed.
+  function addFocusOut(e: FocusEvent) {
+    const form = e.currentTarget as HTMLFormElement
+    if (form.contains(e.relatedTarget as Node | null)) return
+    if (!newTitle.trim() && !newNote.trim()) adding = false
   }
 
   async function move(id: string, c: Column, index: number) {
@@ -334,15 +354,20 @@
         <h3>{c.label} <span>{tasks.length}</span></h3>
 
         {#if c.id === 'orders' && adding}
-          <form onsubmit={add} class="add">
+          <form onsubmit={add} onfocusout={addFocusOut} class="add">
             <input
               bind:this={addField}
               bind:value={newTitle}
-              placeholder="new order · enter to add"
+              placeholder="new order · !tag(r)  to tag it · enter to add"
               spellcheck="false"
               autocomplete="off"
-              onblur={() => !newTitle.trim() && (adding = false)}
+              aria-label="title"
             />
+            <textarea bind:value={newNote} onkeydown={noteKey} placeholder="note · ctrl+enter to add" rows="2" aria-label="note"></textarea>
+            <div class="actions">
+              <button type="submit">add</button>
+              <button type="button" onclick={() => ((adding = false), (newTitle = newNote = ''))}>cancel</button>
+            </div>
           </form>
         {/if}
 
@@ -370,7 +395,10 @@
                 </div>
               </form>
             {:else}
-              <span class="title">{t.title}</span>
+              {@const parsed = parseTitle(t.title)}
+              <span class="title">
+                {#each parsed.tags as tag, k (k)}<span class="tag {tag.color ?? ''}">{tag.name}</span>{/each}{parsed.text}
+              </span>
               {#if t.note}<span class="note">{t.note}</span>{/if}
               {#if selected === t.id}
                 <span class="actions">
@@ -493,6 +521,37 @@
     overflow-wrap: anywhere;
   }
 
+  /* a tag from "!name" or "!name(r)" at the start of the title */
+  .tag {
+    --tag: var(--accent);
+    display: inline-block;
+    margin-right: 6px;
+    padding: 0 4px;
+    border: 1px solid var(--tag);
+    color: var(--tag);
+    font-size: 11px;
+    line-height: 15px;
+    vertical-align: 1px;
+    text-decoration: none;
+  }
+
+  .tag.red {
+    --tag: #d9655b;
+  }
+
+  .tag.blue {
+    --tag: #6a9fd8;
+  }
+
+  .tag.green {
+    --tag: #7fb36a;
+  }
+
+  .conquered .tag,
+  .fallen .tag {
+    opacity: 0.55;
+  }
+
   .note {
     color: var(--dim);
     font-size: 11px;
@@ -534,12 +593,14 @@
     margin-bottom: 8px;
   }
 
+  .add,
   .edit {
     display: flex;
     flex-direction: column;
     gap: 6px;
   }
 
+  .add textarea,
   .edit textarea {
     min-height: 2.6em;
     font-size: 11px;

@@ -65,38 +65,71 @@ function indexFrom(b: Pick<Bill, 'since' | 'cycle'>, day: string): number {
   return k
 }
 
+/** What decides when a bill charges. */
+type Schedule = Pick<Bill, 'since' | 'cycle' | 'until' | 'pause_from' | 'pause_until'>
+
 /** True once the bill's end has come: it charges no more. */
 export function ended(b: Pick<Bill, 'until'>, today = todayISO()): boolean {
   return !!b.until && b.until <= today
 }
 
+/** True when the bill's pause covers day. */
+export function paused(b: Pick<Bill, 'pause_from' | 'pause_until'>, day = todayISO()): boolean {
+  return !!b.pause_from && b.pause_from <= day && (!b.pause_until || day < b.pause_until)
+}
+
+// past this many steps a search gives up: about forty years of weekly charges
+const MAX_STEPS = 2000
+
 /**
  * The first charge on or after today (or the first charge, if that is still
- * ahead). Null when the bill ends before it.
+ * ahead), skipping a pause. Null when the bill ends, or stays paused, before it.
  */
-export function nextCharge(b: Pick<Bill, 'since' | 'cycle' | 'until'>, today = todayISO()): string | null {
-  const c = chargeAt(b, indexFrom(b, today))
-  return b.until && c >= b.until ? null : c
+export function nextCharge(b: Schedule, today = todayISO()): string | null {
+  for (let k = indexFrom(b, today), n = 0; n < MAX_STEPS; k++, n++) {
+    const c = chargeAt(b, k)
+    if (b.until && c >= b.until) return null
+    if (!paused(b, c)) return c
+    if (!b.pause_until) return null
+  }
+  return null
 }
 
-/** The last charge before the end, or null when the bill has no end. */
-export function lastCharge(b: Pick<Bill, 'since' | 'cycle' | 'until'>): string | null {
+/** The last charge before the end, skipping a pause; null when the bill has no end or never charges. */
+export function lastCharge(b: Schedule): string | null {
   if (!b.until) return null
-  return chargeAt(b, indexFrom(b, b.until) - 1)
+  for (let k = indexFrom(b, b.until) - 1; k >= 0; k--) {
+    const c = chargeAt(b, k)
+    if (!paused(b, c)) return c
+  }
+  return null
 }
 
-/** How many charges have fallen so far, today's included, and what they add up to. */
-export function paidSoFar(b: Pick<Bill, 'since' | 'cycle' | 'until' | 'amount'>, today = todayISO()): { count: number; cents: number } {
-  if (b.since > today) return { count: 0, cents: 0 }
-  const tomorrow = addDay(today)
-  const stop = b.until && b.until < tomorrow ? b.until : tomorrow
-  const count = indexFrom(b, stop)
-  return { count, cents: count * b.amount }
+/** Every charge from the first up to (not including) stop, skipping a pause. */
+export function chargesBefore(b: Schedule, stop: string): string[] {
+  const end = b.until && b.until < stop ? b.until : stop
+  const out: string[] = []
+  for (let k = 0, n = indexFrom(b, end); k < n && k < MAX_STEPS * 5; k++) {
+    const c = chargeAt(b, k)
+    if (!paused(b, c)) out.push(c)
+  }
+  return out
 }
 
-function addDay(day: string): string {
+/** What a charge on day cost, by the price history. */
+export function priceOn(b: Pick<Bill, 'amount' | 'history'>, day: string): number {
+  return b.history?.find((h) => day < h.until)?.amount ?? b.amount
+}
+
+/** How many charges have fallen so far, today's included, and what they add up to at the price of each day. */
+export function paidSoFar(b: Schedule & Pick<Bill, 'amount' | 'history'>, today = todayISO()): { count: number; cents: number } {
+  const charges = chargesBefore(b, addDay(today))
+  return { count: charges.length, cents: charges.reduce((sum, c) => sum + priceOn(b, c), 0) }
+}
+
+function addDay(day: string, n = 1): string {
   const [y, m, d] = ymd(day)
-  const t = new Date(Date.UTC(y, m - 1, d + 1))
+  const t = new Date(Date.UTC(y, m - 1, d + n))
   return iso(t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate())
 }
 
@@ -107,11 +140,37 @@ export function perMonth(b: Pick<Bill, 'amount' | 'cycle'>): number {
   return b.amount
 }
 
-/** Monthly totals by currency of the bills still running, largest first. */
+/** True when a bill counts in the totals: not ended and not paused today. */
+export function counts(b: Bill, today = todayISO()): boolean {
+  return !ended(b, today) && !paused(b, today)
+}
+
+/** Monthly totals by currency of the bills that count today, largest first. */
 export function totals(bills: Bill[], today = todayISO()): { currency: string; month: number }[] {
   const by = new Map<string, number>()
-  for (const b of bills) if (!ended(b, today)) by.set(b.currency, (by.get(b.currency) ?? 0) + perMonth(b))
+  for (const b of bills) if (counts(b, today)) by.set(b.currency, (by.get(b.currency) ?? 0) + perMonth(b))
   return [...by].map(([currency, month]) => ({ currency, month })).sort((a, b) => b.month - a.month)
+}
+
+/** The bills that count today, grouped by the card or account they are paid with, the costliest first. */
+export function byMethod(bills: Bill[], today = todayISO()): { method: string; count: number; sums: { currency: string; month: number }[] }[] {
+  const groups = new Map<string, Bill[]>()
+  for (const b of bills) {
+    if (!counts(b, today)) continue
+    const key = b.method.trim()
+    const found = [...groups.keys()].find((k) => k.toLowerCase() === key.toLowerCase())
+    groups.set(found ?? key, [...(groups.get(found ?? key) ?? []), b])
+  }
+  return [...groups]
+    .map(([method, list]) => ({ method, count: list.length, sums: totals(list, today) }))
+    .sort((a, b) => (b.sums[0]?.month ?? 0) - (a.sums[0]?.month ?? 0) || a.method.localeCompare(b.method))
+}
+
+/** True when a bill matches what is typed in the search: name, card or account, note or currency. */
+export function matches(b: Bill, query: string): boolean {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean)
+  const text = `${b.name} ${b.method} ${b.note} ${b.currency}`.toLowerCase()
+  return words.every((w) => text.includes(w))
 }
 
 /** Cents as the viewer writes money: "R$ 55,90", "US$ 60.00". */

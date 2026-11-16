@@ -286,6 +286,12 @@ O plano de batalha do dia. **Um quadro por dia**, com quatro colunas:
 | a fazer | sendo feito | concluído | cancelado |
 
 - **Tarefa:** título, nota opcional, coluna, posição na coluna e o dia a que pertence.
+- **Tags:** o título pode começar com uma ou mais tags, escritas `!nome`. A tag vai do
+  `!` até os primeiros **dois espaços**: `!dtvlt  corrigir o login` é a tag `dtvlt`
+  e o título `corrigir o login`, mas `!dtvlt corrigir o login`, com um espaço só, é
+  tudo tag. Uma letra entre parênteses no fim escolhe a cor: `(r)` vermelho, `(b)` azul,
+  `(g)` verde; sem ela, a tag usa a cor de destaque do tema. Várias seguidas:
+  `!dtvlt(r)  !web  corrigir o login`.
 - **Dias:** o quadro abre no dia de hoje. Dá para navegar para os dias anteriores
   (histórico) e voltar para hoje. Um dia novo começa vazio e oferece trazer o que
   ficou em Orders e In Battle no dia anterior.
@@ -324,19 +330,31 @@ academia. Mostra quanto vai embora todo mês e o que cobra nos próximos dias.
   Nenhuma cobrança cai nele nem depois; o formulário mostra qual fica sendo a última.
   O que acaba em até 30 dias fica destacado, a tempo de renovar ou cancelar, e o que
   já acabou desce para o grupo **ended**, fora dos totais, sem se perder.
+- **Pausa:** suspende as cobranças por um tempo sem dar fim à conta: começa num dia e
+  volta noutro, ou fica até ser retirada (**lift pause**). As cobranças que caem na
+  pausa são puladas; retirar uma pausa que já começou guarda o que ela pulou.
 - **Próxima cobrança:** calculada na página a partir da primeira cobrança e do
-  ciclo, no calendário do navegador. Num mês sem o dia (31 em fevereiro) a cobrança
-  cai no último dia.
-- **Lista:** em ordem de cobrança; o que vence em até 7 dias fica destacado.
-- **Totais:** no topo, por mês e por ano, separados por moeda, só das contas que
-  continuam correndo. Contas anuais
-  contam 1/12 por mês, e semanais 52/12.
-- **Pago até hoje:** quanto a conta já levou, somando as cobranças desde a primeira.
+  ciclo, no calendário do navegador, pulando a pausa. Num mês sem o dia (31 em
+  fevereiro) a cobrança cai no último dia.
+- **Lista:** em ordem de cobrança; o que vence em até 7 dias fica destacado, e o que
+  está pausado aparece apagado.
+- **Busca:** `/` filtra a lista por nome, cartão ou conta, nota e moeda.
+- **Resumo:** com nenhuma conta aberta, o lado direito mostra quanto vai embora por mês
+  e por ano, separado por moeda, e o mesmo por cartão ou conta. Só contam as contas que
+  estão cobrando: as pausadas e as que acabaram ficam de fora. Contas anuais contam
+  1/12 por mês, e semanais 52/12.
+- **Histórico de preço:** quando o valor muda, o vault guarda o anterior e o dia da
+  troca. A conta mostra a sequência e quanto o preço subiu ou desceu desde o
+  primeiro. Trocar a moeda começa o histórico de novo.
+- **Pago até hoje:** quanto a conta já levou, somando as cobranças desde a primeira,
+  cada uma pelo preço do seu dia e sem as que a pausa pulou.
+- **Export:** as contas que não acabaram num arquivo `.ics`, como eventos de dia inteiro
+  que se repetem no ciclo, com o fim, a pausa e um aviso na véspera. Serve para
+  qualquer app de calendário.
 - **Strike:** apaga a conta (com confirmação), para esquecê-la de vez; para uma conta
   cancelada, basta dar um fim.
 - **Dados:** uma coleção dentro do payload criptografado do vault; o valor é
   guardado em centavos.
-- **Depois:** as cobranças no calendário, quando ele existir.
 
 Cada página deve sair numa versão MINOR própria.
 

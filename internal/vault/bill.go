@@ -33,30 +33,58 @@ const MaxAmount = 1_000_000_000_000_00
 // and again. Amount is in cents of Currency. Since is the first charge, as the
 // user's local date (YYYY-MM-DD); the next ones follow from it and the cycle.
 // Until, when set, is the day it ends: no charge falls on it or after it.
+// PauseFrom and PauseUntil skip the charges that fall between them (PauseUntil
+// excluded); a pause with no PauseUntil holds until it is lifted.
 type Bill struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	Amount    int64     `json:"amount"`
-	Currency  string    `json:"currency"`
-	Cycle     Cycle     `json:"cycle"`
-	Since     string    `json:"since"`
-	Until     string    `json:"until,omitempty"`
-	Method    string    `json:"method"`
-	Note      string    `json:"note"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID         string        `json:"id"`
+	Name       string        `json:"name"`
+	Amount     int64         `json:"amount"`
+	Currency   string        `json:"currency"`
+	Cycle      Cycle         `json:"cycle"`
+	Since      string        `json:"since"`
+	Until      string        `json:"until,omitempty"`
+	PauseFrom  string        `json:"pause_from,omitempty"`
+	PauseUntil string        `json:"pause_until,omitempty"`
+	Method     string        `json:"method"`
+	Note       string        `json:"note"`
+	History    []PriceChange `json:"history,omitempty"`
+	CreatedAt  time.Time     `json:"created_at"`
+	UpdatedAt  time.Time     `json:"updated_at"`
+}
+
+// PriceChange is a price a bill used to have: Amount was charged on the days
+// before Until, the local date it changed. The history is oldest first, is
+// written by the vault when the amount changes, and starts over when the
+// currency does.
+type PriceChange struct {
+	Amount int64  `json:"amount"`
+	Until  string `json:"until"`
 }
 
 // BillInput is what the ledger sends when writing a bill.
 type BillInput struct {
-	Name     string `json:"name"`
-	Amount   int64  `json:"amount"`
-	Currency string `json:"currency"`
-	Cycle    Cycle  `json:"cycle"`
-	Since    string `json:"since"`
-	Until    string `json:"until,omitempty"`
-	Method   string `json:"method"`
-	Note     string `json:"note"`
+	Name       string `json:"name"`
+	Amount     int64  `json:"amount"`
+	Currency   string `json:"currency"`
+	Cycle      Cycle  `json:"cycle"`
+	Since      string `json:"since"`
+	Until      string `json:"until,omitempty"`
+	PauseFrom  string `json:"pause_from,omitempty"`
+	PauseUntil string `json:"pause_until,omitempty"`
+	Method     string `json:"method"`
+	Note       string `json:"note"`
+}
+
+// optionalDate trims s and checks it is empty or a YYYY-MM-DD date.
+func optionalDate(s *string, what string) error {
+	*s = strings.TrimSpace(*s)
+	if *s == "" {
+		return nil
+	}
+	if _, err := time.Parse(time.DateOnly, *s); err != nil {
+		return fmt.Errorf("%w: %s must be a date (YYYY-MM-DD)", ErrInvalidItem, what)
+	}
+	return nil
 }
 
 func (in *BillInput) normalize() error {
@@ -81,14 +109,23 @@ func (in *BillInput) normalize() error {
 	if _, err := time.Parse(time.DateOnly, in.Since); err != nil {
 		return fmt.Errorf("%w: first charge must be a date (YYYY-MM-DD)", ErrInvalidItem)
 	}
-	in.Until = strings.TrimSpace(in.Until)
-	if in.Until != "" {
-		if _, err := time.Parse(time.DateOnly, in.Until); err != nil {
-			return fmt.Errorf("%w: end must be a date (YYYY-MM-DD)", ErrInvalidItem)
-		}
-		if in.Until <= in.Since {
-			return fmt.Errorf("%w: end must come after the first charge", ErrInvalidItem)
-		}
+	if err := optionalDate(&in.Until, "end"); err != nil {
+		return err
+	}
+	if in.Until != "" && in.Until <= in.Since {
+		return fmt.Errorf("%w: end must come after the first charge", ErrInvalidItem)
+	}
+	if err := optionalDate(&in.PauseFrom, "pause start"); err != nil {
+		return err
+	}
+	if err := optionalDate(&in.PauseUntil, "pause end"); err != nil {
+		return err
+	}
+	if in.PauseUntil != "" && in.PauseFrom == "" {
+		return fmt.Errorf("%w: a pause needs a start", ErrInvalidItem)
+	}
+	if in.PauseUntil != "" && in.PauseUntil <= in.PauseFrom {
+		return fmt.Errorf("%w: a pause must end after it starts", ErrInvalidItem)
 	}
 	return nil
 }
@@ -144,7 +181,9 @@ func (v *Vault) UpdateBill(id string, in BillInput) (Bill, error) {
 	}
 	next := v.data
 	next.Bills = slices.Clone(v.data.Bills)
-	next.Bills[i].set(in, time.Now().UTC())
+	now := time.Now()
+	next.Bills[i].reprice(in, now.Format(time.DateOnly))
+	next.Bills[i].set(in, now.UTC())
 	if err := v.save(next); err != nil {
 		return Bill{}, err
 	}
@@ -173,6 +212,28 @@ func (v *Vault) DeleteBill(id string) (Bill, error) {
 	return b, nil
 }
 
+// reprice keeps the old price in the history when an edit changes it, as of
+// today (the user's local date). A second change on the same day keeps the
+// price the day started with, a change before the first charge keeps nothing,
+// and a new currency starts the history over.
+func (b *Bill) reprice(in BillInput, today string) {
+	switch {
+	case in.Currency != b.Currency:
+		b.History = nil
+	case in.Amount == b.Amount, today <= in.Since:
+	case len(b.History) > 0 && b.History[len(b.History)-1].Until == today:
+	default:
+		b.History = append(slices.Clone(b.History), PriceChange{Amount: b.Amount, Until: today})
+	}
+	// the earliest prices fall away once there are many
+	if n := len(b.History); n > maxPriceChanges {
+		b.History = slices.Clone(b.History[n-maxPriceChanges:])
+	}
+}
+
+// maxPriceChanges caps a bill's price history.
+const maxPriceChanges = 50
+
 func (b *Bill) set(in BillInput, now time.Time) {
 	b.Name = in.Name
 	b.Amount = in.Amount
@@ -180,6 +241,8 @@ func (b *Bill) set(in BillInput, now time.Time) {
 	b.Cycle = in.Cycle
 	b.Since = in.Since
 	b.Until = in.Until
+	b.PauseFrom = in.PauseFrom
+	b.PauseUntil = in.PauseUntil
 	b.Method = in.Method
 	b.Note = in.Note
 	b.UpdatedAt = now

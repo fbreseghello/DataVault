@@ -7,6 +7,31 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- **Pausa** nas contas do **ledger**: suspende as cobranças por um tempo, até uma data
+  ou até ser retirada (**lift pause**), sem dar fim à conta. As cobranças que caem nela
+  são puladas, e a conta pausada sai dos totais.
+- **Histórico de preço**: quando o valor de uma conta muda, o anterior fica guardado com
+  o dia da troca. A conta mostra a sequência e quanto o preço mudou, e o **pago até
+  hoje** passa a usar o preço de cada cobrança.
+- **Resumo** do ledger, no lado direito quando nenhuma conta está aberta: o total por
+  mês e por ano e o total por cartão ou conta. O campo **paid with** sugere os cartões
+  já usados.
+- **Busca** no ledger: `/` filtra por nome, cartão, nota e moeda.
+- **Export** do ledger para `.ics`: as cobranças como eventos que se repetem, para
+  qualquer app de calendário, com um aviso na véspera.
+- **Tags** no título das tarefas do **siege**: `!dtvlt  corrigir o login` mostra a tag
+  `dtvlt` antes do título. A tag termina nos primeiros dois espaços (com um só, o título
+  inteiro vira tag). `(r)`, `(b)` ou `(g)` no fim da tag a deixa vermelha, azul ou
+  verde, como em `!dtvlt(r)`; sem cor, ela usa a cor de destaque do tema.
+
+### Alterado
+
+- Criar uma tarefa no **siege** já abre o campo **note** junto com o título, com os
+  botões **add** e **cancel**. `Enter` no título adiciona, e `Ctrl+Enter` na nota também.
+- Os totais do ledger saíram da barra de cima e foram para o resumo.
+
 ## [0.19.0] - 2026-11-16
 
 ### Adicionado

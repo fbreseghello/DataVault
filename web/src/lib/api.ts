@@ -272,14 +272,24 @@ export interface Bill {
   since: string
   /** The day it ends, YYYY-MM-DD: no charge on it or after. Empty when it runs on. */
   until?: string
+  /** A pause, YYYY-MM-DD: the charges from pause_from up to (not on) pause_until are skipped. No pause_until holds it until it is lifted. */
+  pause_from?: string
+  pause_until?: string
   /** The card or account it is paid with. */
   method: string
   note: string
+  /** The prices it used to have, oldest first: each was charged before its until. Kept by the vault. */
+  history?: PriceChange[]
   created_at: string
   updated_at: string
 }
 
-export type BillInput = Omit<Bill, 'id' | 'created_at' | 'updated_at'>
+export interface PriceChange {
+  amount: number
+  until: string
+}
+
+export type BillInput = Omit<Bill, 'id' | 'history' | 'created_at' | 'updated_at'>
 
 const billPath = (id: string) => '/api/bills/' + encodeURIComponent(id)
 
@@ -304,8 +314,8 @@ export type SettingsInput = Omit<Settings, 'config_path' | 'vault_path'> & {
 
 export const api = {
   board: (day: string) => request<Board>('GET', '/api/tasks?day=' + encodeURIComponent(day)),
-  createTask: (title: string, day: string, column: Column = 'orders') =>
-    request<Task>('POST', '/api/tasks', { title, note: '', column, day }),
+  createTask: (title: string, day: string, note = '', column: Column = 'orders') =>
+    request<Task>('POST', '/api/tasks', { title, note, column, day }),
   updateTask: (id: string, title: string, note: string) => request<Task>('PUT', taskPath(id), { title, note }),
   moveTask: (id: string, column: Column, index: number) =>
     request<Task>('POST', taskPath(id) + '/move', { column, index }),
