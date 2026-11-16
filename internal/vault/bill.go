@@ -73,6 +73,10 @@ type BillInput struct {
 	PauseUntil string `json:"pause_until,omitempty"`
 	Method     string `json:"method"`
 	Note       string `json:"note"`
+	// PriceSince is the day a new amount took effect, when an edit changes it
+	// and the change came earlier than today. It is not kept on the bill: it
+	// dates the old price in the history.
+	PriceSince string `json:"price_since,omitempty"`
 }
 
 // optionalDate trims s and checks it is empty or a YYYY-MM-DD date.
@@ -127,7 +131,7 @@ func (in *BillInput) normalize() error {
 	if in.PauseUntil != "" && in.PauseUntil <= in.PauseFrom {
 		return fmt.Errorf("%w: a pause must end after it starts", ErrInvalidItem)
 	}
-	return nil
+	return optionalDate(&in.PriceSince, "new price date")
 }
 
 // Bills lists the ledger by name; the page orders it by what comes due first.
@@ -182,7 +186,9 @@ func (v *Vault) UpdateBill(id string, in BillInput) (Bill, error) {
 	next := v.data
 	next.Bills = slices.Clone(v.data.Bills)
 	now := time.Now()
-	next.Bills[i].reprice(in, now.Format(time.DateOnly))
+	if err := next.Bills[i].reprice(in, now.Format(time.DateOnly)); err != nil {
+		return Bill{}, err
+	}
 	next.Bills[i].set(in, now.UTC())
 	if err := v.save(next); err != nil {
 		return Bill{}, err
@@ -213,22 +219,34 @@ func (v *Vault) DeleteBill(id string) (Bill, error) {
 }
 
 // reprice keeps the old price in the history when an edit changes it, as of
-// today (the user's local date). A second change on the same day keeps the
-// price the day started with, a change before the first charge keeps nothing,
-// and a new currency starts the history over.
-func (b *Bill) reprice(in BillInput, today string) {
+// in.PriceSince or, without one, today (the user's local date). A second
+// change on the same day keeps the price the day started with, a change before
+// the first charge keeps nothing, and a new currency starts the history over.
+// The change cannot be dated in the future or before the last one.
+func (b *Bill) reprice(in BillInput, today string) error {
+	day := today
+	if in.PriceSince != "" && in.Amount != b.Amount && in.Currency == b.Currency {
+		if in.PriceSince > today {
+			return fmt.Errorf("%w: a new price cannot start in the future", ErrInvalidItem)
+		}
+		if n := len(b.History); n > 0 && in.PriceSince < b.History[n-1].Until {
+			return fmt.Errorf("%w: the new price must start on or after %s, the last change", ErrInvalidItem, b.History[n-1].Until)
+		}
+		day = in.PriceSince
+	}
 	switch {
 	case in.Currency != b.Currency:
 		b.History = nil
-	case in.Amount == b.Amount, today <= in.Since:
-	case len(b.History) > 0 && b.History[len(b.History)-1].Until == today:
+	case in.Amount == b.Amount, day <= in.Since:
+	case len(b.History) > 0 && b.History[len(b.History)-1].Until == day:
 	default:
-		b.History = append(slices.Clone(b.History), PriceChange{Amount: b.Amount, Until: today})
+		b.History = append(slices.Clone(b.History), PriceChange{Amount: b.Amount, Until: day})
 	}
 	// the earliest prices fall away once there are many
 	if n := len(b.History); n > maxPriceChanges {
 		b.History = slices.Clone(b.History[n-maxPriceChanges:])
 	}
+	return nil
 }
 
 // maxPriceChanges caps a bill's price history.

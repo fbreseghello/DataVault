@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tick, untrack } from 'svelte'
   import { api, ApiError, type Board, type Column, type Task } from './api'
-  import { parseTitle } from './tags'
+  import { hasTag, parseTitle, tagText, type Tag } from './tags'
   import { word } from './theme.svelte'
 
   // Siege: the day's battle plan. One board per day, four columns. Tasks move
@@ -51,11 +51,36 @@
   let error = $state('')
   let addField = $state<HTMLInputElement>()
   let editField = $state<HTMLInputElement>()
+  // a tag clicked on a card: the board shows only the tasks that carry it
+  let filter = $state<Tag | null>(null)
 
   const isToday = $derived(day === today)
 
-  function column(c: Column): Task[] {
+  // every task in a column, in order
+  function full(c: Column): Task[] {
     return board.tasks.filter((t) => t.column === c).sort((a, b) => a.position - b.position)
+  }
+
+  // the tasks a column shows: all of them, or those with the tag being filtered
+  function column(c: Column): Task[] {
+    const f = filter
+    return f ? full(c).filter((t) => hasTag(t.title, f.name)) : full(c)
+  }
+
+  // A place among the shown tasks, as a place in the whole column (both without
+  // the task being moved): before the shown task at that place, or right after
+  // the last shown one.
+  function fullIndex(c: Column, index: number, moving: string): number {
+    const all = full(c).filter((t) => t.id !== moving)
+    const shown = column(c).filter((t) => t.id !== moving)
+    if (!shown.length) return all.length
+    if (index < shown.length) return all.indexOf(shown[index])
+    return all.indexOf(shown[shown.length - 1]) + 1
+  }
+
+  function filterBy(tag: Tag) {
+    filter = filter?.name.toLowerCase() === tag.name.toLowerCase() ? null : tag
+    if (selected && !column(board.tasks.find((t) => t.id === selected)?.column ?? 'orders').some((t) => t.id === selected)) selected = null
   }
 
   function fail(e: unknown) {
@@ -82,10 +107,11 @@
     })
   })
 
+  // A half-written order stays as a draft when the form closes or the day
+  // changes; only cancel throws it away.
   function reset() {
     selected = editing = confirmDelete = null
     adding = false
-    newTitle = newNote = ''
   }
 
   async function go(d: string) {
@@ -95,6 +121,8 @@
   }
 
   async function openAdd() {
+    // while filtering, a new order starts with the tag, so it stays in sight
+    if (filter && !newTitle.trim()) newTitle = tagText(filter) + '  '
     adding = true
     await tick()
     addField?.focus()
@@ -134,9 +162,10 @@
     if (!newTitle.trim() && !newNote.trim()) adding = false
   }
 
+  // index is a place among the tasks the column shows
   async function move(id: string, c: Column, index: number) {
     try {
-      await api.moveTask(id, c, index)
+      await api.moveTask(id, c, fullIndex(c, index, id))
       await load()
     } catch (e) {
       fail(e)
@@ -256,7 +285,8 @@
       if (editing) editing = null
       else if (adding) adding = false
       else if (isTyping(e.target)) (e.target as HTMLElement).blur()
-      else selected = confirmDelete = null
+      else if (selected || confirmDelete) selected = confirmDelete = null
+      else filter = null
       return
     }
     if (isTyping(e.target) || e.ctrlKey || e.metaKey || e.altKey) return
@@ -322,11 +352,16 @@
     <span class="day" class:today={isToday}>{label(day)}</span>
     <button onclick={() => go(shift(day, 1))} aria-label="next day">›</button>
     {#if !isToday}<button onclick={() => go(today)}>today</button>{/if}
+    {#if filter}
+      <button class="filter" onclick={() => (filter = null)} title="show every task · esc">
+        <span class="tag {filter.color ?? ''}">{filter.name}</span> ×
+      </button>
+    {/if}
     <span class="spacer"></span>
     <span class="count">
       {#each COLUMNS as c, i (c.id)}{i ? ' · ' : ''}{column(c.id).length} {c.label.toLowerCase()}{/each}
     </span>
-    <button class="new" onclick={openAdd}>+ new</button>
+    <button class="new" onclick={openAdd} title={adding || !(newTitle.trim() || newNote.trim()) ? "new order · n" : "back to the draft · n"}>{!adding && (newTitle.trim() || newNote.trim()) ? "+ draft" : "+ new"}</button>
   </div>
 
   {#if isToday && board.pending_before > 0}
@@ -366,7 +401,7 @@
             <textarea bind:value={newNote} onkeydown={noteKey} placeholder="note · ctrl+enter to add" rows="2" aria-label="note"></textarea>
             <div class="actions">
               <button type="submit">add</button>
-              <button type="button" onclick={() => ((adding = false), (newTitle = newNote = ''))}>cancel</button>
+              <button type="button" onclick={() => ((adding = false), (newTitle = newNote = ''))} title="throw the draft away">cancel</button>
             </div>
           </form>
         {/if}
@@ -397,7 +432,13 @@
             {:else}
               {@const parsed = parseTitle(t.title)}
               <span class="title">
-                {#each parsed.tags as tag, k (k)}<span class="tag {tag.color ?? ''}">{tag.name}</span>{/each}{parsed.text}
+                {#each parsed.tags as tag, k (k)}<button
+                    type="button"
+                    class="tag {tag.color ?? ''}"
+                    class:on={filter?.name.toLowerCase() === tag.name.toLowerCase()}
+                    title="show only {tag.name}"
+                    onclick={(e) => (e.stopPropagation(), filterBy(tag))}>{tag.name}</button
+                  >{/each}{parsed.text}
               </span>
               {#if t.note}<span class="note">{t.note}</span>{/if}
               {#if selected === t.id}
@@ -545,6 +586,29 @@
 
   .tag.green {
     --tag: var(--green);
+  }
+
+  button.tag {
+    font: inherit;
+    font-size: 11px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  button.tag:hover,
+  .tag.on {
+    background: color-mix(in srgb, var(--tag) 18%, transparent);
+  }
+
+  .filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--muted);
+  }
+
+  .filter .tag {
+    margin-right: 4px;
   }
 
   .conquered .tag,

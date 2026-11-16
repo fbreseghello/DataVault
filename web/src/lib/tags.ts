@@ -33,3 +33,16 @@ export function parseTitle(title: string): { tags: Tag[]; text: string } {
   }
   return { tags, text: s }
 }
+
+/** True when a title carries a tag of that name, whatever its case or color. */
+export function hasTag(title: string, name: string): boolean {
+  const n = name.toLowerCase()
+  return parseTitle(title).tags.some((t) => t.name.toLowerCase() === n)
+}
+
+const LETTERS: Record<TagColor, string> = { red: 'r', blue: 'b', green: 'g' }
+
+/** A tag as it is typed: "!dtvlt(r)". */
+export function tagText(tag: Tag): string {
+  return `!${tag.name}${tag.color ? `(${LETTERS[tag.color]})` : ''}`
+}

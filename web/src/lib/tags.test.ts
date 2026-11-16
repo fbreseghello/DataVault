@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseTitle } from './tags'
+import { hasTag, parseTitle, tagText } from './tags'
 
 describe('parseTitle', () => {
   it('ends a tag at two spaces', () => {
@@ -29,5 +29,17 @@ describe('parseTitle', () => {
 
   it('keeps an unknown color letter in the name', () => {
     expect(parseTitle('!x(y)  t')).toEqual({ tags: [{ name: 'x(y)', color: null }], text: 't' })
+  })
+})
+
+describe('hasTag and tagText', () => {
+  it('finds a tag whatever its case or color', () => {
+    expect(hasTag('!DTVLT(r)  fix', 'dtvlt')).toBe(true)
+    expect(hasTag('!web  !dtvlt  fix', 'dtvlt')).toBe(true)
+    expect(hasTag('dtvlt  fix', 'dtvlt')).toBe(false)
+  })
+  it('writes a tag back as it is typed', () => {
+    expect(tagText({ name: 'dtvlt', color: 'red' })).toBe('!dtvlt(r)')
+    expect(tagText({ name: 'web', color: null })).toBe('!web')
   })
 })

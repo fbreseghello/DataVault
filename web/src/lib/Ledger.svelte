@@ -49,6 +49,7 @@
   let pausing = $state(false)
   let method = $state('')
   let note = $state('')
+  let priceSince = $state('')
 
   type Row = Bill & { next: string | null; over: boolean; held: boolean }
 
@@ -86,6 +87,10 @@
   )
   // what the form would cost a month, as it is typed
   const draftCents = $derived(parseAmount(amount))
+  // an edit that changes the price asks from when
+  const repricing = $derived(
+    !!selected && draftCents !== null && draftCents !== selected.amount && currency.trim().toUpperCase() === selected.currency,
+  )
 
   function fail(e: unknown) {
     if (e instanceof ApiError && e.status === 423) return
@@ -127,6 +132,7 @@
     pausing = !!pauseFrom
     method = b?.method ?? ''
     note = b?.note ?? ''
+    priceSince = todayISO()
   }
 
   function close() {
@@ -154,7 +160,12 @@
       return
     }
     const pause = pausing ? { pause_from: pauseFrom, pause_until: pauseUntil } : { pause_from: '', pause_until: '' }
+    if (repricing && priceSince && (priceSince > todayISO() || priceSince <= since)) {
+      error = 'the new price must start after the first charge, and not after today'
+      return
+    }
     const input: BillInput = { name, amount: cents, currency, cycle, since, until, ...pause, method, note }
+    if (repricing && priceSince && priceSince !== todayISO()) input.price_since = priceSince
     busy = true
     error = ''
     try {
@@ -346,6 +357,13 @@
             <input type="text" inputmode="decimal" bind:value={amount} required autocomplete="off" placeholder="55,90" />
             <input class="currency" type="text" bind:value={currency} required maxlength="3" spellcheck="false" autocomplete="off" aria-label="currency" />
           </label>
+          {#if repricing}
+            <label class="row">
+              <span>new price from</span>
+              <input type="date" bind:value={priceSince} min={selected?.history?.at(-1)?.until ?? since} max={today} />
+              <span class="unit">the charges before keep the old price</span>
+            </label>
+          {/if}
           <label class="row">
             <span>every</span>
             <select bind:value={cycle}>

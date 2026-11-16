@@ -289,7 +289,10 @@ export interface PriceChange {
   until: string
 }
 
-export type BillInput = Omit<Bill, 'id' | 'history' | 'created_at' | 'updated_at'>
+export type BillInput = Omit<Bill, 'id' | 'history' | 'created_at' | 'updated_at'> & {
+  /** The day a changed amount took effect, when that was before today; it dates the old price. */
+  price_since?: string
+}
 
 const billPath = (id: string) => '/api/bills/' + encodeURIComponent(id)
 

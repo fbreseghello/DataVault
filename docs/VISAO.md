@@ -292,6 +292,11 @@ O plano de batalha do dia. **Um quadro por dia**, com quatro colunas:
   tudo tag. Uma letra entre parênteses no fim escolhe a cor: `(r)` vermelho, `(b)` azul,
   `(g)` verde, nos tons do tema; sem ela, a tag usa a cor de destaque. Várias seguidas:
   `!dtvlt(r)  !web  corrigir o login`.
+- **Filtro por tag:** clicar numa tag mostra só as tarefas que a têm, em todas as
+  colunas; a tag aparece na barra de cima, e clicar nela ou `Esc` volta a mostrar tudo.
+  Uma ordem nova criada com o filtro ligado já começa com a tag.
+- **Rascunho:** fechar o formulário de uma ordem nova com `Esc`, ou trocar de dia, guarda
+  o que foi escrito; o botão vira **+ draft** e volta ao texto. Só **cancel** descarta.
 - **Dias:** o quadro abre no dia de hoje. Dá para navegar para os dias anteriores
   (histórico) e voltar para hoje. Um dia novo começa vazio e oferece trazer o que
   ficou em Orders e In Battle no dia anterior.
@@ -344,7 +349,8 @@ academia. Mostra quanto vai embora todo mês e o que cobra nos próximos dias.
   estão cobrando: as pausadas e as que acabaram ficam de fora. Contas anuais contam
   1/12 por mês, e semanais 52/12.
 - **Histórico de preço:** quando o valor muda, o vault guarda o anterior e o dia da
-  troca. A conta mostra a sequência e quanto o preço subiu ou desceu desde o
+  troca. O dia é hoje, ou o que se escolher em **new price from**, para um reajuste que
+  já aconteceu (nunca no futuro nem antes da troca anterior). A conta mostra a sequência e quanto o preço subiu ou desceu desde o
   primeiro. Trocar a moeda começa o histórico de novo.
 - **Pago até hoje:** quanto a conta já levou, somando as cobranças desde a primeira,
   cada uma pelo preço do seu dia e sem as que a pausa pulou.

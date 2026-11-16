@@ -25,11 +25,20 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
   `dtvlt` antes do título. A tag termina nos primeiros dois espaços (com um só, o título
   inteiro vira tag). `(r)`, `(b)` ou `(g)` no fim da tag a deixa vermelha, azul ou
   verde, como em `!dtvlt(r)`; sem cor, ela usa a cor de destaque do tema.
+- **Filtro por tag** no siege: clicar numa tag mostra só as tarefas com ela, e `Esc`
+  ou clicar na tag da barra de cima volta a mostrar tudo. Uma ordem nova criada com o
+  filtro ligado já começa com a tag.
+- **New price from** no ledger: ao mudar o valor de uma conta, dá para dizer desde quando
+  o preço novo vale, para um reajuste que já aconteceu. O **pago até hoje** usa essa data.
+- Testes do frontend (`npm --prefix web test`, com vitest) para as datas do ledger, o
+  `.ics` e as tags, rodando também no CI.
 - Cores `red`, `blue` e `green` nos temas, só para as tags do siege. Cada tema embutido
   tem os seus tons, e um tema importado pode trocá-los (veja `docs/TEMAS.md`).
 
 ### Alterado
 
+- **Esc** no formulário de uma ordem nova no siege não descarta mais o texto: ele fica
+  como rascunho, e o botão vira **+ draft**. Só **cancel** descarta.
 - Criar uma tarefa no **siege** já abre o campo **note** junto com o título, com os
   botões **add** e **cancel**. `Enter` no título adiciona, e `Ctrl+Enter` na nota também.
 - Os totais do ledger saíram da barra de cima e foram para o resumo.
