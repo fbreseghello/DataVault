@@ -7,6 +7,11 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Alterado
+
+- O ícone do **hollow** no souls agora é uma caveira encapuzada, de órbitas vazias, no
+  lugar do elmo.
+
 ## [0.18.0] - 2026-11-13
 
 ### Adicionado
