@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-11-16
+
 ### Adicionado
 
 - O **hollow** ganha corpo: na primeira vez que a página abre, ela pede a classe entre
@@ -520,7 +522,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.21.1...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.22.0...HEAD
+[0.22.0]: https://github.com/fbreseghello/DataVault/compare/v0.21.1...v0.22.0
 [0.21.1]: https://github.com/fbreseghello/DataVault/compare/v0.21.0...v0.21.1
 [0.21.0]: https://github.com/fbreseghello/DataVault/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/fbreseghello/DataVault/compare/v0.19.0...v0.20.0
