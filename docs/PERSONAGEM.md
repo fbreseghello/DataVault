@@ -1,28 +1,34 @@
 # DataVault — Personagem
 
-> **Em construção.** Este documento descreve um personagem que evolui com o uso do
-> DataVault. Já existem o ícone no topo da barra lateral, a experiência vinda do Siege,
-> com níveis, títulos, atributos e o histórico, e a escolha de classe com o boneco de
-> cada uma (veja a
-> [ordem de construção](#ordem-de-construção)). O resto serve de referência para quando
-> for construído. A forma geral segue o
-> [guia de estilo](ESTILO.md) e o formato de temas segue [TEMAS.md](TEMAS.md).
+> **Em construção.** Este documento descreve um companheiro que evolui com o uso do
+> DataVault. Já existem o ícone no topo da barra lateral e a experiência vinda do Siege,
+> com níveis, títulos, atributos e o histórico (veja a
+> [ordem de construção](#ordem-de-construção)). A versão 0.22 trouxe classes em pixel art;
+> elas saem quando os companheiros descritos aqui entrarem. A forma geral segue o
+> [guia de estilo](ESTILO.md) e o formato de temas segue [TEMAS.md](TEMAS.md). Os prompts
+> das imagens estão em [HOLLOW-ARTE.md](HOLLOW-ARTE.md).
 
 ## A ideia
 
-Um personagem em pixel art, com o Tibia e o Habbo como referências, que acompanha
-quem usa o cofre. Ele ganha **experiência
-(XP)** com o que acontece no sistema (concluir tarefas no Siege, escrever no Unspoken,
-renovar uma chave no prazo) e sobe de **nível**. Quem usa escolhe a **classe** dele, e
-com os níveis vêm títulos e peças novas para **personalizar** o boneco. Ele também
-aparece fora da página: na **tela de descanso** e no terminal, com o `dtvlt hollow`.
+Um **companheiro** que acompanha quem usa o cofre, no espírito de um tamagotchi, mas com
+a arte e o tom do DataVault. Quem usa escolhe **o que** ele é, numa de quatro
+categorias: uma figura de dark fantasy, um animal, um shinigami ou um demônio. Ele
+ganha **experiência (XP)** com o que acontece no sistema (concluir tarefas no Siege,
+escrever no Unspoken, renovar uma chave no prazo) e sobe de **nível**, com títulos ao
+longo do caminho. Também aparece fora da página: na **tela de descanso** e no terminal,
+com o `dtvlt hollow`.
 
-Não é um jogo que pede atenção. É um diário de campanha silencioso: o personagem fica
-parado, como as outras artes do DataVault, e só registra o caminho percorrido.
+A arte é **ilustração no estilo do tarot Rider-Waite-Smith** (1909), como a carta do
+Eremita: traço de nanquim, cor chapada, uma figura solitária num cenário quase vazio.
+Nas telas, cada imagem aparece nos tons do tema.
+
+Não é um jogo que pede atenção, e o companheiro não morre nem adoece por abandono, ao
+contrário do tamagotchi. É um diário de campanha silencioso: ele fica parado, como as
+outras artes do DataVault, e só registra o caminho percorrido.
 
 - **Sim:** progresso lento e honesto, texto seco, arte parada, tudo local e criptografado.
 - **Não:** "LEVEL UP!!!", confete, sons, notificações insistentes, ranking, metas que
-  culpam quem não abriu o app, recompensa por ações sem sentido.
+  culpam quem não abriu o app, recompensa por ações sem sentido, fome, morte, sujeira.
 
 O nome interno da funcionalidade é **`hollow`** (como as páginas, a chave usa o nome
 do `souls`). Cada tema dá o seu nome a ela.
@@ -148,41 +154,92 @@ Novas chaves em `words`, com as mesmas regras (uma linha, até 24 caracteres):
 | `xp` | a experiência | souls | mana | xp |
 | `level` | o nível (abreviado `lv` na dica) | level | circle | level |
 | `deeds` | o histórico de XP | deeds | grimoire notes | quest journal |
-| `attire` | a tela de personalizar | attire | regalia | gear |
 
-## A página
+## A página: a carta
 
-O boneco grande à esquerda e o status à direita.
+A página é **uma carta de tarot**. As ilustrações vêm sem moldura nem título (veja
+[A arte](#a-arte)); a moldura, o número e o nome são desenhados pelo app, em linhas
+finas nos tons do tema, e carregam o que o companheiro é. À esquerda a carta, à
+direita a leitura.
 
 ```
 datavault / hollow
-──────────────────────────────────────────────────────────────────
- lv 7 · the unkindled                     340 souls to next · class
-──────────────────────────────────────────────────────────────────
-                                 │ level 7 · cleric · the unkindled
-        ┌──────────────────┐     │ souls   [##########......]  340 / 500
-        │                  │     │
-        │  sprite 64 × 64  │     │ vigor   ################  58
-        │  no maior múlti- │     │ memory  ########........  31
-        │  plo que couber  │     │ ...
-        │                  │     │
-        └──────────────────┘     │ deeds
-                                 │ today
-                                 │ +10  task conquered      14:20
-                                 │ +25  day cleared         14:20
-──────────────────────────────────────────────────────────────────
+────────────────────────────────────────────────────────────────────
+                                   │
+    ┌──────────── IX ───────────┐   │   IX · the hermit
+    │                          │   │   the unkindled
+    │                          ·   │
+    │                          ·   │   souls    340 / 500
+    │       a ilustração        ·   │
+    │      nos tons do tema    ·   │   vigor    ████████████   58
+    │                          ·   │   memory   ██████         31
+    │                          ·   │   ward     ████           24
+    │                          ·   │   hoard    █               6
+    │                          ·   │   thrift   ██             12
+    │                          ·   │
+    └───── ◆ THE HERMIT ◆ ··········┘   │   today
+                                   │   +10  task conquered   14:20
+     yesterday · four orders       │   +25  day cleared      14:20
+     conquered, the day cleared    │
+────────────────────────────────────────────────────────────────────
+ IX · 160 souls to next                   space turn · c companion
 ```
 
-- **À esquerda:** o sprite no maior múltiplo inteiro que cabe no painel, com o quarto
-  atrás quando ele existir.
-- **À direita:** o nível, a classe e o título; a barra de XP em ASCII (`[`, `#` para o
-  ganho, `.` para o que falta, `]`, e os números); os atributos; e embaixo o histórico
-  (`deeds`) agrupado por dia, com o ganho, o motivo e a hora. Nunca mostra o título de
-  notas, entradas ou tarefas, só o tipo de ação, como o log da sessão no terminal.
-- **`attire`:** troca o histórico pela lista de peças (veja
-  [Personalizar](#personalizar)); escolher uma peça mostra o boneco já com ela.
-- O personagem olha para a esquerda, para dentro da tela, como as artes da tela de
-  descanso.
+### A frente
+
+- **O número é o nível**, em algarismos romanos no topo da moldura, como nas cartas:
+  nível 9 é `IX`. Num nível novo, só o numeral fica em `--accent`, até a página ser
+  aberta.
+- **O nome** do companheiro vai no pé da moldura, em versalete: `THE HERMIT`.
+- **A moldura é a barra de XP.** O contorno é traçado em `--fg`, no sentido horário a
+  partir do numeral, conforme o XP do nível sobe; o que falta fica pontilhado em
+  `--line`. Quando o contorno fecha, o numeral muda. Não há outra barra de XP na tela.
+- **A moldura envelhece com os títulos.** A cada título novo (de 5 em 5 níveis) ela
+  ganha um detalhe: marcas nos cantos, depois uma linha dupla, depois um ornamento em
+  volta do numeral, e assim por diante. A carta de quem está há muito tempo com o
+  companheiro parece mais gasta e mais rica, sem nenhuma ilustração nova.
+- **Selos de epitáfio.** Cada [epitáfio](#epitáfios) conquistado vira um pequeno selo
+  (◆) no pé da moldura, ao lado do nome. Passar o mouse mostra o texto; os que faltam
+  não aparecem.
+- A ilustração ocupa o miolo, no maior tamanho que cabe no painel sem distorcer, na
+  proporção 2:3 das imagens.
+
+### O verso
+
+`espaço`, ou um clique na carta, vira a carta. O verso guarda o que é permanente:
+
+- o desenho do verso é o **ícone `hollow` do tema repetido em treliça**, em 1 bit, nos
+  tons do tema, então cada tema tem o seu verso de baralho;
+- por cima, a lista dos epitáfios gravados, com a data, e `since 12 Mar 2026`, o dia em
+  que o companheiro foi escolhido;
+- quando existir, a crônica do ano (veja [Ritmo](#ritmo)).
+
+A frente é o momento; o verso, a história. `espaço` de novo volta à frente.
+
+### A leitura, à direita
+
+Só texto, na hierarquia de cinzas do resto do app, sem caixas nem cards, como uma
+tiragem anotada num caderno:
+
+- o numeral, o nome e o título: `IX · the hermit` e, embaixo, `the unkindled`;
+- o XP do nível em números (`340 / 500`), já que a barra é a moldura;
+- os cinco atributos, com barras curtas relativas ao maior;
+- o histórico (`deeds`) agrupado por dia, com o ganho, o motivo e a hora. Nunca mostra o
+  título de notas, entradas ou tarefas, só o tipo de ação, como o log da sessão no
+  terminal.
+
+### A leitura do dia
+
+Na primeira vez que a página abre num dia, uma linha embaixo da carta resume o dia
+anterior no tom de uma leitura: `yesterday · four orders conquered, the day cleared`.
+Some quando outra página é aberta. Só números e tipos de ação, nunca títulos; num dia
+sem nada, não aparece.
+
+### O que fica de fora
+
+Ícones e botões além de **companion**; animação, a não ser a carta virando (que
+respeita "reduzir movimento"); a cor de destaque fora do numeral; sombra ou brilho na
+carta.
 
 ## Experiência
 
@@ -254,28 +311,72 @@ Sem tela cheia nem animação. Quando o XP passa do limite:
   as outras mensagens de estado;
 - no terminal aberto, o log da sessão registra `17:24  level 8`.
 
-## Classe
+## O companheiro
 
-Quem usa **escolhe a classe** do personagem. Ela define a silhueta base, as peças
-iniciais e o atributo de afinidade (veja [Atributos](#atributos)). Cada tema dá nomes e
-peças próprias às classes; a chave interna é a do `souls`.
+Quem usa **escolhe o companheiro** numa de quatro categorias. A chave interna é fixa
+(`hermit`, `raven`, ...); os nomes aparecem em inglês, como o resto da interface.
 
-| Chave | souls | arcane | dungeon | Afinidade | Silhueta |
-|---|---|---|---|---|---|
-| `knight` | knight | battlemage | warrior | vigor | ombros largos, elmo, espada |
-| `scribe` | scribe | scholar | bard | memory | encurvado, capuz, livro e pena |
-| `warden` | warden | enchanter | paladin | ward | escudo à frente, armadura fechada |
-| `thief` | thief | trickster | rogue | hoard | magro, capuz baixo, adagas |
-| `cleric` | cleric | oracle | priest | thrift | manto longo, lanterna ou cajado |
+### Wanderers
 
-- **A primeira vez** que a página abre, ela mostra os cinco sprites lado a lado, com o
-  nome e uma linha de descrição. Setas escolhem, `Enter` confirma.
-- **Trocar depois** é livre e não custa XP nem nível: em `attire`, **class** abre a mesma
-  escolha. As peças que não servem na classe nova voltam para as iniciais dela; as
-  destravadas continuam destravadas.
-- O painel mostra a classe entre o nível e o título: `level 7 · knight · the unkindled`.
-- **Afinidade:** o atributo da classe ganha 10% a mais de pontos. É um empurrão, não
-  uma trava: um knight que só escreve notas ainda fica com memory alto.
+Figuras de dark fantasy: andarilhos, guerreiros e magos que seguem quem usa o cofre.
+
+| Chave | Quem é |
+|---|---|
+| `hermit` | o eremita: velho de manto e capuz, lanterna erguida, cajado |
+| `mercenary` | guerreiro marcado de cicatrizes, espada enorme no ombro, capa rasgada |
+| `sorcerer` | mago de manto longo, cajado entalhado e um grimório preso ao cinto |
+| `witch` | bruxa de chapéu largo, ervas penduradas e uma vela acesa na mão |
+| `necromancer` | encapuzado e magro, entre ossos, com uma lanterna de luz fria |
+
+### Animals
+
+Bichos de companhia.
+
+| Chave | Quem é |
+|---|---|
+| `dog` | um cão magro e leal, sentado, de orelhas em pé |
+| `cat` | um gato preto sentado, cauda enrolada nas patas |
+| `raven` | um corvo pousado num galho seco |
+| `bat` | um morcego pendurado de cabeça para baixo, asas fechadas |
+| `owl` | uma coruja pousada, olhos grandes |
+| `wolf` | um lobo de pé, pelo espesso, olhar atento |
+| `serpent` | uma serpente enrolada, cabeça erguida |
+
+### Shinigami
+
+Ceifadores que ficam ao lado, pacientes.
+
+| Chave | Quem é |
+|---|---|
+| `reaper` | alto e esquelético, manto preto, foice |
+| `gaunt` | magro e anguloso, olhos grandes e redondos, sorriso torto, asas finas e esfarrapadas |
+| `masked` | envolto em panos, com uma máscara de osso, um caderno na mão |
+
+### Demons
+
+Demônios domesticados, meio contrariados de estar ali.
+
+| Chave | Quem é |
+|---|---|
+| `imp` | pequeno, chifres curtos, asas de morcego, rabo pontudo |
+| `brute` | grande e curvado, chifres retorcidos, correntes nos pulsos |
+| `fiend` | esguio, asas grandes, cauda longa, garras |
+| `hellhound` | um cão de fogo, costelas à mostra, brasas no pelo |
+
+### Escolher e trocar: tirar uma carta
+
+- **A primeira vez** que a página abre, ela mostra **quatro cartas viradas para baixo**,
+  uma por categoria. O verso de cada uma traz o selo da categoria no meio, um ícone de
+  16 × 16 em 1 bit como os da barra: uma **lanterna** (wanderers), uma **pegada**
+  (animals), uma **foice** (shinigami) e **chifres** (demons). O nome vai embaixo.
+- Escolher uma categoria abre os companheiros dela **em leque**, de frente, cada um com
+  o nome no pé e uma linha de descrição. Setas escolhem, `Enter` confirma e a carta vira
+  para o centro; `Esc` volta às categorias.
+- **Trocar depois** é livre e não custa XP nem nível: **companion** (tecla `c`) abre a
+  mesma escolha. O nível, o XP, os atributos e o histórico continuam.
+- As classes da versão 0.22 (`knight`, `scribe`, `warden`, `thief`, `cleric`) saem.
+  Quem já tinha escolhido uma vê a escolha de companheiro na próxima vez que abrir a
+  página. A afinidade de classe sai junto: os atributos passam a refletir só o uso.
 
 ## Atributos
 
@@ -293,138 +394,67 @@ usado.
 
 - No painel, abaixo da barra de XP, cada atributo é uma linha com uma barra curta:
   `vigor   ######....  42`. A barra é relativa ao maior atributo.
-- Peças especiais de `attire` podem pedir um atributo mínimo além do nível
-  (`lv 10 · ward 30`).
 
-## O sprite
+## A arte
 
-O boneco é **pixel art**, não ASCII. As referências são dois jogos, e só como
-referência: **nada é copiado** (nem sprites, nem proporções exatas, nem paletas, nem
-nomes de peças).
+### O estilo
 
-| Do **Tibia** vem | Do **Habbo** vem |
+**Ilustração no estilo do tarot Rider-Waite-Smith** (1909), tendo a carta do Eremita
+como referência: contorno firme de nanquim, áreas de cor chapada, pouca textura, uma
+figura solitária, de corpo inteiro, em três quartos olhando para a esquerda, num
+cenário quase vazio. **Só o estilo**: nada de moldura, título nem número de carta.
+
+- As imagens são geradas no Midjourney com os prompts de
+  [HOLLOW-ARTE.md](HOLLOW-ARTE.md), todas com a mesma referência de estilo
+  (`--sref`), para os companheiros parecerem do mesmo baralho.
+- Formato **2:3** (vertical), com a figura inteira e uma margem em volta.
+- Guerreiros, shinigamis e demônios podem lembrar o clima de obras conhecidas (o
+  guerreiro marcado de Berserk, os shinigamis de Death Note), mas **nunca** reproduzem um
+  personagem: os prompts descrevem traços genéricos e nunca citam nomes de obras ou de
+  personagens.
+
+### Nos tons do tema
+
+A imagem é guardada **em tons de cinza** e pintada na hora com as cores do tema: o
+preto vira `--bg`, o branco vira `--fg`, e os cinzas do meio passam por `--dim` e
+`--muted`. É um degradê contínuo, sem os degraus do pixel art, então o traço e a
+sombra da ilustração se mantêm. Ela muda sozinha quando o tema muda.
+
+- **A cor de destaque nunca entra na imagem.**
+- O fundo da ilustração deve ser escuro e liso, para virar o `--bg` da página sem
+  marca de borda.
+- Os ícones da barra continuam em pixel art de 1 bit; a ilustração do companheiro é a
+  única arte desse tipo no app, e o guia deve registrar isso quando ela entrar no
+  código.
+
+### Os arquivos
+
+- Os originais do Midjourney ficam em `art/hollow/`, um PNG por companheiro, com a
+  chave no nome (`hermit.png`, `raven.png`).
+- Um script em `scripts/art/` converte cada um: recorta a margem, passa para tons de
+  cinza, ajusta o contraste para o preto do fundo cair no `--bg`, reduz para no máximo
+  1024 px de altura e grava em WebP. É esse arquivo que vai no binário.
+- O tamanho de todos juntos fica abaixo de alguns MB, para o `dtvlt` não crescer demais.
+
+## O cofre no humor: a carta invertida
+
+No tarot, uma carta de cabeça para baixo é a leitura **invertida**: o mesmo arcano, com
+o sentido torto. Quando o cofre tem pendências, a carta do companheiro aparece **girada
+180°**, e embaixo dela surge uma linha só, em `--dim`: `reversed · 2 keys rotting`.
+Resolvida a causa, ela volta à posição normal.
+
+| Fica invertida quando | Volta quando |
 |---|---|
-| o sprite compacto em visão 3/4, de lado e de cima ao mesmo tempo | o avatar montado em peças trocáveis, camada sobre camada |
-| o outfit por classe, com addons que se ganham com o tempo | o quarto isométrico com móveis (veja [O quarto](#o-quarto)) |
-| escolher a cor de cada parte do corpo | a tela de vestir, com o boneco mudando enquanto se escolhe |
+| há entradas vencidas no Grimoire ou uma com 2 códigos de recuperação ou menos | tudo é renovado |
+| há tarefas em In Battle há mais de 3 dias | elas saem de In Battle |
 
-### Tamanho e vista
-
-- **64 × 64 pixels**, em visão 3/4, olhando para a esquerda e um pouco para baixo, para
-  dentro da tela, com os pés perto do pé da grade, para todas as classes pisarem no
-  mesmo chão. (As classes começaram em 32 × 32 e estão sendo redesenhadas em 64, uma
-  por vez, a partir do cleric; enquanto isso as duas convivem, e cada uma é desenhada
-  no maior múltiplo que cabe.)
-- Sempre em **múltiplos inteiros**: o maior que cabe na página, 2× na escolha de classe,
-  o que couber na tela de descanso. Cada pixel da arte cai em pixels inteiros da tela.
-- Um desenho novo pode partir do de 32 ampliado com o **Scale2x**, que suaviza as
-  diagonais, e ganha os detalhes por cima, já em 64.
-- Desenhado como os ícones: um caminho SVG por tom, com `shape-rendering: crispEdges`.
-
-### Cores: os tons do tema
-
-O sprite usa **só as cores do tema**, então continua monocromático e muda sozinho
-quando o tema muda.
-
-| Índice | Cor | Uso |
-|---|---|---|
-| `.` | transparente | fundo |
-| `1` | `--line` | contorno e sombra mais funda |
-| `2` | `--dim` | sombra |
-| `3` | `--muted` | tom médio |
-| `4` | `--fg` | luz |
-
-- A **cor de destaque nunca entra no boneco.**
-- Isto estende a regra do [guia](ESTILO.md#ícones) de pixel art de 1 bit: os ícones
-  continuam com 1 bit; o sprite do personagem é a única arte em 4 tons. O guia deve
-  registrar isso quando a funcionalidade entrar no código.
-
-### Personalizar
-
-O boneco é montado em **camadas**, desenhadas de baixo para cima. Cada peça é uma grade
-de 64 × 64 com o mesmo formato, e um pixel não transparente cobre o de baixo.
-
-| Ordem | Camada | O que é | Exemplos (souls) |
-|---|---|---|---|
-| 1 | `back` | o que fica atrás do corpo | capa rasgada, manto, aljava |
-| 2 | `body` | o corpo da classe | vem da classe |
-| 3 | `legs` | pernas e pés | grevas, botas, pés enfaixados |
-| 4 | `torso` | o que veste no tronco | cota, gibão, túnica |
-| 5 | `head` | cabeça, cabelo ou elmo | capuz, elmo fechado, coroa partida |
-| 6 | `hand` | o que segura | espada, cajado, lanterna, livro |
-| 7 | `addon` | um detalhe que se ganha | ombreira, brasão, pena no elmo |
-
-**Cor por parte**, como no Tibia, mas dentro dos tons do tema. Algumas regiões das
-peças são marcadas com letras em vez de números, e quem usa escolhe o tom de cada uma:
-
-| Letra | Região | Escolha |
-|---|---|---|
-| `H` / `h` | cabeça | `fg`, `muted` ou `dim` |
-| `T` / `t` | tronco | idem |
-| `L` / `l` | pernas | idem |
-| `F` / `f` | pés | idem |
-
-Maiúscula é a luz da região, no tom escolhido; minúscula é a sombra, um tom abaixo.
-Escolher `dim` faz a sombra cair em `line`.
-
-Exemplo do formato (só algumas linhas de um elmo):
-
-```
-................................
-............111111..............
-..........11HHHHHH11............
-.........1HHHHHHHHHh1...........
-.........1HH11111HHh1...........
-.........1Hh1....1hh1...........
-```
-
-- A classe escolhe o `body` e as peças iniciais; as outras camadas são livres.
-- **Peças se destravam por nível**, por atributo ou por epitáfio (veja
-  [Epitáfios](#epitáfios)), nunca por compra nem por sorte. A lista em `attire`
-  mostra todas; as que faltam aparecem desabilitadas, em `--muted`, com a dica do
-  nível que as libera (`lv 10`), como as opções futuras em settings.
-- Cada tema traz o seu conjunto de peças, combinando com o clima: elmos e capas no
-  `souls`, chapéus e cajados no `arcane`, armaduras e tochas de 8 bits no `dungeon`. Ao
-  trocar de tema, a escolha de cada camada vai para a peça de mesma posição no novo
-  conjunto.
-- **Addons**, como no Tibia: cada classe tem dois, que se ganham por nível ou por
-  epitáfio e ficam na camada `addon`.
-- Temas importados podem trazer peças num campo novo, `attire`, com as mesmas regras
-  dos ícones: chaves conhecidas, 32 linhas de 32 caracteres, só os índices e as letras
-  acima.
-
-### Regras da arte
-
-- **Contorno de 1 pixel** em `1` em volta da silhueta toda, para o boneco se destacar
-  do fundo em qualquer tema.
-- **Luz de cima e da direita**, sempre do mesmo lado em todas as peças.
-- **Sem antisserrilhado** e sem pixels soltos. Vãos de 2 pixels, como nos ícones.
-- **Parado.** O personagem não pisca, não respira, não anda.
-- Peças com direção (espada, capa) são desenhadas olhando para a esquerda.
-- Toda combinação de peças precisa continuar legível: cada camada é testada sobre cada
-  `body`, nos três temas e nas três escolhas de tom.
-- **Silhueta primeiro**, como nos ícones: se a classe não se reconhece só pelo
-  contorno em 1×, detalhe nenhum salva.
-
-As peças são desenhadas à mão num editor de pixel art (Aseprite, Piskel, LibreSprite)
-com uma paleta indexada de 5 cores, exportadas em PNG e convertidas na grade de texto
-por um script em `scripts/art/`, que também confere tamanho, índices e contorno.
-
-## O cofre no corpo
-
-O boneco mostra a saúde do cofre. São camadas extras, por cima do `attire`, que
-aparecem e somem sozinhas; quem usa não escolhe nem remove, só resolve a causa.
-
-| Marca | Aparece quando | Some quando |
-|---|---|---|
-| **armadura gasta:** rachaduras e manchas de ferrugem, pixels de `fg` trocados por `dim` | há entradas vencidas no Grimoire ou uma entrada com 2 códigos de recuperação ou menos | tudo é renovado |
-| **peso nas costas:** o boneco fica encurvado | há tarefas em In Battle há mais de 3 dias | elas saem de In Battle |
-| **saco de moedas:** pendurado no cinto, maior com o gasto | sempre, proporcional ao gasto mensal do Ledger, em 3 tamanhos | contas recebem strike |
-
-- Não tiram XP nem nível. É uma auditoria de relance, não uma punição.
+- Não tira XP nem nível, e nada piora com o tempo. É uma auditoria de relance, não uma
+  punição.
+- O numeral e o nome giram junto com a carta, como numa carta de verdade; a leitura à
+  direita continua de pé.
 - A dica do ícone na barra lateral diz a causa: `hollow · lv 7 · 2 keys rotting`.
-- As marcas seguem as regras da arte: paradas, nos tons do tema, sem cor de destaque.
-  O peso nas costas troca o `body` por uma variante encurvada da classe.
+- Uma ilustração só por companheiro basta: a carta invertida dispensa as versões
+  "inquietas" que o plano chegou a prever.
 
 ## Epitáfios
 
@@ -441,15 +471,15 @@ lápide. Cada tema dá o seu nome à lista (`epitaphs` no `souls`, `chronicles` 
 | `buried a year of dead words` | uma nota enterrada há mais de um ano |
 | `cut the ledger by half` | o gasto mensal cai à metade do maior já registrado |
 
-- Cada um dá XP uma vez e pode destravar uma peça que não sai por nível.
+- Cada um dá XP uma vez.
 - A lista mostra a data e o texto; os que faltam ficam ocultos, só com `???`, para não
   virarem uma lista de tarefas.
 - Mesmo tom do resto: minúsculas, sem exclamação.
 
 ## Ritmo
 
-- **A vela do dia:** ao lado do boneco, uma vela em pixel art, no mesmo formato do
-  sprite (16 × 32, tons do tema), parada. Ela vai derretendo conforme as tarefas do dia
+- **A vela do dia:** ao lado do companheiro, uma vela pequena no mesmo estilo de
+  ilustração e nos tons do tema, parada. Ela vai derretendo conforme as tarefas do dia
   saem de Orders e é trocada por uma nova à meia-noite. Não apaga por falta de uso.
 - **A crônica do ano:** no primeiro acesso de cada ano, a página oferece a crônica do
   ano anterior, uma página de texto com o resumo: tarefas conquistadas, notas escritas,
@@ -458,54 +488,30 @@ lápide. Cada tema dá o seu nome à lista (`epitaphs` no `souls`, `chronicles` 
 
 ## Tela de descanso
 
-Um estilo novo da tela de descanso, **`hollow`**, ao lado de `pillar`, `skull-i`,
-`skull-ii` e `candle`:
+Cada companheiro também é um **estilo da tela de descanso**, ao lado de `pillar`,
+`skull-i`, `skull-ii` e `candle`. Assim, as ilustrações valem por si, mesmo para quem
+não liga para o nível.
 
-- O personagem, com a classe, o `attire` e as marcas do cofre, **dentro do quarto**
-  (veja abaixo), no canto inferior direito, olhando para a esquerda, como as outras
-  artes.
-- Parado. Embaixo do quarto, em `--dim` e 11 px, só `lv 7 · the unkindled`.
-- O tamanho é o maior múltiplo inteiro que cabe na altura pedida sem passar de metade
-  da largura, para os pixels continuarem inteiros.
-- Com o hollow desligado em settings, o estilo some da lista e, se estava em uso, a
-  tela volta para o padrão.
-- O cofre travado não tem acesso ao personagem; a tela de descanso só mostra o hollow
-  enquanto a sessão está aberta, e volta ao estilo padrão depois do lock.
-
-### O quarto
-
-A referência aqui é o Habbo: um **quarto isométrico pequeno**, onde o personagem fica.
-
-- Piso em losango com linhas de 2:1 (2 pixels para o lado, 1 para cima), de 4 × 4
-  ladrilhos, e duas paredes ao fundo. Tudo nos tons do tema, com o mesmo contorno do
-  sprite.
-- **Os móveis contam a história do cofre.** Cada atributo destrava móveis em alguns
-  patamares, e eles aparecem sozinhos no quarto:
-
-  | Atributo | Móveis (souls) |
-  |---|---|
-  | vigor | um suporte de armas, depois um boneco de treino |
-  | memory | uma pilha de livros, depois uma estante |
-  | ward | um cadeado na porta, depois um baú selado |
-  | hoard | uma caixa, depois um baú de relíquias |
-  | thrift | uma balança, depois um cofre de moedas |
-
-- Epitáfios destravam objetos únicos (uma lápide pequena, um estandarte), que quem usa
-  posiciona em `attire → room`, ladrilho a ladrilho, como no Habbo.
-- Cada tema traz o seu conjunto: pedra e velas no `souls`, estantes e cristais no
-  `arcane`, tochas e baús no `dungeon`.
-- O quarto também aparece, menor, atrás do boneco no painel da página.
+- **`hollow`** mostra **a carta inteira** do companheiro escolhido, com a moldura, o
+  numeral e o nome, invertida se for o caso, no canto inferior direito, como as outras
+  artes. Embaixo, em `--dim` e 11 px, só `the unkindled`.
+- Cada ilustração também pode ser escolhida diretamente como estilo (`hermit`,
+  `raven`...), sem nível nem texto, mesmo com o hollow desligado.
+- Parada, nos tons do tema, no maior tamanho que cabe na altura pedida sem passar de
+  metade da largura.
+- O cofre travado não tem acesso ao companheiro escolhido: o estilo `hollow` só aparece
+  enquanto a sessão está aberta e volta ao padrão depois do lock. As ilustrações
+  escolhidas diretamente não dependem do cofre e continuam valendo.
 
 ## Dados
 
 - Uma coleção própria, `hollow`, dentro do payload criptografado do vault, como as
   tarefas e as notas. Nada fica fora do arquivo do cofre.
-- Guarda: a classe, as escolhas de `attire`, o último nível visto, os epitáfios
-  (chave e data) e a lista de **deeds** (XP, atributo, tipo de ação, id da origem,
-  data). O XP total, o nível e os atributos são calculados a partir dos deeds, então
-  desfazer é só apagar o deed da origem.
-- As marcas do cofre não são guardadas: são calculadas na hora a partir do Grimoire,
-  do Siege e do Ledger.
+- Guarda: o companheiro, o último nível visto, os epitáfios (chave e data) e a lista de
+  **deeds** (XP, atributo, tipo de ação, id da origem, data). O XP total, o nível e os
+  atributos são calculados a partir dos deeds, então desfazer é só apagar o deed da
+  origem.
+- O humor não é guardado: é calculado na hora a partir do Grimoire e do Siege.
 - Os deeds guardam o **id** da origem, nunca o título. Apagar a origem apaga o deed.
 - Deeds com mais de um ano podem ser compactados num deed só por mês, para o vault
   não crescer sem limite.
@@ -521,7 +527,7 @@ ficha à direita.
 ```
 $ dtvlt hollow
 
-         .###.         hollow   level 7 · knight · the unkindled
+         .###.         hollow   level 7 · hermit · the unkindled
         :#####:        xp       [##########......]  340 / 500
         ##-=-##
         :#####:        vigor    ##########  58
@@ -535,15 +541,16 @@ $ dtvlt hollow
                        since    12 Mar 2026 · 9 epitaphs
 ```
 
-- Lê o personagem pela API de controle, como `dtvlt status`. Com o cofre travado, mostra
-  só a silhueta da classe e `vault locked · the hollow sleeps`, sem números.
+- Lê o personagem pela API de controle, como `dtvlt status`. Com o cofre travado, não
+  mostra a arte nem números, só `vault locked · the hollow sleeps`.
 - Segue as regras do [terminal](ESTILO.md#terminal): rótulos esmaecidos em 8 colunas,
   valores normais, o nome em negrito, dois espaços de indentação. Sem cores.
-- A arte é o **mesmo sprite convertido em ASCII** na hora, com o `attire` e as marcas
-  do cofre: cada coluna de pixels vira um caractere e cada par de linhas vira uma linha
-  (a célula de 0,6 × 1 fica quase quadrada), e o tom vira um caractere da rampa do
-  guia (` `, `.`, `:`, `+`, `#`). Os 64 × 64 pixels são reduzidos à metade antes, e viram 32 × 16 caracteres. O quarto
-  não aparece no terminal. O desenho acima é só um esboço da posição.
+- A arte é **a carta do companheiro em ASCII**: a moldura em caracteres de caixa, com o
+  numeral no topo e o nome no pé, de cabeça para baixo se estiver invertida, e dentro
+  dela a ilustração convertida na hora: a imagem é reduzida a 40 colunas (cada linha de texto cobre duas linhas de
+  pixels, porque a célula de 0,6 × 1 fica quase quadrada), e o tom de cada célula vira
+  um caractere da rampa do guia (` `, `.`, `:`, `+`, `#`). O desenho acima é só um
+  esboço da posição.
 - Com `NO_COLOR` ou saída redirecionada, sai texto puro, bom para colar num README.
 - No console é `hollow`.
 - **`--art`** imprime só o boneco; **`--card`** só a ficha.
@@ -572,44 +579,49 @@ volta com `on`. A escolha fica em `hollow` no `config.toml`.
 
 ## Ordem de construção
 
-Quando for a hora, uma versão MINOR para cada passo:
+Uma versão MINOR para cada passo:
 
 1. **Ícone e página vazia** *(feito)*: a chave `hollow` nos três temas, o botão no
    topo da barra e a placa "nothing here yet".
 2. **XP, níveis e atributos** *(feito)*: a coleção de deeds, os ganhos do Siege, a
    barra, os atributos, o histórico, os títulos por tema, o ícone em destaque num nível
-   novo e o log da sessão. Veio antes do sprite, que era o passo 2 do plano original;
-   até o sprite chegar, a página mostra o ícone do tema no lugar do boneco.
-3. **Classe e sprite base** *(feito)*: o renderizador de sprites, a escolha de classe,
-   a afinidade e o corpo de cada uma. Os cinco corpos foram desenhados direto na grade
-   de texto; o script que converte PNG de um editor de pixel art fica para o passo 6,
-   quando as peças de `attire` precisarem dele. Até lá, trocar de classe é pelo botão
-   **class** da página.
-4. **Tela de descanso e `dtvlt hollow`:** o boneco fora da página.
-5. **As outras fontes de XP:** Unspoken, Grimoire, Crypt, Ledger e o rested.
-6. **Personalizar:** as camadas, as cores por parte, os addons, as peças por tema e a
-   tela `attire`.
-7. **O cofre no corpo, epitáfios e ritmo:** as marcas, a lista de epitáfios, a vela e
-   a crônica.
-8. **O quarto:** o piso isométrico, os móveis por atributo e o posicionamento.
+   novo e o log da sessão.
+3. ~~**Classe e sprite em pixel art**~~ *(feito na 0.22 e 0.23, depois descartado)*: as
+   cinco classes em pixel art ficaram longe do que se queria e dão lugar aos
+   companheiros. O layout da página (arte à esquerda, status à direita) fica.
+4. **As ilustrações:** gerar no Midjourney a primeira leva, um companheiro de cada
+   categoria (`hermit`, `raven`, `reaper`, `imp`), e o script de conversão para tons
+   de cinza e WebP.
+5. **A carta na página:** a moldura com o numeral e o nome, a moldura como barra de XP,
+   a imagem nos tons do tema, a leitura à direita, a escolha tirando uma carta (com os
+   quatro selos de categoria) e a troca livre. As classes saem.
+6. **Os outros companheiros:** o resto das quatro categorias.
+7. **Tela de descanso e `dtvlt hollow`:** os estilos de descanso e o retrato em ASCII.
+8. **As outras fontes de XP:** Unspoken, Grimoire, Crypt, Ledger e o rested.
+9. **A carta completa:** a carta invertida, o verso, os selos de epitáfio, a moldura
+   que envelhece, a leitura do dia, a vela e a crônica.
+10. **Estágios:** cada companheiro cresce em três ilustrações, que mudam em níveis
+    fixos (filhote e adulto, diabrete e demônio). Fica por último porque triplica as
+    imagens.
 
 ## Fora de questão
 
-- Copiar sprites, peças, móveis, paletas ou nomes do Tibia, do Habbo ou de qualquer
-  outro jogo. Eles são referência de jeito, não de arte.
-- Moeda, loja, sorteio de peças: tudo vem de esforço.
-- Perder XP, nível ou peças por ficar longe do cofre.
+- Reproduzir personagens de outras obras (Guts, Ryuk, a carta do Eremita em si) ou
+  citar os nomes delas nos prompts. Elas são referência de clima, não de arte.
+- Personalizar o companheiro peça por peça: as peças geradas não encaixam umas nas
+  outras sem muito retoque, e a escolha do companheiro já faz esse papel.
+- Moeda, loja, sorteio: tudo vem de esforço.
+- Perder XP, nível ou o companheiro por ficar longe do cofre; fome, doença ou morte.
 - Mostrar o título de entradas, notas ou tarefas no histórico, na ficha ou na crônica.
 - Qualquer coisa que dependa de rede.
 
 ## Em aberto
 
 - [ ] Os nomes do arcane (`familiar`) e do dungeon (`hero`) estão bons?
-- [ ] Os nomes das classes e dos atributos por tema.
+- [ ] O nome da categoria 1: `wanderers`?
 - [ ] Os valores de XP e a curva de níveis precisam de uso real para ajustar.
-- [ ] Um respiro de 2 quadros, bem lento e desligado com "reduzir movimento", como a
-      vela da tela de descanso? Hoje o boneco é parado.- [ ] O boneco também aparece pequeno ao lado da arte do login (opcional, desligado
-      por padrão)? O login não tem acesso ao cofre, então seria só a silhueta da classe
+- [ ] Os níveis em que cada estágio muda (passo 10).
+- [ ] O companheiro também aparece pequeno ao lado da arte do login (opcional,
+      desligado por padrão)? O login não tem acesso ao cofre, então seria só a escolha
       guardada no `config.toml`.
-- [ ] Exportar o boneco como `.txt` pela página, além do `dtvlt hollow --art`.
-- [ ] Exportar o personagem junto com o tema, ou separado?
+- [ ] Exportar o retrato como `.txt` pela página, além do `dtvlt hollow --art`.
