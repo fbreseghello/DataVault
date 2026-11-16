@@ -7,6 +7,8 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.21.1] - 2026-11-16
+
 ### Corrigido
 
 - Um tema importado não pode mais trazer caracteres de controle (como sequências de
@@ -506,7 +508,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.21.0...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.21.1...HEAD
+[0.21.1]: https://github.com/fbreseghello/DataVault/compare/v0.21.0...v0.21.1
 [0.21.0]: https://github.com/fbreseghello/DataVault/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/fbreseghello/DataVault/compare/v0.19.0...v0.20.0
 [0.19.0]: https://github.com/fbreseghello/DataVault/compare/v0.18.1...v0.19.0
