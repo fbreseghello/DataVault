@@ -11,8 +11,9 @@
 ## A ideia
 
 Um **companheiro** que acompanha quem usa o cofre, no espírito de um tamagotchi, mas com
-a arte e o tom do DataVault. Quem usa escolhe **o que** ele é, numa de quatro
-categorias: uma figura de dark fantasy, um animal, um shinigami ou um demônio. Ele
+a arte e o tom do DataVault. Quem usa escolhe **o que** ele é, numa de cinco
+categorias: uma figura de dark fantasy, um animal, um shinigami, um demônio ou um
+guerreiro do Japão feudal. Ele
 ganha **experiência (XP)** com o que acontece no sistema (concluir tarefas no Siege,
 escrever no Unspoken, renovar uma chave no prazo) e sobe de **nível**, com títulos ao
 longo do caminho. Também aparece fora da página: na **tela de descanso** e no terminal,
@@ -313,7 +314,7 @@ Sem tela cheia nem animação. Quando o XP passa do limite:
 
 ## O companheiro
 
-Quem usa **escolhe o companheiro** numa de quatro categorias. A chave interna é fixa
+Quem usa **escolhe o companheiro** numa de cinco categorias. A chave interna é fixa
 (`hermit`, `raven`, ...); os nomes aparecem em inglês, como o resto da interface.
 
 ### Wanderers
@@ -363,12 +364,25 @@ Demônios domesticados, meio contrariados de estar ali.
 | `fiend` | esguio, asas grandes, cauda longa, garras |
 | `hellhound` | um cão de fogo, costelas à mostra, brasas no pelo |
 
+### Bushi
+
+Guerreiros do Japão feudal, desenhados no mesmo estilo de tarot dos outros.
+
+| Chave | Quem é |
+|---|---|
+| `samurai` | armadura completa e kabuto, a katana na cintura, de pé e firme |
+| `ronin` | o samurai sem senhor: chapéu de palha largo, quimono gasto, a espada no ombro |
+| `shinobi` | roupa escura, rosto coberto, uma lâmina curta junto ao corpo |
+| `komuso` | o monge do cesto: um chapéu de palha que cobre a cabeça inteira, uma flauta shakuhachi |
+| `sohei` | o monge guerreiro: hábito, capuz branco, a naginata (lança de lâmina curva) |
+
 ### Escolher e trocar: tirar uma carta
 
-- **A primeira vez** que a página abre, ela mostra **quatro cartas viradas para baixo**,
+- **A primeira vez** que a página abre, ela mostra **cinco cartas viradas para baixo**,
   uma por categoria. O verso de cada uma traz o selo da categoria no meio, um ícone de
   16 × 16 em 1 bit como os da barra: uma **lanterna** (wanderers), uma **pegada**
-  (animals), uma **foice** (shinigami) e **chifres** (demons). O nome vai embaixo.
+  (animals), uma **foice** (shinigami), **chifres** (demons) e um **chapéu de palha**
+  (bushi). O nome vai embaixo.
 - Escolher uma categoria abre os companheiros dela **em leque**, de frente, cada um com
   o nome no pé e uma linha de descrição. Setas escolhem, `Enter` confirma e a carta vira
   para o centro; `Esc` volta às categorias.
@@ -590,12 +604,12 @@ Uma versão MINOR para cada passo:
    cinco classes em pixel art ficaram longe do que se queria e dão lugar aos
    companheiros. O layout da página (arte à esquerda, status à direita) fica.
 4. **As ilustrações:** gerar no Midjourney a primeira leva, um companheiro de cada
-   categoria (`hermit`, `raven`, `reaper`, `imp`), e o script de conversão para tons
+   categoria (`hermit`, `raven`, `reaper`, `imp`, `ronin`), e o script de conversão para tons
    de cinza e WebP.
 5. **A carta na página:** a moldura com o numeral e o nome, a moldura como barra de XP,
    a imagem nos tons do tema, a leitura à direita, a escolha tirando uma carta (com os
-   quatro selos de categoria) e a troca livre. As classes saem.
-6. **Os outros companheiros:** o resto das quatro categorias.
+   cinco selos de categoria) e a troca livre. As classes saem.
+6. **Os outros companheiros:** o resto das cinco categorias.
 7. **Tela de descanso e `dtvlt hollow`:** os estilos de descanso e o retrato em ASCII.
 8. **As outras fontes de XP:** Unspoken, Grimoire, Crypt, Ledger e o rested.
 9. **A carta completa:** a carta invertida, o verso, os selos de epitáfio, a moldura

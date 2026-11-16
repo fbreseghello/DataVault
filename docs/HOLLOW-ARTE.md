@@ -13,7 +13,7 @@ companheiros parecerem saídos do mesmo baralho.
    `--seed` do job do hermit.
 3. Salve cada escolhida em `art/hollow/` com a chave no nome: `hermit.png`,
    `raven.png`, `reaper.png`...
-4. A primeira leva é um de cada categoria: **`hermit`, `raven`, `reaper` e `imp`**. Com
+4. A primeira leva é um de cada categoria: **`hermit`, `raven`, `reaper`, `imp` e `ronin`**. Com
    eles aprovados no app, vêm os outros.
 
 As cores que vierem não importam: o app converte tudo para os tons do tema. O que conta
@@ -138,6 +138,33 @@ Os prompts abaixo já vêm montados, prontos para colar.
 **hellhound**
 ```
 /imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a hellhound standing on all four legs, ribs showing through its hide, embers glowing in its fur, smoke rising from its back, bared teeth, on cracked bare ground, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+## Bushi
+
+**samurai**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a samurai in full lacquered armor and a horned kabuto helmet, a katana and a short sword at the waist, standing firm with one hand on the hilt, on a bare wooden floor, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+**ronin**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a masterless ronin in a wide straw hat that shades the eyes, a worn and patched kimono, a katana resting on his shoulder, standing on a bare dirt road, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+**shinobi**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a shinobi in dark close-fitting clothes, the face covered but for the eyes, a short straight blade held low against the body, standing on a bare rooftop at night, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+**komuso**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a komuso monk wearing a woven straw basket hat that hides the whole head, a plain dark robe and a kesa sash, holding a long bamboo shakuhachi flute, standing on a bare stone path, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+**sohei**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a sohei warrior monk in a dark monastic robe and a white cloth hood around the head, a naginata polearm with a curved blade held upright, standing on bare stone steps, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
 ```
 
 ## Uma imagem por companheiro
