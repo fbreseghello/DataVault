@@ -392,6 +392,34 @@ Guerreiros do Japão feudal, desenhados no mesmo estilo de tarot dos outros.
   Quem já tinha escolhido uma vê a escolha de companheiro na próxima vez que abrir a
   página. A afinidade de classe sai junto: os atributos passam a refletir só o uso.
 
+### Os temas e as categorias
+
+**Todo companheiro serve para qualquer tema.** Um demônio pode viver no `dungeon` e um
+corvo no `arcane`: a escolha é de quem usa, nunca do tema. A carta, a moldura e a
+ilustração já mudam de cor com o tema, então qualquer companheiro combina com qualquer
+um deles.
+
+O que o tema faz é **dar o tom da escolha**:
+
+- **A ordem das cartas.** Cada tema pode pôr na frente as categorias que combinam com
+  ele, numa lista nova e opcional do tema, `companions`, com as chaves das categorias em
+  ordem (`["wanderers", "shinigami"]`). As que o tema não lista vêm depois, na ordem de
+  sempre. Nada some e nada fica trancado.
+- **O verso do baralho.** O verso da carta usa o ícone `hollow` do tema (veja
+  [O verso](#o-verso)), então o mesmo companheiro, em temas diferentes, parece vir de
+  baralhos diferentes.
+- **Categorias novas, pensadas para um tema.** Com o tempo entram categorias com a cara
+  de um tema (criaturas arcanas para o `arcane`, heróis de masmorra para o `dungeon`, e
+  o que vier com os temas novos). Elas também ficam abertas a todos, mas aparecem
+  primeiro no tema para o qual foram pensadas. Um tema importado pode ordenar as
+  categorias que existem, mas não cria categorias: as ilustrações vêm com o DataVault.
+
+| Tema | Põe na frente |
+|---|---|
+| `souls` | wanderers, shinigami |
+| `arcane` | wanderers, animals |
+| `dungeon` | bushi, demons |
+
 ## Atributos
 
 Cada página alimenta um atributo. O XP é um só, mas cada ganho também soma pontos no
@@ -609,7 +637,8 @@ Uma versão MINOR para cada passo:
 5. **A carta na página:** a moldura com o numeral e o nome, a moldura como barra de XP,
    a imagem nos tons do tema, a leitura à direita, a escolha tirando uma carta (com os
    cinco selos de categoria) e a troca livre. As classes saem.
-6. **Os outros companheiros:** o resto das cinco categorias.
+6. **Os outros companheiros:** o resto das cinco categorias, e a ordem de cada tema
+   (`companions`).
 7. **Tela de descanso e `dtvlt hollow`:** os estilos de descanso e o retrato em ASCII.
 8. **As outras fontes de XP:** Unspoken, Grimoire, Crypt, Ledger e o rested.
 9. **A carta completa:** a carta invertida, o verso, os selos de epitáfio, a moldura
@@ -633,6 +662,8 @@ Uma versão MINOR para cada passo:
 
 - [ ] Os nomes do arcane (`familiar`) e do dungeon (`hero`) estão bons?
 - [ ] O nome da categoria 1: `wanderers`?
+- [ ] Quais categorias novas cada tema pede (criaturas arcanas, heróis de masmorra...)
+      e a ordem de cada um.
 - [ ] Os valores de XP e a curva de níveis precisam de uso real para ajustar.
 - [ ] Os níveis em que cada estágio muda (passo 10).
 - [ ] O companheiro também aparece pequeno ao lado da arte do login (opcional,
