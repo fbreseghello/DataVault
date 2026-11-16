@@ -13,7 +13,8 @@ companheiros parecerem saídos do mesmo baralho.
    `--seed` do job do hermit.
 3. Salve cada escolhida em `art/hollow/` com a chave no nome: `hermit.png`,
    `raven.png`, `reaper.png`...
-4. A primeira leva é um de cada categoria: **`hermit`, `raven`, `reaper`, `imp` e `ronin`**. Com
+4. A primeira leva é um de cada categoria: **`hermit`, `raven`, `reaper`, `imp`, `ronin`,
+   `pixie` e `goblin`**. Com
    eles aprovados no app, vêm os outros.
 
 As cores que vierem não importam: o app converte tudo para os tons do tema. O que conta
@@ -38,6 +39,8 @@ No hermit, que é o primeiro, tire o `--sref <sref>`.
 Os prompts abaixo já vêm montados, prontos para colar.
 
 ## Wanderers
+
+A categoria própria do [souls](temas/souls.md).
 
 **hermit**
 ```
@@ -165,6 +168,64 @@ Os prompts abaixo já vêm montados, prontos para colar.
 **sohei**
 ```
 /imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a sohei warrior monk in a dark monastic robe and a white cloth hood around the head, a naginata polearm with a curved blade held upright, standing on bare stone steps, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+## Fae
+
+A categoria própria do [arcane](temas/arcane.md).
+
+**pixie**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a tiny pixie with dragonfly wings and wild tangled hair, sitting on a toadstool in a moonlit glade, old knowing eyes, never cute, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+**wisp**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a will-o-the-wisp, a floating pale light above a dark marsh, a faint face barely visible inside the glow, thin reeds below, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+**dryad**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a dryad with skin of tree bark, bare branches growing as her hair, roots instead of feet, standing in a moonlit clearing, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+**moth**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a moth fairy with large patterned moth wings and thin feathered antennae, a still gaze, drawn toward a small lit candle, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+**changeling**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a changeling that looks like a small child in a plain smock, pointed ears and eyes far too old, standing at the edge of a dark wood, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+## Denizens
+
+A categoria própria do [dungeon](temas/dungeon.md).
+
+**goblin**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a small wiry goblin with large ears and a crooked grin, a short dagger in one hand and a stolen lantern in the other, in a stone dungeon corridor by torchlight, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+**skeleton**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a skeleton warrior standing guard, a cracked round shield and a rusted sword, scraps of old armor on its bones, in a stone dungeon corridor by torchlight, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+**slime**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a gelatinous slime, a translucent rounded blob with a few coins, a key and a small bone suspended inside it, on a dungeon flagstone floor by torchlight, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+**mimic**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a mimic, a wooden treasure chest with iron bands, rows of sharp teeth along the open lid and a long tongue, on a dungeon flagstone floor by torchlight, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
+```
+
+**golem**
+```
+/imagine prompt: illustration in the style of the 1909 Rider-Waite-Smith tarot artwork, like The Hermit, a stone golem, a huge cracked figure of stacked rough stones, faded carved runes on its chest, standing in a dungeon hall by torchlight, solitary full-length figure facing three-quarters to the left, quiet and solemn, bold black ink outlines, flat areas of muted tone, little texture, sparse composition, plain flat dark background, the whole figure inside the image with a margin around it --ar 2:3 --style raw --sref <sref> --no border, frame, card, text, letters, numbers, title, watermark, signature
 ```
 
 ## Uma imagem por companheiro

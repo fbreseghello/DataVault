@@ -11,9 +11,9 @@
 ## A ideia
 
 Um **companheiro** que acompanha quem usa o cofre, no espírito de um tamagotchi, mas com
-a arte e o tom do DataVault. Quem usa escolhe **o que** ele é, numa de cinco
-categorias: uma figura de dark fantasy, um animal, um shinigami, um demônio ou um
-guerreiro do Japão feudal. Ele
+a arte e o tom do DataVault. Quem usa escolhe **o que** ele é, numa das
+categorias: uma figura de dark fantasy, um animal, um shinigami, um demônio, um
+guerreiro do Japão feudal, uma fada, um habitante de masmorra. Ele
 ganha **experiência (XP)** com o que acontece no sistema (concluir tarefas no Siege,
 escrever no Unspoken, renovar uma chave no prazo) e sobe de **nível**, com títulos ao
 longo do caminho. Também aparece fora da página: na **tela de descanso** e no terminal,
@@ -314,12 +314,15 @@ Sem tela cheia nem animação. Quando o XP passa do limite:
 
 ## O companheiro
 
-Quem usa **escolhe o companheiro** numa de cinco categorias. A chave interna é fixa
+Quem usa **escolhe o companheiro** numa das categorias abaixo. Cada tema tem a sua
+**categoria própria**, desenhada com a cara dele (veja
+[Os temas e as categorias](#os-temas-e-as-categorias)); as outras são de todos. A chave interna é fixa
 (`hermit`, `raven`, ...); os nomes aparecem em inglês, como o resto da interface.
 
 ### Wanderers
 
 Figuras de dark fantasy: andarilhos, guerreiros e magos que seguem quem usa o cofre.
+A categoria própria do [souls](temas/souls.md).
 
 | Chave | Quem é |
 |---|---|
@@ -376,13 +379,40 @@ Guerreiros do Japão feudal, desenhados no mesmo estilo de tarot dos outros.
 | `komuso` | o monge do cesto: um chapéu de palha que cobre a cabeça inteira, uma flauta shakuhachi |
 | `sohei` | o monge guerreiro: hábito, capuz branco, a naginata (lança de lâmina curva) |
 
+### Fae
+
+As fadas antigas, do bosque à noite: belas e um pouco inquietantes, nunca fofas. A
+categoria própria do [arcane](temas/arcane.md).
+
+| Chave | Quem é |
+|---|---|
+| `pixie` | pequenina, asas de libélula, cabelo desgrenhado, sentada num cogumelo |
+| `wisp` | uma luz flutuante sobre o pântano, com um rosto que mal se vê dentro dela |
+| `dryad` | pele de casca de árvore, galhos no lugar do cabelo, raízes nos pés |
+| `moth` | asas de mariposa, antenas finas, olhar parado, atraída por uma vela |
+| `changeling` | parece uma criança, mas tem orelhas pontudas e olhos velhos demais |
+
+### Denizens
+
+Os habitantes da masmorra: os monstros clássicos que todo aventureiro já encontrou,
+agora do seu lado. A categoria própria do [dungeon](temas/dungeon.md).
+
+| Chave | Quem é |
+|---|---|
+| `goblin` | pequeno e magro, orelhas grandes, uma adaga e uma lanterna roubada |
+| `skeleton` | de pé, escudo rachado e espada enferrujada, ainda de guarda |
+| `slime` | uma massa gelatinosa, com moedas e uma chave presas dentro |
+| `mimic` | um baú de tesouro com dentes na tampa e uma língua longa |
+| `golem` | um gigante de pedra rachado, com runas apagadas no peito |
+
 ### Escolher e trocar: tirar uma carta
 
-- **A primeira vez** que a página abre, ela mostra **cinco cartas viradas para baixo**,
-  uma por categoria. O verso de cada uma traz o selo da categoria no meio, um ícone de
-  16 × 16 em 1 bit como os da barra: uma **lanterna** (wanderers), uma **pegada**
-  (animals), uma **foice** (shinigami), **chifres** (demons) e um **chapéu de palha**
-  (bushi). O nome vai embaixo.
+- **A primeira vez** que a página abre, ela mostra **as cartas das categorias viradas
+  para baixo**, na ordem do tema. O verso de cada uma traz o selo da categoria no meio,
+  um ícone de 16 × 16 em 1 bit como os da barra: uma **lanterna** (wanderers), uma
+  **pegada** (animals), uma **foice** (shinigami), **chifres** (demons), um **chapéu de
+  palha** (bushi), uma **asa de mariposa** (fae) e uma **tocha** (denizens). O nome vai
+  embaixo.
 - Escolher uma categoria abre os companheiros dela **em leque**, de frente, cada um com
   o nome no pé e uma linha de descrição. Setas escolhem, `Enter` confirma e a carta vira
   para o centro; `Esc` volta às categorias.
@@ -393,6 +423,10 @@ Guerreiros do Japão feudal, desenhados no mesmo estilo de tarot dos outros.
   página. A afinidade de classe sai junto: os atributos passam a refletir só o uso.
 
 ### Os temas e as categorias
+
+O estilo de cada tema, com os companheiros que fazem sentido nele, está num documento
+próprio: [souls](temas/souls.md), [arcane](temas/arcane.md) e
+[dungeon](temas/dungeon.md).
 
 **Todo companheiro serve para qualquer tema.** Um demônio pode viver no `dungeon` e um
 corvo no `arcane`: a escolha é de quem usa, nunca do tema. A carta, a moldura e a
@@ -408,17 +442,16 @@ O que o tema faz é **dar o tom da escolha**:
 - **O verso do baralho.** O verso da carta usa o ícone `hollow` do tema (veja
   [O verso](#o-verso)), então o mesmo companheiro, em temas diferentes, parece vir de
   baralhos diferentes.
-- **Categorias novas, pensadas para um tema.** Com o tempo entram categorias com a cara
-  de um tema (criaturas arcanas para o `arcane`, heróis de masmorra para o `dungeon`, e
-  o que vier com os temas novos). Elas também ficam abertas a todos, mas aparecem
-  primeiro no tema para o qual foram pensadas. Um tema importado pode ordenar as
+- **A categoria própria.** Cada tema tem uma categoria desenhada com a cara dele:
+  **wanderers** no `souls`, **fae** no `arcane`, **denizens** no `dungeon`. Ela abre a
+  escolha no tema dela, mas fica aberta a todos. Um tema novo vem com a sua. Um tema importado pode ordenar as
   categorias que existem, mas não cria categorias: as ilustrações vêm com o DataVault.
 
 | Tema | Põe na frente |
 |---|---|
-| `souls` | wanderers, shinigami |
-| `arcane` | wanderers, animals |
-| `dungeon` | bushi, demons |
+| `souls` | wanderers, shinigami, bushi |
+| `arcane` | fae, wanderers, animals |
+| `dungeon` | denizens, bushi, demons |
 
 ## Atributos
 
@@ -632,12 +665,13 @@ Uma versão MINOR para cada passo:
    cinco classes em pixel art ficaram longe do que se queria e dão lugar aos
    companheiros. O layout da página (arte à esquerda, status à direita) fica.
 4. **As ilustrações:** gerar no Midjourney a primeira leva, um companheiro de cada
-   categoria (`hermit`, `raven`, `reaper`, `imp`, `ronin`), e o script de conversão para tons
+   categoria (`hermit`, `raven`, `reaper`, `imp`, `ronin`, `pixie`, `goblin`), e o script de conversão para tons
    de cinza e WebP.
 5. **A carta na página:** a moldura com o numeral e o nome, a moldura como barra de XP,
    a imagem nos tons do tema, a leitura à direita, a escolha tirando uma carta (com os
-   cinco selos de categoria) e a troca livre. As classes saem.
-6. **Os outros companheiros:** o resto das cinco categorias, e a ordem de cada tema
+   selos de categoria) e a troca livre. As classes saem.
+6. **Os outros companheiros:** o resto das categorias, com as próprias de cada tema
+   (fae e denizens), e a ordem de cada tema
    (`companions`).
 7. **Tela de descanso e `dtvlt hollow`:** os estilos de descanso e o retrato em ASCII.
 8. **As outras fontes de XP:** Unspoken, Grimoire, Crypt, Ledger e o rested.
@@ -662,8 +696,8 @@ Uma versão MINOR para cada passo:
 
 - [ ] Os nomes do arcane (`familiar`) e do dungeon (`hero`) estão bons?
 - [ ] O nome da categoria 1: `wanderers`?
-- [ ] Quais categorias novas cada tema pede (criaturas arcanas, heróis de masmorra...)
-      e a ordem de cada um.
+- [ ] A categoria própria de cada tema novo, e se as categorias próprias devem ser
+      exclusivas do tema (hoje ficam abertas a todos).
 - [ ] Os valores de XP e a curva de níveis precisam de uso real para ajustar.
 - [ ] Os níveis em que cada estágio muda (passo 10).
 - [ ] O companheiro também aparece pequeno ao lado da arte do login (opcional,

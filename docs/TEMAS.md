@@ -18,6 +18,11 @@ Um tema muda quatro coisas, sempre dentro do clima RPG de 1 bit:
 | `arcane` | torre de mago à noite | spellbook, whispers, rituals, reliquary, tithes |
 | `dungeon` | dungeon 8-bit à luz de tocha | keyring, journal, quest log, chest, upkeep |
 
+Cada tema embutido tem um documento que dita o seu estilo (o clima, a paleta, os
+nomes, os ícones, a arte e os companheiros do hollow): [souls](temas/souls.md),
+[arcane](temas/arcane.md) e [dungeon](temas/dungeon.md). Um tema novo começa por um
+documento desses.
+
 Os arquivos ficam em [`internal/theme/builtin/`](../internal/theme/builtin/) e vão
 embutidos no `dtvlt`. Escolha um em **settings → appearance → theme**: a tela muda na
 hora, e **save** guarda a escolha (`theme` no `config.toml`). Sair sem salvar volta ao
