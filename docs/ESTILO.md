@@ -95,10 +95,10 @@ crispEdges`.
 | coração partido, metades separadas | `heart` | Unspoken |
 | espada, ponta para cima e à direita | `sword` | Siege |
 | cruz sobre um monte de terra | `cross` | Crypt |
-| saco de moedas cheio, amarrado na boca | `sack` | Ledger |
+| balança de dois pratos, em equilíbrio | `scales` | Ledger |
 | lápide com inscrição em degraus | `tomb` | encerrar sessão, tela "session ended" |
 | cadeado com buraco de chave | `seal` | itens selados |
-| caveira encapuzada, de órbitas vazias | `hollow` | o personagem, no topo da barra |
+| capuz vazio, sem rosto dentro | `hollow` | o personagem, no topo da barra |
 
 Regras para desenhar um ícone novo:
 
@@ -230,7 +230,7 @@ três: `souls` (o padrão), `arcane` e `dungeon`. Outros podem ser importados co
 | Unspoken | coração partido | notas; **Dead Words** para as enterradas |
 | Siege | espada | colunas **Orders**, **In Battle**, **Conquered**, **Fallen** |
 | Crypt | cruz | documentos e arquivos guardados |
-| Ledger | saco de moedas | assinaturas e gastos fixos; apagar é **strike** |
+| Ledger | balança | assinaturas e gastos fixos; apagar é **strike** |
 | — | lápide | encerrar a sessão |
 | Hollow | elmo fechado | o personagem (veja [PERSONAGEM.md](PERSONAGEM.md)) |
 

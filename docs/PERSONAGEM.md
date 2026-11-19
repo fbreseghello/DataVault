@@ -70,27 +70,28 @@ Cada tema traz o seu ícone na chave `hollow` de `icons` (16 × 16, 1 bit, `#` a
 Os três já estão nos temas embutidos e foram testados em 32 px ao lado dos vizinhos,
 como pede o [guia](ESTILO.md#ícones).
 
-### souls: caveira encapuzada
+### souls: capuz vazio
 
-Uma caveira de órbitas vazias dentro de um capuz, vazada como o `end` e o `seal`. (Um
-elmo fechado foi o primeiro desenho e, em 32 px, ficou pesado demais.)
+Um capuz sem ninguém dentro: o que sobra de quem se tornou hollow. É só a borda do
+capuz sobre os ombros, sem rosto. (Uma caveira de órbitas vazias dentro do capuz veio
+antes e, em 32 px, tinha informação demais; um elmo fechado, antes dela, ficou pesado.)
 
 ```
 ................
-.....######.....
-...##......##...
-..#..######..#..
-.#..########..#.
-.#.##########.#.
-#..#...##...#..#
-#..#...##...#..#
-#..###.##.###..#
-#...###..###...#
-#....######....#
-.#...#.##.#...#.
-.#....####....#.
-..#..........#..
+......####......
+....########....
+...###....###...
+..###......###..
+..##........##..
+.###........###.
 .##..........##.
+.##..........##.
+.###........###.
+..###......###..
+..####....####..
+.##############.
+################
+................
 ................
 ```
 

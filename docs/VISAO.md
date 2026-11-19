@@ -210,7 +210,7 @@ A barra lateral tem uma página por ícone. Os nomes seguem a estética do Grimo
 | coração partido | **Unspoken** | notas íntimas, o que não foi dito em voz alta |
 | espada | **Siege** | kanban das tarefas do dia: ir para a guerra |
 | cruz | **Crypt** | documentos e arquivos guardados criptografados |
-| saco de moedas | **Ledger** | assinaturas e gastos fixos |
+| balança | **Ledger** | assinaturas e gastos fixos |
 
 ### Grimoire: forge
 

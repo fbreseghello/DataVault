@@ -46,8 +46,8 @@ antigos (*crypt*, *ledger*).
 ## Os ícones
 
 **Formas cheias**, pesadas, como objetos de pedra e couro: o livro fechado, o coração
-partido, a espada, a cruz sobre a cova, o saco de moedas, a lápide, a caveira
-encapuzada do hollow. Vãos de 2 pixels separam as partes. O `grimoire` é desenhado um
+partido, a espada, a cruz sobre a cova, a balança, a lápide, o capuz
+vazio do hollow. Vãos de 2 pixels separam as partes. O `grimoire` é desenhado um
 passo maior (`large_icons`), porque deixa mais vazio no quadro.
 
 ## A arte
