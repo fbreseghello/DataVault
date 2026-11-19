@@ -37,65 +37,39 @@
 </script>
 
 {#if hasPin !== null}
-  <form onsubmit={submit}>
-    <h3>{word('grimoire')} <span>the {word('seal')} pin opens every {word('sealed')} entry</span></h3>
-    {#if hasPin}
-      <label class="row">
-        <span>current {word('seal')} pin</span>
-        <input type="password" bind:value={current} required autocomplete="current-password" />
-        <span></span>
+  <form class="set-group" onsubmit={submit} aria-labelledby="set-seal">
+    <header>
+      <h3 id="set-seal">{word('grimoire')}</h3>
+      <p>the {word('seal')} pin opens every {word('sealed')} entry; it saves on its own</p>
+    </header>
+    <div class="set-fields">
+      {#if hasPin}
+        <label class="set-field">
+          <span class="set-label">current {word('seal')} pin</span>
+          <span class="set-control">
+            <input type="password" bind:value={current} required autocomplete="current-password" />
+          </span>
+        </label>
+      {/if}
+      <label class="set-field">
+        <span class="set-label">{hasPin ? `new ${word('seal')} pin` : `${word('seal')} pin`}</span>
+        <span class="set-control">
+          <input type="password" bind:value={next} minlength="4" required autocomplete="new-password" />
+        </span>
+        {#if !hasPin}<span class="set-hint">not set yet</span>{/if}
       </label>
-    {/if}
-    <label class="row">
-      <span>{hasPin ? `new ${word('seal')} pin` : `${word('seal')} pin`}</span>
-      <input type="password" bind:value={next} minlength="4" required autocomplete="new-password" />
-      <span class="unit">{hasPin ? '' : 'not set yet'}</span>
-    </label>
-    <label class="row">
-      <span>confirm pin</span>
-      <input type="password" bind:value={confirm} required autocomplete="new-password" />
-      <span></span>
-    </label>
-    <div class="buttons">
-      <button type="submit" disabled={busy}>{hasPin ? `change ${word('seal')} pin` : `set ${word('seal')} pin`}</button>
-      {#if message}<span class="msg" role="status">{message}</span>{/if}
+      <label class="set-field">
+        <span class="set-label">confirm pin</span>
+        <span class="set-control">
+          <input type="password" bind:value={confirm} required autocomplete="new-password" />
+        </span>
+      </label>
+      <div class="set-field">
+        <span class="set-actions">
+          <button type="submit" disabled={busy}>{hasPin ? `change ${word('seal')} pin` : `set ${word('seal')} pin`}</button>
+          {#if message}<span class="set-note" role="status">{message}</span>{/if}
+        </span>
+      </div>
     </div>
   </form>
 {/if}
-
-<style>
-  h3 {
-    margin: 24px 0 10px;
-    font-size: 12px;
-    font-weight: 400;
-    color: var(--muted);
-  }
-  h3 span {
-    color: var(--dim);
-    margin-left: 8px;
-  }
-  .row {
-    display: grid;
-    grid-template-columns: 150px minmax(0, 180px) 1fr;
-    gap: 12px;
-    align-items: baseline;
-    margin-bottom: 10px;
-  }
-  .row > span:first-child,
-  .unit {
-    color: var(--dim);
-  }
-  .unit {
-    font-size: 12px;
-  }
-  .buttons {
-    display: flex;
-    gap: 16px;
-    align-items: baseline;
-    margin-top: 6px;
-  }
-  .msg {
-    color: var(--accent);
-    font-size: 12px;
-  }
-</style>

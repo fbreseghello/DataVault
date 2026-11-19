@@ -1,3 +1,6 @@
+/* Hallmark · redesign: full, app scope (settings) · 2026-11-19 · genre: modern-minimal (inferred) · theme: brand (the project's tokens, JetBrains Mono) · shape: app screen
+ * critique: settings was one long column of label, control and hint on every row; it now groups by when a change applies, hints sit under their control, and save stays in reach
+ * built: the project · v2.0.0 */
 :root {
   --bg: #0a0a0a;
   --fg: #e4e4e4;
@@ -26,6 +29,7 @@ html,
 body {
   margin: 0;
   height: 100%;
+  overflow-x: clip;
 }
 
 body {
@@ -69,6 +73,10 @@ button {
 button:hover:not(:disabled),
 button:focus-visible {
   color: var(--fg);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 button:disabled {
@@ -156,5 +164,170 @@ textarea {
 @media (prefers-reduced-motion: reduce) {
   :root {
     --blink: 0s;
+  }
+}
+
+/* Settings: one group per row, its name and when it applies on the left,
+   its fields on the right; a hint sits under the control it explains. */
+.set-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.set-group {
+  display: grid;
+  grid-template-columns: 13rem minmax(0, 1fr);
+  gap: 16px 32px;
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+}
+
+.set-group > header h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--fg);
+}
+
+.set-group > header p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--dim);
+  max-width: 28ch;
+}
+
+.set-fields {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  min-width: 0;
+}
+
+.set-field {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 20rem);
+  column-gap: 16px;
+  row-gap: 4px;
+  align-items: baseline;
+}
+
+.set-field > :not(.set-label) {
+  grid-column: 2;
+  margin: 0;
+}
+
+.set-label {
+  color: var(--muted);
+}
+
+.set-control {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+}
+
+.set-num {
+  width: 5rem;
+  flex: none;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 4px 0;
+  outline: none;
+}
+
+.set-num:focus {
+  border-bottom-color: var(--muted);
+}
+
+.set-unit,
+.set-hint {
+  color: var(--dim);
+  font-size: 12px;
+}
+
+.set-unit {
+  white-space: nowrap;
+}
+
+.set-note,
+.set .danger {
+  color: var(--accent);
+}
+
+.set-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+}
+
+.set-actions .set-note {
+  font-size: 12px;
+}
+
+.set-toggle,
+.set-actions button {
+  white-space: nowrap;
+}
+
+.set-toggle.on {
+  color: var(--accent);
+}
+
+.set .primary {
+  color: var(--fg);
+}
+
+.set select {
+  cursor: pointer;
+}
+
+.set-path {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+/* Save stays in reach while the form scrolls, and ends where the form ends. */
+.set-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 13rem minmax(0, 1fr);
+  gap: 32px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.set-bar-note {
+  color: var(--dim);
+  font-size: 12px;
+}
+
+@media (max-width: 52rem) {
+  .set-group,
+  .set-bar {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .set-bar-note {
+    display: none;
+  }
+}
+
+@media (max-width: 36rem) {
+  .set-field {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .set-field > :not(.set-label) {
+    grid-column: 1;
   }
 }
