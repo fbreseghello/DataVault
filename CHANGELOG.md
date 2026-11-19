@@ -7,6 +7,19 @@ e o projeto usa [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-11-19
+
+### Alterado
+
+- As **configurações** ficam agrupadas pelo momento em que cada mudança vale: session,
+  rest screen, appearance e terminal, depois o pin do grimoire e os arquivos. Cada
+  grupo traz o nome e quando se aplica à esquerda e os campos à direita, com a dica
+  embaixo do controle que ela explica. O **save** fica sempre ao alcance enquanto o
+  formulário rola.
+- No tema **souls**, o ícone do **hollow** vira um capuz vazio, mais limpo que a
+  caveira encapuzada, e o verso das cartas acompanha. O **Ledger** troca o saco de
+  moedas por uma **balança**.
+
 ## [0.24.1] - 2026-11-16
 
 ### Alterado
@@ -581,7 +594,8 @@ Primeira versão.
 - `dtvlt install` e `uninstall`. O `.exe` baixado oferece instalar ou atualizar
   sozinho ao ser aberto.
 
-[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.24.1...HEAD
+[Unreleased]: https://github.com/fbreseghello/DataVault/compare/v0.25.0...HEAD
+[0.25.0]: https://github.com/fbreseghello/DataVault/compare/v0.24.1...v0.25.0
 [0.24.1]: https://github.com/fbreseghello/DataVault/compare/v0.24.0...v0.24.1
 [0.24.0]: https://github.com/fbreseghello/DataVault/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/fbreseghello/DataVault/compare/v0.22.1...v0.23.0
